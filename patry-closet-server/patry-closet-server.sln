@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "patry-closet-server", "patry-closet-server.csproj", "{05CC2671-C1D8-4D12-A645-3C32C69AD466}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "patry-closet-web", "..\patry-closet-web\patry-closet-web.esproj", "{742E1050-B1A0-A907-335C-A470D8AB9229}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05CC2671-C1D8-4D12-A645-3C32C69AD466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05CC2671-C1D8-4D12-A645-3C32C69AD466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05CC2671-C1D8-4D12-A645-3C32C69AD466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05CC2671-C1D8-4D12-A645-3C32C69AD466}.Release|Any CPU.Build.0 = Release|Any CPU
+		{742E1050-B1A0-A907-335C-A470D8AB9229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{742E1050-B1A0-A907-335C-A470D8AB9229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{742E1050-B1A0-A907-335C-A470D8AB9229}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{742E1050-B1A0-A907-335C-A470D8AB9229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{742E1050-B1A0-A907-335C-A470D8AB9229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{742E1050-B1A0-A907-335C-A470D8AB9229}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A02A7B0E-D418-460B-93EE-A0325D8273BF}
+	EndGlobalSection
+EndGlobal
