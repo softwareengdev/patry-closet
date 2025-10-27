@@ -5,12 +5,36 @@ import Carousel from 'infinite-react-carousel'; // Para carrusel de recomendacio
 
 // Mock data para productos (reemplaza con API cuando server esté desarrollado)
 const mockProducts = [
-    { id: 1, name: 'Vestido Elegante', price: 59.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rojo', size: 'M' },
-    { id: 2, name: 'Camisa Moderna', price: 39.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Azul', size: 'L' },
-    { id: 3, name: 'Pantalón Trendy', price: 49.99, image: 'https://images.unsplash.com/photo-1594633312681-86309903deb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S' },
-    { id: 4, name: 'Accesorio Chic', price: 19.99, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Rojo', size: 'XS' },
-    // Agrega más mocks para testing infinite scroll (duplica si necesitas)
-    { id: 5, name: 'Vestido Verano', price: 69.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'M' },
+    { id: 1, name: 'Vestido Elegante', price: 59.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rojo', size: 'M' },
+    { id: 2, name: 'Camisa Moderna', price: 39.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Azul', size: 'L' },
+    { id: 3, name: 'Pantalón Trendy', price: 49.99, image: 'https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S' },
+    { id: 4, name: 'Accesorio Chic', price: 19.99, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Rojo', size: 'XS' },
+    { id: 5, name: 'Vestido Verano', price: 69.99, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'M' },
+    { id: 6, name: 'Chaqueta Casual', price: 89.99, image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Gris', size: 'L' },
+    { id: 7, name: 'Blusa Floral', price: 34.99, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rosa', size: 'S' },
+    { id: 8, name: 'Pantalón Clásico', price: 54.99, image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'M' },
+    { id: 9, name: 'Bolso de Cuero', price: 79.99, image: 'https://images.unsplash.com/photo-1590080875833-48a57b66b84d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Marrón', size: '-' },
+    { id: 10, name: 'Zapatos Deportivos', price: 99.99, image: 'https://images.unsplash.com/photo-1600181953597-6a1cf22bb056?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Blanco', size: '42' },
+    { id: 11, name: 'Falda Plisada', price: 44.99, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Verde', size: 'S' },
+    { id: 12, name: 'Cinturón de Piel', price: 25.99, image: 'https://images.unsplash.com/photo-1514995669114-6081e934b693?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Negro', size: '-' },
+    { id: 13, name: 'Abrigo Largo', price: 129.99, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Beige', size: 'L' },
+    { id: 14, name: 'Polo Deportivo', price: 29.99, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Verde', size: 'M' },
+    { id: 15, name: 'Sombrero Veraniego', price: 22.99, image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Beige', size: '-' },
+    { id: 16, name: 'Blazer Formal', price: 109.99, image: 'https://images.unsplash.com/photo-1593032465171-8b0f6b8a4ef1?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Gris', size: 'M' },
+    { id: 17, name: 'Top Deportivo', price: 27.99, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S' },
+    { id: 18, name: 'Leggings Fitness', price: 35.99, image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07b?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Gris', size: 'M' },
+    { id: 19, name: 'Reloj Clásico', price: 149.99, image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Plateado', size: '-' },
+    { id: 20, name: 'Sudadera Urbana', price: 59.99, image: 'https://images.unsplash.com/photo-1618354691438-25bc0f99d21d?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'L' },
+    { id: 21, name: 'Vestido Floral', price: 74.99, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rosa', size: 'M' },
+    { id: 22, name: 'Gorra Casual', price: 19.99, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Azul', size: '-' },
+    { id: 23, name: 'Camisa Blanca', price: 39.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Blanco', size: 'L' },
+    { id: 24, name: 'Pantalón Jeans', price: 59.99, image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'S' },
+    { id: 25, name: 'Bufanda Invierno', price: 29.99, image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Rojo', size: '-' },
+    { id: 26, name: 'Chamarra Cuero', price: 159.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'XL' },
+    { id: 27, name: 'Falda Denim', price: 45.99, image: 'https://images.unsplash.com/photo-1600181953597-6a1cf22bb056?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'S' },
+    { id: 28, name: 'Bolso Clutch', price: 65.99, image: 'https://images.unsplash.com/photo-1590080875833-48a57b66b84d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Negro', size: '-' },
+    { id: 29, name: 'Campera Deportiva', price: 89.99, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Verde', size: 'L' },
+    { id: 30, name: 'Vestido Noche', price: 119.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'M' },
     // ... hasta 20+ para simular paginación
 ];
 
