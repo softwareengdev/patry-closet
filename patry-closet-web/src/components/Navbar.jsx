@@ -1,7 +1,15 @@
 ﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingCart, User, Menu, X, ChevronDown } from 'react-icons/react'; // Instala react-icons: npm install react-icons
+import {
+    FiSearch as Search,
+    FiShoppingCart as ShoppingCart,
+    FiUser as User,
+    FiMenu as Menu,
+    FiX as X,
+    FiChevronDown as ChevronDown
+} from "react-icons/fi";
+ // Instala react-icons: npm install react-icons
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

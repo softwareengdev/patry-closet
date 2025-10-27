@@ -1,4 +1,5 @@
-﻿import { Routes, Route } from 'react-router-dom';
+﻿// src/App.jsx
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
@@ -9,9 +10,9 @@ const CartPage = () => <div className="py-20 text-center">Página de Carrito (En
 
 function App() {
     return (
-        <div className="w-full"> {/* Asegura full-width en root */}
+        <div className="w-full min-h-screen"> {/* Asegura full-width y height */}
             <Navbar />
-            <main className="pt-16"> {/* Padding para evitar overlap con navbar fixed */}
+            <main className="pt-16"> {/* Padding para navbar fixed */}
                 <Routes>
                     <Route path="/" element={
                         <>
