@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "framer-motion": "^10.16.4",
+    "@tanstack/react-query": "^5.90.5",
+    "axios": "^1.12.2",
+    "framer-motion": "^10.18.0",
+    "infinite-react-carousel": "^1.2.11",
     "lucide-react": "^0.294.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.17.0"
+    "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
@@ -15,9 +18,9 @@
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
+    "react-icons": "^5.5.0",
     "tailwindcss": "^3.4.1",
-    "vite": "^5.0.0",
-    "react-icons": "^5.5.0"
+    "vite": "^5.0.0"
   },
   "scripts": {
     "dev": "vite",
