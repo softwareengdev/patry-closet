@@ -2,8 +2,8 @@
 
 const HeroSection = () => {
     return (
-        <div className="relative w-full h-screen overflow-hidden" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')" }}>
-            <div className="absolute inset-0 bg-black opacity-30"></div>
+        <div className="relative w-full h-screen bg-cover bg-center overflow-hidden" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')" }}>
+            <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay más oscuro para contraste */}
             <div className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4">
                 <motion.h1
                     initial={{ opacity: 0, y: 50 }}
