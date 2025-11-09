@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
 import ProductsPage from './components/ProductsPage';
+import ProductDetail from './components/ProductDetail';
 
 // Placeholder para otras páginas
 /*const ProductsPage = () => <div className="py-20 text-center">Página de Productos (Grid completo en desarrollo)</div>;
@@ -21,6 +22,7 @@ function App() {
                         </>
                     } />
                     <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/products/:id" element={<ProductDetail />} />
                 </Routes>
             </main>
         </div>

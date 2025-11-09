@@ -1,201 +1,296 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, ChevronDown } from 'lucide-react';
-import Carousel from 'infinite-react-carousel'; // Para carrusel de recomendaciones (renombrado para evitar conflictos)
+import { Filter, ChevronDown, Search as SearchIcon } from 'lucide-react';
+import Carousel from 'infinite-react-carousel';
+import { Link } from 'react-router-dom';
+import Slider from 'react-slider'; // Nueva dependencia para slider de precio
 
-// Mock data para productos (reemplaza con API cuando server esté desarrollado)
-const mockProducts = [
-    { id: 1, name: 'Vestido Elegante', price: 59.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rojo', size: 'M' },
-    { id: 2, name: 'Camisa Moderna', price: 39.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Azul', size: 'L' },
-    { id: 3, name: 'Pantalón Trendy', price: 49.99, image: 'https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S' },
-    { id: 4, name: 'Accesorio Chic', price: 19.99, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Rojo', size: 'XS' },
-    { id: 5, name: 'Vestido Verano', price: 69.99, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'M' },
-    { id: 6, name: 'Chaqueta Casual', price: 89.99, image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Gris', size: 'L' },
-    { id: 7, name: 'Blusa Floral', price: 34.99, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rosa', size: 'S' },
-    { id: 8, name: 'Pantalón Clásico', price: 54.99, image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'M' },
-    { id: 9, name: 'Bolso de Cuero', price: 79.99, image: 'https://images.unsplash.com/photo-1590080875833-48a57b66b84d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Marrón', size: '-' },
-    { id: 10, name: 'Zapatos Deportivos', price: 99.99, image: 'https://images.unsplash.com/photo-1600181953597-6a1cf22bb056?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Blanco', size: '42' },
-    { id: 11, name: 'Falda Plisada', price: 44.99, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Verde', size: 'S' },
-    { id: 12, name: 'Cinturón de Piel', price: 25.99, image: 'https://images.unsplash.com/photo-1514995669114-6081e934b693?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Negro', size: '-' },
-    { id: 13, name: 'Abrigo Largo', price: 129.99, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Beige', size: 'L' },
-    { id: 14, name: 'Polo Deportivo', price: 29.99, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Verde', size: 'M' },
-    { id: 15, name: 'Sombrero Veraniego', price: 22.99, image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Beige', size: '-' },
-    { id: 16, name: 'Blazer Formal', price: 109.99, image: 'https://images.unsplash.com/photo-1593032465171-8b0f6b8a4ef1?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Gris', size: 'M' },
-    { id: 17, name: 'Top Deportivo', price: 27.99, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S' },
-    { id: 18, name: 'Leggings Fitness', price: 35.99, image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07b?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Gris', size: 'M' },
-    { id: 19, name: 'Reloj Clásico', price: 149.99, image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Plateado', size: '-' },
-    { id: 20, name: 'Sudadera Urbana', price: 59.99, image: 'https://images.unsplash.com/photo-1618354691438-25bc0f99d21d?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'L' },
-    { id: 21, name: 'Vestido Floral', price: 74.99, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rosa', size: 'M' },
-    { id: 22, name: 'Gorra Casual', price: 19.99, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Azul', size: '-' },
-    { id: 23, name: 'Camisa Blanca', price: 39.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Blanco', size: 'L' },
-    { id: 24, name: 'Pantalón Jeans', price: 59.99, image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'S' },
-    { id: 25, name: 'Bufanda Invierno', price: 29.99, image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Rojo', size: '-' },
-    { id: 26, name: 'Chamarra Cuero', price: 159.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'XL' },
-    { id: 27, name: 'Falda Denim', price: 45.99, image: 'https://images.unsplash.com/photo-1600181953597-6a1cf22bb056?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'S' },
-    { id: 28, name: 'Bolso Clutch', price: 65.99, image: 'https://images.unsplash.com/photo-1590080875833-48a57b66b84d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Negro', size: '-' },
-    { id: 29, name: 'Campera Deportiva', price: 89.99, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Verde', size: 'L' },
-    { id: 30, name: 'Vestido Noche', price: 119.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'M' },
-    // ... hasta 20+ para simular paginación
+// Mock data extendido (agregado popularity para sorting)
+export const mockProducts = [
+    { id: 1, name: 'Vestido Elegante', price: 59.99, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rojo', size: 'M', popularity: 85 },
+    { id: 2, name: 'Camisa Moderna', price: 39.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Azul', size: 'L', popularity: 70 },
+    { id: 3, name: 'Pantalón Trendy', price: 49.99, image: 'https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S', popularity: 90 },
+    { id: 4, name: 'Accesorio Chic', price: 19.99, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Rojo', size: '-', popularity: 60 },
+    { id: 5, name: 'Vestido Verano', price: 69.99, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Azul', size: 'M', popularity: 95 },
+    { id: 6, name: 'Chaqueta Casual', price: 89.99, image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Gris', size: 'L', popularity: 80 },
+    { id: 7, name: 'Blusa Floral', price: 34.99, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rosa', size: 'S', popularity: 75 },
+    { id: 8, name: 'Pantalón Clásico', price: 54.99, image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'M', popularity: 65 },
+    { id: 9, name: 'Bolso de Cuero', price: 79.99, image: 'https://images.unsplash.com/photo-1590080875833-48a57b66b84d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Marrón', size: '-', popularity: 88 },
+    { id: 10, name: 'Zapatos Deportivos', price: 99.99, image: 'https://images.unsplash.com/photo-1600181953597-6a1cf22bb056?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Blanco', size: '42', popularity: 92 },
+    { id: 11, name: 'Falda Plisada', price: 44.99, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Verde', size: 'S', popularity: 78 },
+    { id: 12, name: 'Cinturón de Piel', price: 25.99, image: 'https://images.unsplash.com/photo-1514995669114-6081e934b693?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Negro', size: '-', popularity: 55 },
+    { id: 13, name: 'Abrigo Largo', price: 129.99, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Beige', size: 'L', popularity: 82 },
+    { id: 14, name: 'Polo Deportivo', price: 29.99, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Verde', size: 'M', popularity: 68 },
+    { id: 15, name: 'Sombrero Veraniego', price: 22.99, image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Beige', size: '-', popularity: 62 },
+    { id: 16, name: 'Blazer Formal', price: 109.99, image: 'https://images.unsplash.com/photo-1593032465171-8b0f6b8a4ef1?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Gris', size: 'M', popularity: 87 },
+    { id: 17, name: 'Top Deportivo', price: 27.99, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Negro', size: 'S', popularity: 72 },
+    { id: 18, name: 'Leggings Fitness', price: 35.99, image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07b?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Gris', size: 'M', popularity: 76 },
+    { id: 19, name: 'Reloj Clásico', price: 149.99, image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Plateado', size: '-', popularity: 91 },
+    { id: 20, name: 'Sudadera Urbana', price: 59.99, image: 'https://images.unsplash.com/photo-1618354691438-25bc0f99d21d?auto=format&fit=crop&w=500&q=80', category: 'Hombres', color: 'Negro', size: 'L', popularity: 84 },
+    { id: 21, name: 'Vestido Floral', price: 74.99, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80', category: 'Mujeres', color: 'Rosa', size: 'M', popularity: 89 },
+    { id: 22, name: 'Gorra Casual', price: 19.99, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=500&q=80', category: 'Accesorios', color: 'Azul', size: '-', popularity: 58 },
+    // Agrega más si necesitas expandir el mock
 ];
 
-// Mock para recomendaciones AI (simuladas basadas en categorías)
-const mockRecommendations = [
-    { id: 101, name: 'Recomendado 1', price: 29.99, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
-    { id: 102, name: 'Recomendado 2', price: 45.99, image: 'https://images.unsplash.com/photo-1594633312681-86309903deb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
-    // Agrega 8+ para carrusel
-];
+// Mock recomendaciones (simuladas)
+const mockRecommendations = mockProducts.slice(0, 8); // Puedes filtrar basado en preferencias
 
 const ProductsPage = () => {
-    const [filters, setFilters] = useState({ category: '', priceMin: 0, priceMax: 1000, color: '', size: '', search: '' });
-    const [visibleProducts, setVisibleProducts] = useState(mockProducts.slice(0, 8)); // Simula infinite scroll con slices
+    const [filters, setFilters] = useState({
+        category: '',
+        price: [0, 200], // Rango inicial corregido
+        color: '',
+        size: '',
+        search: '', // Nuevo: búsqueda por nombre
+    });
+    const [sort, setSort] = useState('popularity-desc'); // Nuevo: sorting
+    const [filteredProducts, setFilteredProducts] = useState(mockProducts);
+    const [visibleProducts, setVisibleProducts] = useState([]);
     const [page, setPage] = useState(1);
-    const hasNextPage = page * 8 < mockProducts.length;
+    const [isLoading, setIsLoading] = useState(false);
+    const productsPerPage = 8; // Para infinite scroll
+    const observerRef = useRef(null);
+
+    // Categorías, colores, tallas únicas desde mock (avanzado: extraídas dinámicamente)
+    const categories = [...new Set(mockProducts.map(p => p.category))];
+    const colors = [...new Set(mockProducts.map(p => p.color))];
+    const sizes = [...new Set(mockProducts.map(p => p.size).filter(s => s !== '-'))];
+
+    // Filtrado y sorting (corregido y avanzado)
+    useEffect(() => {
+        let products = mockProducts;
+
+        // Búsqueda
+        if (filters.search) {
+            products = products.filter(p => p.name.toLowerCase().includes(filters.search.toLowerCase()));
+        }
+
+        // Categoría
+        if (filters.category) {
+            products = products.filter(p => p.category === filters.category);
+        }
+
+        // Precio (corregido: inclusivo)
+        products = products.filter(p => p.price >= filters.price[0] && p.price <= filters.price[1]);
+
+        // Color
+        if (filters.color) {
+            products = products.filter(p => p.color === filters.color);
+        }
+
+        // Talla (corregido: ignora '-' para accesorios)
+        if (filters.size) {
+            products = products.filter(p => p.size === filters.size || p.size === '-');
+        }
+
+        // Sorting
+        switch (sort) {
+            case 'price-asc':
+                products.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                products.sort((a, b) => b.price - a.price);
+                break;
+            case 'name-asc':
+                products.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'popularity-desc':
+                products.sort((a, b) => b.popularity - a.popularity);
+                break;
+            default:
+                break;
+        }
+
+        setFilteredProducts(products);
+        setVisibleProducts(products.slice(0, productsPerPage));
+        setPage(1);
+    }, [filters, sort]);
+
+    // Infinite scroll (avanzado: usando IntersectionObserver)
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting && visibleProducts.length < filteredProducts.length) {
+                    setIsLoading(true);
+                    setTimeout(() => { // Simula carga
+                        const nextPage = page + 1;
+                        const newProducts = filteredProducts.slice(0, nextPage * productsPerPage);
+                        setVisibleProducts(newProducts);
+                        setPage(nextPage);
+                        setIsLoading(false);
+                    }, 500);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [page, filteredProducts, visibleProducts.length]);
 
     const handleFilterChange = (key, value) => {
-        setFilters((prev) => ({ ...prev, [key]: value }));
-        // Filtra mocks (en real, re-fetch API)
-        const filtered = mockProducts.filter(p =>
-            (!filters.category || p.category === filters.category) &&
-            (p.price >= filters.priceMin && p.price <= filters.priceMax) &&
-            (!filters.color || p.color === filters.color) &&
-            (!filters.size || p.size === filters.size) &&
-            (!filters.search || p.name.toLowerCase().includes(filters.search.toLowerCase()))
-        );
-        setVisibleProducts(filtered.slice(0, 8));
-        setPage(1);
+        setFilters(prev => ({ ...prev, [key]: value }));
     };
 
-    const loadMore = () => {
-        setVisibleProducts(prev => [...prev, ...mockProducts.slice(page * 8, (page + 1) * 8)]);
-        setPage(prev => prev + 1);
+    const resetFilters = () => {
+        setFilters({ category: '', price: [0, 200], color: '', size: '', search: '' });
+        setSort('popularity-desc');
     };
+
+    // Preparado para API con react-query (descomenta cuando API lista)
+    // const { data: productsFromApi, isLoading: apiLoading } = useQuery(['products'], () => axios.get('/api/products').then(res => res.data));
+    // useEffect(() => { if (productsFromApi) setFilteredProducts(productsFromApi); }, [productsFromApi]);
 
     return (
-        <section className="py-12 bg-gray-100 min-h-screen">
+        <section className="py-16 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8">
-                {/* Sidebar Filtros Innovadores (collapsible en mobile) */}
+                {/* Filtros Aside (sticky en desktop) */}
                 <motion.aside
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="w-full lg:w-64 bg-white p-6 rounded-xl shadow-lg"
+                    className="w-full lg:w-64 bg-white p-6 rounded-xl shadow-lg lg:sticky lg:top-20"
                 >
-                    <h3 className="text-2xl font-bold mb-6 flex items-center"><Filter className="mr-2 h-5 w-5" /> Filtros</h3>
-                    {/* Búsqueda Semántica */}
+                    <h3 className="text-2xl font-bold mb-6 flex items-center"><Filter className="mr-2" /> Filtros</h3>
+
+                    {/* Búsqueda (nuevo) */}
                     <div className="mb-6">
-                        <input
-                            type="text"
-                            placeholder="Busca: 'vestidos rojos para verano'"
-                            value={filters.search}
-                            onChange={(e) => handleFilterChange('search', e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-full focus:border-blue-600 focus:outline-none transition-colors"
-                        />
-                        <p className="text-xs text-gray-500 mt-2">Búsqueda inteligente para resultados precisos</p>
-                    </div>
-                    {/* Filtros Categoría con Dropdown */}
-                    <div className="mb-6">
-                        <button className="flex items-center w-full text-left font-medium text-gray-700 hover:text-blue-600 transition-colors">
-                            <ChevronDown className="mr-2 h-4 w-4" /> Categoría
-                        </button>
-                        <div className="mt-2 space-y-2">
-                            {['Mujeres', 'Hombres', 'Accesorios', 'Ofertas'].map(cat => (
-                                <label key={cat} className="block text-gray-600">
-                                    <input
-                                        type="checkbox"
-                                        className="mr-2 accent-blue-600"
-                                        onChange={(e) => handleFilterChange('category', e.target.checked ? cat : '')}
-                                    />
-                                    {cat}
-                                </label>
-                            ))}
+                        <label className="block text-gray-700 font-medium mb-2">Buscar:</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={filters.search}
+                                onChange={e => handleFilterChange('search', e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600"
+                                placeholder="Nombre del producto..."
+                            />
+                            <SearchIcon className="absolute right-3 top-3 text-gray-400" size={18} />
                         </div>
                     </div>
-                    {/* Slider Precio */}
+
+                    {/* Categorías */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Precio: ${filters.priceMin} - ${filters.priceMax}</label>
-                        <input
-                            type="range"
-                            min="0"
-                            max="1000"
-                            value={filters.priceMax}
-                            onChange={(e) => handleFilterChange('priceMax', e.target.value)}
-                            className="w-full accent-blue-600"
+                        <label className="block text-gray-700 font-medium mb-2">Categorías:</label>
+                        <select
+                            value={filters.category}
+                            onChange={e => handleFilterChange('category', e.target.value)}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600"
+                        >
+                            <option value="">Todas</option>
+                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                    </div>
+
+                    {/* Precio (corregido con slider) */}
+                    <div className="mb-6">
+                        <label className="block text-gray-700 font-medium mb-2">Precio: ${filters.price[0]} - ${filters.price[1]}</label>
+                        <Slider
+                            className="w-full h-6"
+                            thumbClassName="w-6 h-6 bg-blue-600 rounded-full cursor-pointer"
+                            trackClassName="h-2 bg-gray-200 rounded"
+                            min={0}
+                            max={200}
+                            value={filters.price}
+                            onChange={value => handleFilterChange('price', value)}
+                            pearling
+                            minDistance={10}
                         />
                     </div>
-                    {/* Colores (swatches circulares innovadores) */}
+
+                    {/* Colores (corregido) */}
                     <div className="mb-6">
                         <label className="block text-gray-700 font-medium mb-2">Colores:</label>
-                        <div className="flex space-x-3">
-                            {['Rojo', 'Azul', 'Negro', 'Blanco'].map(color => (
+                        <div className="flex flex-wrap gap-2">
+                            {colors.map(color => (
                                 <div
                                     key={color}
-                                    className={`w-8 h-8 rounded-full cursor-pointer border-2 ${filters.color === color ? 'border-blue-600' : 'border-gray-300'} transition-all`}
+                                    className={`w-8 h-8 rounded-full cursor-pointer border-2 ${filters.color === color ? 'border-blue-600' : 'border-transparent'} hover:border-blue-400 transition-all`}
                                     style={{ backgroundColor: color.toLowerCase() }}
                                     onClick={() => handleFilterChange('color', color)}
+                                    aria-label={`Filtrar por ${color}`}
                                 />
                             ))}
                         </div>
                     </div>
-                    {/* Tallas (chips interactivos) */}
-                    <div>
+
+                    {/* Tallas (corregido) */}
+                    <div className="mb-6">
                         <label className="block text-gray-700 font-medium mb-2">Tallas:</label>
                         <div className="flex flex-wrap gap-2">
-                            {['XS', 'S', 'M', 'L', 'XL'].map(size => (
+                            {sizes.map(size => (
                                 <span
                                     key={size}
                                     className={`px-4 py-1 rounded-full cursor-pointer transition-colors ${filters.size === size ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-blue-100'}`}
                                     onClick={() => handleFilterChange('size', size)}
+                                    aria-label={`Filtrar por talla ${size}`}
                                 >
                                     {size}
                                 </span>
                             ))}
                         </div>
                     </div>
+
+                    {/* Sorting (nuevo) */}
+                    <div className="mb-6">
+                        <label className="block text-gray-700 font-medium mb-2">Ordenar por:</label>
+                        <select
+                            value={sort}
+                            onChange={e => setSort(e.target.value)}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600"
+                        >
+                            <option value="popularity-desc">Popularidad (Mayor a Menor)</option>
+                            <option value="price-asc">Precio (Menor a Mayor)</option>
+                            <option value="price-desc">Precio (Mayor a Menor)</option>
+                            <option value="name-asc">Nombre (A-Z)</option>
+                        </select>
+                    </div>
+
+                    <button onClick={resetFilters} className="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition">Resetear Filtros</button>
                 </motion.aside>
 
-                {/* Grid Principal con Infinite Scroll Simulado */}
+                {/* Grid Principal */}
                 <div className="flex-1">
                     <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Catálogo de Productos</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                         {visibleProducts.map(product => (
-                            <motion.div
-                                key={product.id}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.3 }}
-                                className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition duration-300 ease-in-out"
-                            >
-                                <img src={product.image} alt={product.name} className="w-full h-80 object-cover" loading="lazy" />
-                                <div className="p-6">
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
-                                    <p className="text-lg text-gray-700 mb-4">${product.price.toFixed(2)}</p>
-                                    <button className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200">Añadir al Carrito</button>
-                                </div>
-                            </motion.div>
+                            <Link to={`/products/${product.id}`} key={product.id}>
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition duration-300 ease-in-out"
+                                >
+                                    <img src={product.image} alt={product.name} className="w-full h-80 object-cover" loading="lazy" />
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
+                                        <p className="text-lg text-gray-700 mb-4">${product.price.toFixed(2)}</p>
+                                        <button className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200">Ver Detalles</button>
+                                    </div>
+                                </motion.div>
+                            </Link>
                         ))}
                     </div>
-                    {hasNextPage && (
-                        <button
-                            onClick={loadMore}
-                            className="mt-12 mx-auto block bg-gray-200 text-gray-800 px-8 py-4 rounded-full font-medium hover:bg-gray-300 transition duration-200"
-                        >
-                            Cargar Más Productos
-                        </button>
-                    )}
+                    {isLoading && <p className="text-center mt-8 text-gray-600">Cargando más productos...</p>}
+                    <div ref={observerRef} className="h-10" /> {/* Trigger para observer */}
 
-                    {/* Sección Recomendaciones Innovadora (Carrusel con Simulación AI) */}
+                    {/* Recomendaciones */}
                     <section className="mt-16">
                         <h3 className="text-3xl font-bold text-center mb-12 text-gray-800">Recomendaciones Personalizadas</h3>
                         <Carousel slidesToShow={4} arrows arrowsScroll={4} responsive={[{ breakpoint: 1024, settings: { slidesToShow: 3 } }, { breakpoint: 600, settings: { slidesToShow: 2 } }]}>
                             {mockRecommendations.map(rec => (
                                 <div key={rec.id} className="p-4">
-                                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                                        <img src={rec.image} alt={rec.name} className="w-full h-48 object-cover" />
-                                        <div className="p-4">
-                                            <h4 className="text-lg font-semibold">{rec.name}</h4>
-                                            <p className="text-gray-700">${rec.price.toFixed(2)}</p>
-                                            <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-600">Ver Más</button>
+                                    <Link to={`/products/${rec.id}`}>
+                                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                            <img src={rec.image} alt={rec.name} className="w-full h-48 object-cover" />
+                                            <div className="p-4">
+                                                <h4 className="text-lg font-semibold">{rec.name}</h4>
+                                                <p className="text-gray-700">${rec.price.toFixed(2)}</p>
+                                                <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-600">Ver Más</button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </div>
                             ))}
                         </Carousel>
