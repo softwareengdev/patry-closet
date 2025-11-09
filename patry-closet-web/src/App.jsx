@@ -4,21 +4,19 @@ import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
 import ProductsPage from './components/ProductsPage';
 import ProductDetail from './components/ProductDetail';
-
-// Placeholder para otras páginas
-/*const ProductsPage = () => <div className="py-20 text-center">Página de Productos (Grid completo en desarrollo)</div>;
-const CartPage = () => <div className="py-20 text-center">Página de Carrito (En desarrollo)</div>;*/
+import ContactSection from './components/ContactSection'; // Agregado
 
 function App() {
     return (
-        <div className="w-full min-h-screen"> {/* Full-width root */}
+        <div className="w-full min-h-screen">
             <Navbar />
-            <main className="pt-16 w-full"> {/* Padding y full-width */}
+            <main className="pt-16 w-full">
                 <Routes>
                     <Route path="/" element={
                         <>
                             <HeroSection />
                             <FeaturedProducts />
+                            <ContactSection /> {/* Agregado: Nueva sección en home */}
                         </>
                     } />
                     <Route path="/products" element={<ProductsPage />} />
