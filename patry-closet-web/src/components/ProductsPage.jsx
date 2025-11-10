@@ -4,6 +4,7 @@ import { Filter, ChevronDown, Search as SearchIcon } from 'lucide-react';
 import Carousel from 'infinite-react-carousel';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slider'; // Nueva dependencia para slider de precio
+import { useTranslation } from 'react-i18next'; // Agregado para i18n
 
 // Mock data extendido (agregado popularity para sorting)
 export const mockProducts = [
@@ -36,6 +37,7 @@ export const mockProducts = [
 const mockRecommendations = mockProducts.slice(0, 8); // Puedes filtrar basado en preferencias
 
 const ProductsPage = () => {
+    const { t } = useTranslation(); // Agregado para traducciones
     const [filters, setFilters] = useState({
         category: '',
         price: [0, 200], // Rango inicial corregido
@@ -145,26 +147,27 @@ const ProductsPage = () => {
     // useEffect(() => { if (productsFromApi) setFilteredProducts(productsFromApi); }, [productsFromApi]);
 
     return (
-        <section className="py-16 bg-gray-50 min-h-screen">
+        <section className="py-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8">
                 {/* Filtros Aside (sticky en desktop) */}
                 <motion.aside
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="w-full lg:w-64 bg-white p-6 rounded-xl shadow-lg lg:sticky lg:top-20"
+                    className="w-full lg:w-64 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg lg:sticky lg:top-20"
                 >
-                    <h3 className="text-2xl font-bold mb-6 flex items-center"><Filter className="mr-2" /> Filtros</h3>
+                    <h3 className="text-2xl font-bold mb-6 flex items-center text-gray-800 dark:text-gray-200"><Filter className="mr-2" /> {t('filters')}</h3>
 
                     {/* Búsqueda (nuevo) */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Buscar:</label>
+                        <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">{t('search')}:</label>
                         <div className="relative">
                             <input
                                 type="text"
                                 value={filters.search}
                                 onChange={e => handleFilterChange('search', e.target.value)}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600"
-                                placeholder="Nombre del producto..."
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                                placeholder={t('productNamePlaceholder')}
+                                aria-label={t('searchProducts')}
                             />
                             <SearchIcon className="absolute right-3 top-3 text-gray-400" size={18} />
                         </div>
@@ -172,36 +175,38 @@ const ProductsPage = () => {
 
                     {/* Categorías */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Categorías:</label>
+                        <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">{t('categories')}:</label>
                         <select
                             value={filters.category}
                             onChange={e => handleFilterChange('category', e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            aria-label={t('selectCategory')}
                         >
-                            <option value="">Todas</option>
+                            <option value="">{t('all')}</option>
                             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
                     </div>
 
                     {/* Precio (corregido con slider) */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Precio: ${filters.price[0]} - ${filters.price[1]}</label>
+                        <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">{t('price')}: ${filters.price[0]} - ${filters.price[1]}</label>
                         <Slider
                             className="w-full h-6"
                             thumbClassName="w-6 h-6 bg-blue-600 rounded-full cursor-pointer"
-                            trackClassName="h-2 bg-gray-200 rounded"
+                            trackClassName="h-2 bg-gray-200 dark:bg-gray-600 rounded"
                             min={0}
                             max={200}
                             value={filters.price}
                             onChange={value => handleFilterChange('price', value)}
                             pearling
                             minDistance={10}
+                            ariaLabelledBy="price-label" // Para accesibilidad, aunque Slider maneja internamente
                         />
                     </div>
 
                     {/* Colores (corregido) */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Colores:</label>
+                        <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">{t('colors')}:</label>
                         <div className="flex flex-wrap gap-2">
                             {colors.map(color => (
                                 <div
@@ -209,7 +214,9 @@ const ProductsPage = () => {
                                     className={`w-8 h-8 rounded-full cursor-pointer border-2 ${filters.color === color ? 'border-blue-600' : 'border-transparent'} hover:border-blue-400 transition-all`}
                                     style={{ backgroundColor: color.toLowerCase() }}
                                     onClick={() => handleFilterChange('color', color)}
-                                    aria-label={`Filtrar por ${color}`}
+                                    aria-label={`${t('filterByColor')} ${color}`}
+                                    role="button"
+                                    tabIndex={0}
                                 />
                             ))}
                         </div>
@@ -217,14 +224,16 @@ const ProductsPage = () => {
 
                     {/* Tallas (corregido) */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Tallas:</label>
+                        <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">{t('sizes')}:</label>
                         <div className="flex flex-wrap gap-2">
                             {sizes.map(size => (
                                 <span
                                     key={size}
-                                    className={`px-4 py-1 rounded-full cursor-pointer transition-colors ${filters.size === size ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-blue-100'}`}
+                                    className={`px-4 py-1 rounded-full cursor-pointer transition-colors ${filters.size === size ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'}`}
                                     onClick={() => handleFilterChange('size', size)}
-                                    aria-label={`Filtrar por talla ${size}`}
+                                    aria-label={`${t('filterBySize')} ${size}`}
+                                    role="button"
+                                    tabIndex={0}
                                 >
                                     {size}
                                 </span>
@@ -234,25 +243,28 @@ const ProductsPage = () => {
 
                     {/* Sorting (nuevo) */}
                     <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">Ordenar por:</label>
+                        <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">{t('sortBy')}:</label>
                         <select
                             value={sort}
                             onChange={e => setSort(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-600 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            aria-label={t('selectSort')}
                         >
-                            <option value="popularity-desc">Popularidad (Mayor a Menor)</option>
-                            <option value="price-asc">Precio (Menor a Mayor)</option>
-                            <option value="price-desc">Precio (Mayor a Menor)</option>
-                            <option value="name-asc">Nombre (A-Z)</option>
+                            <option value="popularity-desc">{t('popularityDesc')}</option>
+                            <option value="price-asc">{t('priceAsc')}</option>
+                            <option value="price-desc">{t('priceDesc')}</option>
+                            <option value="name-asc">{t('nameAsc')}</option>
                         </select>
                     </div>
 
-                    <button onClick={resetFilters} className="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition">Resetear Filtros</button>
+                    <button onClick={resetFilters} className="w-full bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition" aria-label={t('resetFilters')}>
+                        {t('resetFilters')}
+                    </button>
                 </motion.aside>
 
                 {/* Grid Principal */}
                 <div className="flex-1">
-                    <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Catálogo de Productos</h2>
+                    <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-gray-200">{t('productCatalog')}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                         {visibleProducts.map(product => (
                             <Link to={`/products/${product.id}`} key={product.id}>
@@ -260,41 +272,45 @@ const ProductsPage = () => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.3 }}
-                                    className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition duration-300 ease-in-out"
+                                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition duration-300 ease-in-out"
                                 >
                                     <img src={product.image} alt={product.name} className="w-full h-80 object-cover" loading="lazy" />
                                     <div className="p-6">
-                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
-                                        <p className="text-lg text-gray-700 mb-4">${product.price.toFixed(2)}</p>
-                                        <button className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200">Ver Detalles</button>
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{product.name}</h3>
+                                        <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">${product.price.toFixed(2)}</p>
+                                        <button className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200" aria-label={`${t('viewDetails')} ${product.name}`}>
+                                            {t('viewDetails')}
+                                        </button>
                                     </div>
                                 </motion.div>
                             </Link>
                         ))}
                     </div>
-                    {isLoading && <p className="text-center mt-8 text-gray-600">Cargando más productos...</p>}
+                    {isLoading && <p className="text-center mt-8 text-gray-600 dark:text-gray-400">{t('loadingMoreProducts')}</p>}
                     <div ref={observerRef} className="h-10" /> {/* Trigger para observer */}
 
                     {/* Recomendaciones */}
                     <section className="mt-16">
-                        <h3 className="text-3xl font-bold text-center mb-12 text-gray-800">Recomendaciones Personalizadas</h3>
+                        <h3 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-gray-200">{t('personalizedRecommendations')}</h3>
                         <Carousel slidesToShow={4} arrows arrowsScroll={4} responsive={[{ breakpoint: 1024, settings: { slidesToShow: 3 } }, { breakpoint: 600, settings: { slidesToShow: 2 } }]}>
                             {mockRecommendations.map(rec => (
                                 <div key={rec.id} className="p-4">
                                     <Link to={`/products/${rec.id}`}>
-                                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                                             <img src={rec.image} alt={rec.name} className="w-full h-48 object-cover" />
                                             <div className="p-4">
-                                                <h4 className="text-lg font-semibold">{rec.name}</h4>
-                                                <p className="text-gray-700">${rec.price.toFixed(2)}</p>
-                                                <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-600">Ver Más</button>
+                                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white">{rec.name}</h4>
+                                                <p className="text-gray-700 dark:text-gray-300">${rec.price.toFixed(2)}</p>
+                                                <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-600" aria-label={`${t('viewMore')} ${rec.name}`}>
+                                                    {t('viewMore')}
+                                                </button>
                                             </div>
                                         </div>
                                     </Link>
                                 </div>
                             ))}
                         </Carousel>
-                        <p className="text-center text-gray-500 mt-4">Basado en tus preferencias (simulado con IA para estilos únicos)</p>
+                        <p className="text-center text-gray-500 dark:text-gray-400 mt-4">{t('basedOnPreferences')}</p>
                     </section>
                 </div>
             </div>
