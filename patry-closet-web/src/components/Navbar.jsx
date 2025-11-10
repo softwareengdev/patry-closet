@@ -139,7 +139,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                         </Link>
                     </div>
 
-                    {/* Icons: Search, Cart, User, Theme Toggle, Language Selector */}
+                    {/* Icons: Search, Cart, User, Theme, Language */}
                     <div className="hidden md:flex items-center space-x-4">
                         <button className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors" aria-label={t('search')}>
                             <Search className="w-6 h-6" />
@@ -147,7 +147,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                         <Link to="/cart" className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors" aria-label={t('cart')}>
                             <ShoppingCart className="w-6 h-6" />
                             <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                3 {/* Placeholder para items en carrito */}
+                                3 {/* Placeholder; actualiza con contexto si implementado */}
                             </span>
                         </Link>
                         <Link to="/profile" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors" aria-label={t('profile')}>
@@ -215,7 +215,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                                     </div>
                                 )}
                             </div>
-                            {/* Repite para Hombres y Accesorios de manera similar */}
+                            {/* Repite para Hombres y Accesorios */}
                             <div>
                                 <button
                                     onClick={() => toggleDropdown('men')}
@@ -268,9 +268,8 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                             <Link to="/cart" className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors" aria-label={t('cart')}>
                                 Carrito
                             </Link>
-                            {/* Agrega toggle theme y language en mobile */}
                             <button onClick={toggleDarkMode} className="w-full text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium transition-colors" aria-label={t('toggleTheme')}>
-                                {darkMode ? 'Modo Claro' : 'Modo Oscuro'}
+                                {darkMode ? t('lightMode') : t('darkMode')}
                             </button>
                             <select
                                 onChange={(e) => changeLanguage(e.target.value)}
