@@ -1,6 +1,9 @@
 ﻿import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom'; // Agregado para link
+import { useTranslation } from 'react-i18next'; // Para i18n
 
 const HeroSection = () => {
+    const { t } = useTranslation();
     const { scrollYProgress } = useScroll();
     const y = useTransform(scrollYProgress, [0, 1], [0, 50]); // Parallax en h1
 
@@ -15,7 +18,7 @@ const HeroSection = () => {
                     transition={{ duration: 1 }}
                     className="text-6xl font-extrabold mb-4 tracking-wide"
                 >
-                    Descubre la Moda de Patry Closet
+                    {t('discoverFashion')}
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0, y: 50 }}
@@ -23,17 +26,17 @@ const HeroSection = () => {
                     transition={{ duration: 1, delay: 0.2 }}
                     className="text-2xl mb-8"
                 >
-                    Colecciones innovadoras y estilos únicos para ti
+                    {t('innovativeCollections')}
                 </motion.p>
-                <motion.button
+                <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 0.4 }}
-                    className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-200 transition duration-300"
-                    aria-label="Explorar ahora"
                 >
-                    Explorar Ahora
-                </motion.button>
+                    <Link to="/blog" className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-200 transition duration-300" aria-label={t('exploreNow')}>
+                        {t('exploreNow')}
+                    </Link>
+                </motion.div>
             </div>
         </div>
     );
