@@ -1,45 +1,45 @@
-import { motion } from 'framer-motion';
+ï»¿import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-// Mock para artículos de blog (extiende con API real)
+// Mock para artÃ­culos de blog (extiende con API real)
 const mockBlogPosts = [
     {
         id: 1,
-        title: 'Tendencias de Moda 2025: Estilos Innovadores y Elegantes para un Guardarropa Único',
+        title: 'Tendencias de Moda 2025: Estilos Innovadores y Elegantes para un Guardarropa Ãšnico',
         date: 'Noviembre 10, 2025',
         author: 'Equipo de Estilismo Patry Closet',
         content: `
-            <p>El 2025 trae una explosión de creatividad en la moda, fusionando lo clásico con lo innovador. Inspirados en figuras famosas como Zendaya y Timothée Chalamet, que combinan elegancia atemporal con toques futuristas, exploramos tendencias que elevan tu estilismo a niveles únicos. Desde siluetas oversize hasta encajes delicados, descubre cómo incorporar estos estilos en tu guardarropa diario.</p>
+            <p>El 2025 trae una explosiÃ³n de creatividad en la moda, fusionando lo clÃ¡sico con lo innovador. Inspirados en figuras famosas como Zendaya y TimothÃ©e Chalamet, que combinan elegancia atemporal con toques futuristas, exploramos tendencias que elevan tu estilismo a niveles Ãºnicos. Desde siluetas oversize hasta encajes delicados, descubre cÃ³mo incorporar estos estilos en tu guardarropa diario.</p>
             
             <h2>1. Boho Chic Reinventado: Libertad y Elegancia</h2>
             <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80" alt="Boho Chic 2025" className="w-full h-64 object-cover rounded-lg mb-4" />
-            <p>El Boho Chic evoluciona en 2025 hacia una versión más refinada, incorporando telas sostenibles como algodón orgánico y lino reciclado. Famosas como Florence Pugh lo llevan con maxi vestidos fluidos y accesorios artesanales. Tip: Combina un vestido boho con botas de cuero para un look urbano-innovador.</p>
+            <p>El Boho Chic evoluciona en 2025 hacia una versiÃ³n mÃ¡s refinada, incorporando telas sostenibles como algodÃ³n orgÃ¡nico y lino reciclado. Famosas como Florence Pugh lo llevan con maxi vestidos fluidos y accesorios artesanales. Tip: Combina un vestido boho con botas de cuero para un look urbano-innovador.</p>
             
             <h2>2. Siluetas Oversize: Comodidad con Estilo</h2>
             <img src="https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=800&q=80" alt="Siluetas Oversize 2025" className="w-full h-64 object-cover rounded-lg mb-4" />
-            <p>Inspirado en diseñadores como Balenciaga, las prendas oversize dominan con blazers anchos y pantalones bombacho. Celebridades como Harry Styles los usan para desafiar normas de género. Estilismo: Equilibra con accesorios minimalistas para un toque elegante y moderno.</p>
+            <p>Inspirado en diseÃ±adores como Balenciaga, las prendas oversize dominan con blazers anchos y pantalones bombacho. Celebridades como Harry Styles los usan para desafiar normas de gÃ©nero. Estilismo: Equilibra con accesorios minimalistas para un toque elegante y moderno.</p>
             
             <h2>3. Encajes y Transparencias: Sensualidad Elegante</h2>
             <img src="https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=800&q=80" alt="Encajes 2025" className="w-full h-64 object-cover rounded-lg mb-4" />
-            <p>Los encajes delicados y transparencias sutiles, vistos en pasarelas de Chanel, agregan misterio. Famosas como Rihanna los integran en looks cotidianos. Consejo: Layering con básicos sólidos para un estilismo versátil y sofisticado.</p>
+            <p>Los encajes delicados y transparencias sutiles, vistos en pasarelas de Chanel, agregan misterio. Famosas como Rihanna los integran en looks cotidianos. Consejo: Layering con bÃ¡sicos sÃ³lidos para un estilismo versÃ¡til y sofisticado.</p>
             
             <h2>4. Lentejuelas y Brillantes: Glamour Diario</h2>
             <img src="https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=800&q=80" alt="Lentejuelas 2025" className="w-full h-64 object-cover rounded-lg mb-4" />
-            <p>No solo para noches: lentejuelas en tonos mocha mousse (el color del año) se usan en prendas diurnas, como faldas o tops. Influencers como Emma Chamberlain lo combinan con denim para un contraste innovador.</p>
+            <p>No solo para noches: lentejuelas en tonos mocha mousse (el color del aÃ±o) se usan en prendas diurnas, como faldas o tops. Influencers como Emma Chamberlain lo combinan con denim para un contraste innovador.</p>
             
-            <h2>5. Polka Dots y Estampados Geométricos: Retro Moderno</h2>
+            <h2>5. Polka Dots y Estampados GeomÃ©tricos: Retro Moderno</h2>
             <img src="https://images.unsplash.com/photo-1529139574466-a303d20ff24f?auto=format&fit=crop&w=800&q=80" alt="Polka Dots 2025" className="w-full h-64 object-cover rounded-lg mb-4" />
-            <p>Los polka dots regresan en versiones oversized, fusionados con formas geométricas. Diseñadores como Louis Vuitton los elevan con tejidos high-tech. Estilo famoso: Como en los looks de Zendaya, mezcla con neutros para elegancia.</p>
+            <p>Los polka dots regresan en versiones oversized, fusionados con formas geomÃ©tricas. DiseÃ±adores como Louis Vuitton los elevan con tejidos high-tech. Estilo famoso: Como en los looks de Zendaya, mezcla con neutros para elegancia.</p>
             
-            <p>En Patry Closet, incorporamos estas tendencias en colecciones sostenibles. ¡Explora y crea tu estilismo único!</p>
+            <p>En Patry Closet, incorporamos estas tendencias en colecciones sostenibles. Â¡Explora y crea tu estilismo Ãºnico!</p>
         `,
         images: [
             'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
             'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=800&q=80',
-            // Agrega más
+            // Agrega mÃ¡s
         ]
     },
-    // Agrega más posts si necesitas
+    // Agrega mÃ¡s posts si necesitas
 ];
 
 const Blog = () => {

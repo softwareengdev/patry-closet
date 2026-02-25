@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+ï»¿/** @type {import('tailwindcss').Config} */
 export default {
     content: [
         "./index.html",
@@ -7,14 +7,14 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: "#FF6B6B", // Rosa vibrante para botones/llamadas a acción
+                primary: "#FF6B6B", // Rosa vibrante para botones/llamadas a acciÃ³n
                 secondary: "#4ECDC4", // Turquesa para acentos
                 accent: "#FFE66D", // Amarillo suave para highlights
                 neutral: "#F7F7F7", // Fondo claro para secciones
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'], // Moderna para texto general
-                display: ['Playfair Display', 'serif'], // Elegante para títulos de moda
+                display: ['Playfair Display', 'serif'], // Elegante para tÃ­tulos de moda
             },
             spacing: {
                 '128': '32rem', // Espacios grandes para grids de productos
