@@ -7,7 +7,9 @@ import ProductsPage from './components/ProductsPage';
 import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
 import Cart from './components/Cart';
-import Blog from './components/Blog'; // Agregado
+import Blog from './components/Blog';
+/*import WishlistPage from './components/WishlistPage'; // ← nuevo*/
+
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 
@@ -36,19 +38,20 @@ function App() {
             <CartProvider>
                 <div className={`w-full min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-white'}`}>
                     <Navbar toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-                    <main className="pt-16 w-full">
+                    <main className="pt-20 w-full"> {/* ← cambiado a pt-20 porque navbar es h-20 */}
                         <Routes>
                             <Route path="/" element={
                                 <>
                                     <HeroSection />
-                                    <FeaturedProducts />
+                                    <FeaturedProducts onQuickView={() => { }} /> {/* ← prop obligatoria */}
                                     <ContactSection />
                                 </>
                             } />
                             <Route path="/products" element={<ProductsPage />} />
                             <Route path="/products/:id" element={<ProductDetail />} />
                             <Route path="/cart" element={<Cart />} />
-                            <Route path="/blog" element={<Blog />} /> {/* Nueva ruta */}
+                            {/*<Route path="/wishlist" element={<WishlistPage />} />*/}
+                            <Route path="/blog" element={<Blog />} />
                         </Routes>
                     </main>
                 </div>

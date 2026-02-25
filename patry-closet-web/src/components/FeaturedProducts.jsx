@@ -1,7 +1,7 @@
 ﻿import ProductCard from './ProductCard';
-import { mockProducts } from './ProductsPage'; // Reutilizamos el mock
+import { mockProducts } from './ProductsPage';
 
-const FeaturedProducts = ({ onQuickView }) => {
+const FeaturedProducts = ({ onQuickView = () => { } }) => {  // ← opcional
     return (
         <section className="py-20 bg-white dark:bg-gray-950 w-full">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,14 +11,9 @@ const FeaturedProducts = ({ onQuickView }) => {
                         Ver todo <span className="text-xl">→</span>
                     </a>
                 </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {mockProducts.slice(0, 8).map(product => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onQuickView={onQuickView}
-                        />
+                        <ProductCard key={product.id} product={product} onQuickView={onQuickView} />
                     ))}
                 </div>
             </div>
