@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import SearchAutocomplete from './SearchAutocomplete';
 import MiniCart from './MiniCart';
 
@@ -149,8 +150,11 @@ const Navbar = ({ isTransparent = false }) => {
     const { getItemCount, cartItems, miniCartOpen, setMiniCartOpen, flyToCartAnimation } = useContext(CartContext);
     const { wishlistItems } = useContext(WishlistContext);
     const { mode, setMode, isDark, isHighContrast } = useContext(ThemeContext);
+    const { user, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
 
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
     const megaTimeoutRef = useRef(null);
     const themePickerRef = useRef(null);
     const cartIconRef = useRef(null);
@@ -190,6 +194,18 @@ const Navbar = ({ isTransparent = false }) => {
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, [themePickerOpen]);
+
+    /* ─── Close user menu on click outside ─── */
+    useEffect(() => {
+        if (!userMenuOpen) return;
+        const handler = (e) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [userMenuOpen]);
 
     const showSolid = !isTransparent || scrolled || isMobileMenuOpen || activeMega;
     const navTextClass = showSolid
@@ -308,12 +324,76 @@ const Navbar = ({ isTransparent = false }) => {
                                 </button>
                             </div>
 
-                            {/* Profile */}
-                            <Link to="/profile" className={iconClass} onClick={closeMega}>
-                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                                    <User className="w-5 h-5" />
-                                </motion.div>
-                            </Link>
+                            {/* Profile / Auth */}
+                            <div className="relative" ref={userMenuRef}>
+                                <button
+                                    className={iconClass}
+                                    onClick={() => {
+                                        closeMega();
+                                        if (isAuthenticated) {
+                                            setUserMenuOpen(!userMenuOpen);
+                                        } else {
+                                            navigate('/login');
+                                        }
+                                    }}
+                                    aria-label={isAuthenticated ? t('account.myAccount', 'My Account') : t('auth.signIn', 'Sign In')}
+                                    aria-expanded={userMenuOpen}
+                                    aria-haspopup="true"
+                                >
+                                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                                        {isAuthenticated && user?.avatar ? (
+                                            <img src={user.avatar} alt="" className="w-6 h-6 rounded-full object-cover ring-2 ring-transparent hover:ring-pink-400 transition-all" />
+                                        ) : (
+                                            <User className="w-5 h-5" />
+                                        )}
+                                    </motion.div>
+                                </button>
+                                {/* User dropdown menu */}
+                                <AnimatePresence>
+                                    {userMenuOpen && isAuthenticated && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                                            transition={{ duration: 0.15 }}
+                                            className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-50 overflow-hidden border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
+                                        >
+                                            <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                                <p className="text-sm font-semibold truncate">{user?.firstName} {user?.lastName}</p>
+                                                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                            </div>
+                                            <div className="py-1">
+                                                {[
+                                                    { label: t('account.myAccount', 'My Account'), to: '/account' },
+                                                    { label: t('account.orders', 'My Orders'), to: '/account/orders' },
+                                                    { label: t('account.wishlist', 'My Wishlist'), to: '/wishlist' },
+                                                ].map((item) => (
+                                                    <Link
+                                                        key={item.to}
+                                                        to={item.to}
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                        className={`block px-4 py-2 text-sm transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}
+                                                    >
+                                                        {item.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                            <div className={`border-t ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                                <button
+                                                    onClick={async () => {
+                                                        setUserMenuOpen(false);
+                                                        await logout();
+                                                        navigate('/');
+                                                    }}
+                                                    className={`w-full text-left px-4 py-2.5 text-sm text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}
+                                                >
+                                                    {t('account.logout', 'Sign Out')}
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
                             {/* ─── Theme Picker ─── */}
                             <div className="relative" ref={themePickerRef}>
@@ -547,6 +627,45 @@ const Navbar = ({ isTransparent = false }) => {
                                 </Link>
 
                                 <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                                    {/* Auth section mobile */}
+                                    {isAuthenticated ? (
+                                        <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                {user?.avatar ? (
+                                                    <img src={user.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                                                ) : (
+                                                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                        <User className="w-4 h-4 text-gray-500" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <p className="text-sm font-medium">{user?.firstName} {user?.lastName}</p>
+                                                    <p className="text-xs text-gray-500">{user?.email}</p>
+                                                </div>
+                                            </div>
+                                            <Link to="/account" className="flex items-center gap-3 py-2 text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                                                <User className="w-4 h-4" /> {t('account.myAccount', 'My Account')}
+                                            </Link>
+                                        </div>
+                                    ) : (
+                                        <div className="pb-3 border-b border-gray-100 dark:border-gray-800 flex gap-2">
+                                            <Link
+                                                to="/login"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex-1 text-center py-2.5 text-sm font-medium bg-black dark:bg-white text-white dark:text-black rounded-lg"
+                                            >
+                                                {t('auth.signIn', 'Sign In')}
+                                            </Link>
+                                            <Link
+                                                to="/register"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex-1 text-center py-2.5 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-lg"
+                                            >
+                                                {t('auth.register', 'Register')}
+                                            </Link>
+                                        </div>
+                                    )}
+
                                     <Link to="/wishlist" className="flex items-center gap-3 py-2 text-sm" onClick={() => setIsMobileMenuOpen(false)}>
                                         <Heart className="w-4 h-4" /> {t('wishlist')} ({wishlistItems.length})
                                     </Link>

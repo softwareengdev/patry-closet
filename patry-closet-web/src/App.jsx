@@ -12,6 +12,14 @@ import Blog from './components/Blog';
 import WishlistPage from './components/WishlistPage';
 import Checkout from './components/Checkout';
 
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import AccountPage from './pages/AccountPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
@@ -37,12 +45,14 @@ function AppContent() {
     const { isDark, isHighContrast } = useContext(ThemeContext);
     const location = useLocation();
     const isHome = location.pathname === '/';
+    const isAuthPage = ['/login', '/register', '/forgot-password'].includes(location.pathname) || location.pathname.startsWith('/account/verify-email');
+    const showNavbar = !isAuthPage;
 
     return (
         <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
             <SkipToContent />
-            <Navbar isTransparent={isHome} />
-            <main id="main-content" className={isHome ? 'w-full' : 'pt-20 w-full'} role="main" tabIndex={-1}>
+            {showNavbar && <Navbar isTransparent={isHome} />}
+            <main id="main-content" className={isHome || isAuthPage ? 'w-full' : 'pt-20 w-full'} role="main" tabIndex={-1}>
                 <AnimatePresence mode="wait">
                     <Routes location={location} key={location.pathname}>
                         <Route path="/" element={
@@ -70,6 +80,32 @@ function AppContent() {
                         <Route path="/blog" element={
                             <motion.div {...pageTransition}><Blog /></motion.div>
                         } />
+
+                        {/* Auth routes */}
+                        <Route path="/login" element={
+                            <motion.div {...pageTransition}><LoginPage /></motion.div>
+                        } />
+                        <Route path="/register" element={
+                            <motion.div {...pageTransition}><RegisterPage /></motion.div>
+                        } />
+                        <Route path="/forgot-password" element={
+                            <motion.div {...pageTransition}><ForgotPasswordPage /></motion.div>
+                        } />
+                        <Route path="/account/verify-email" element={
+                            <motion.div {...pageTransition}><VerifyEmailPage /></motion.div>
+                        } />
+
+                        {/* Protected routes */}
+                        <Route path="/account" element={
+                            <motion.div {...pageTransition}>
+                                <ProtectedRoute><AccountPage /></ProtectedRoute>
+                            </motion.div>
+                        } />
+                        <Route path="/account/*" element={
+                            <motion.div {...pageTransition}>
+                                <ProtectedRoute><AccountPage /></ProtectedRoute>
+                            </motion.div>
+                        } />
                     </Routes>
                 </AnimatePresence>
             </main>
@@ -80,11 +116,13 @@ function AppContent() {
 function App() {
     return (
         <ThemeProvider>
-            <WishlistProvider>
-                <CartProvider>
-                    <AppContent />
-                </CartProvider>
-            </WishlistProvider>
+            <AuthProvider>
+                <WishlistProvider>
+                    <CartProvider>
+                        <AppContent />
+                    </CartProvider>
+                </WishlistProvider>
+            </AuthProvider>
         </ThemeProvider>
     );
 }
