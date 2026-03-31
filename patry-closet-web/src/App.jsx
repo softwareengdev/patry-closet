@@ -9,6 +9,8 @@ import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
 import Cart from './components/Cart';
 import Blog from './components/Blog';
+import WishlistPage from './components/WishlistPage';
+import Checkout from './components/Checkout';
 
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -58,6 +60,12 @@ function AppContent() {
                         } />
                         <Route path="/cart" element={
                             <motion.div {...pageTransition}><Cart /></motion.div>
+                        } />
+                        <Route path="/wishlist" element={
+                            <motion.div {...pageTransition}><WishlistPage /></motion.div>
+                        } />
+                        <Route path="/checkout" element={
+                            <motion.div {...pageTransition}><Checkout /></motion.div>
                         } />
                         <Route path="/blog" element={
                             <motion.div {...pageTransition}><Blog /></motion.div>

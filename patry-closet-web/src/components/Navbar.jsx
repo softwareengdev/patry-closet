@@ -16,6 +16,7 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { ThemeContext } from '../context/ThemeContext';
 import SearchAutocomplete from './SearchAutocomplete';
+import MiniCart from './MiniCart';
 
 /* ─── Mega-menu category data ─── */
 const megaMenuData = {
@@ -139,24 +140,22 @@ const themeLabels = {
 const Navbar = ({ isTransparent = false }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeMega, setActiveMega] = useState(null);
-    const [miniCartOpen, setMiniCartOpen] = useState(false);
     const [themePickerOpen, setThemePickerOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [mobileExpanded, setMobileExpanded] = useState(null);
 
     const { t, i18n } = useTranslation();
-    const { getItemCount, cartItems } = useContext(CartContext);
+    const { getItemCount, cartItems, miniCartOpen, setMiniCartOpen, flyToCartAnimation } = useContext(CartContext);
     const { wishlistItems } = useContext(WishlistContext);
     const { mode, setMode, isDark, isHighContrast } = useContext(ThemeContext);
     const navigate = useNavigate();
 
     const megaTimeoutRef = useRef(null);
     const themePickerRef = useRef(null);
+    const cartIconRef = useRef(null);
 
     const changeLanguage = (lng) => i18n.changeLanguage(lng);
-
-    const lastItems = cartItems.slice(-3);
 
     /* ─── Scroll detection ─── */
     useEffect(() => {
@@ -290,9 +289,14 @@ const Navbar = ({ isTransparent = false }) => {
                                 )}
                             </Link>
 
-                            {/* Mini Cart */}
-                            <div className="relative" onMouseEnter={() => setMiniCartOpen(true)} onMouseLeave={() => setMiniCartOpen(false)}>
-                                <Link to="/cart" className="relative group" onClick={closeMega}>
+                            {/* Mini Cart - click to open slide-over */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setMiniCartOpen(true)}
+                                    className="relative group"
+                                    ref={cartIconRef}
+                                    aria-label={t('cart')}
+                                >
                                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                                         <ShoppingCart className={`w-5 h-5 transition-colors ${iconClass}`} />
                                     </motion.div>
@@ -301,46 +305,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             {getItemCount()}
                                         </motion.span>
                                     )}
-                                </Link>
-
-                                {/* Mini cart dropdown */}
-                                <AnimatePresence>
-                                    {miniCartOpen && getItemCount() > 0 && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                                            className={`absolute right-0 mt-2 w-80 shadow-2xl overflow-hidden z-50 ${isHighContrast ? 'bg-hc-bg border-2 border-hc-border' : 'bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl'}`}
-                                        >
-                                            <div className="p-4 border-b dark:border-gray-800">
-                                                <p className="font-medium text-sm">{t('cart')} • {getItemCount()}</p>
-                                            </div>
-                                            <div className="max-h-60 overflow-y-auto">
-                                                {lastItems.map((item, index) => (
-                                                    <div key={`${item.id}-${index}`} className="flex gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                        <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded" />
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="font-medium text-xs truncate">{item.name}</p>
-                                                            <p className="text-[11px] text-gray-500 mt-0.5">{item.size} • {item.color}</p>
-                                                            <p className="text-xs font-medium mt-0.5">${(item.price * item.quantity).toFixed(2)} ×{item.quantity}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <div className="p-3 border-t dark:border-gray-800">
-                                                <Link
-                                                    to="/cart"
-                                                    onClick={() => setMiniCartOpen(false)}
-                                                    className={`flex items-center justify-center gap-2 py-3 text-xs font-medium uppercase tracking-wider transition-all active:scale-[0.98] ${isHighContrast ? 'bg-hc-accent text-black' : 'bg-accent-900 hover:bg-accent-800 text-white rounded-lg'}`}
-                                                >
-                                                    {t('viewCart')}
-                                                    <ArrowRight className="w-3.5 h-3.5" />
-                                                </Link>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
+                                </button>
                             </div>
 
                             {/* Profile */}
@@ -411,12 +376,12 @@ const Navbar = ({ isTransparent = false }) => {
                             <motion.button whileTap={{ scale: 0.9 }} onClick={() => setSearchOpen(!searchOpen)} className={iconClass}>
                                 <SearchIcon className="w-5 h-5" />
                             </motion.button>
-                            <Link to="/cart" className={`relative ${iconClass}`}>
+                            <button onClick={() => setMiniCartOpen(true)} className={`relative ${iconClass}`} aria-label={t('cart')}>
                                 <ShoppingCart className="w-5 h-5" />
                                 {getItemCount() > 0 && (
                                     <span className="absolute -top-1 -right-1 bg-accent-900 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{getItemCount()}</span>
                                 )}
-                            </Link>
+                            </button>
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -637,6 +602,37 @@ const Navbar = ({ isTransparent = false }) => {
                         onClick={closeMega}
                     />
                 )}
+            </AnimatePresence>
+
+            {/* ─── Mini Cart Slide-over ─── */}
+            <MiniCart />
+
+            {/* ─── Fly-to-cart animation ─── */}
+            <AnimatePresence>
+                {flyToCartAnimation && cartIconRef.current && (() => {
+                    const target = cartIconRef.current.getBoundingClientRect();
+                    return (
+                        <motion.div
+                            key="fly-to-cart"
+                            initial={{
+                                position: 'fixed',
+                                left: flyToCartAnimation.left + flyToCartAnimation.width / 2,
+                                top: flyToCartAnimation.top + flyToCartAnimation.height / 2,
+                                scale: 1,
+                                opacity: 1,
+                                zIndex: 9999,
+                            }}
+                            animate={{
+                                left: target.left + target.width / 2,
+                                top: target.top + target.height / 2,
+                                scale: 0.1,
+                                opacity: 0,
+                            }}
+                            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                            className="w-4 h-4 -translate-x-1/2 -translate-y-1/2 bg-accent-900 rounded-full pointer-events-none"
+                        />
+                    );
+                })()}
             </AnimatePresence>
         </>
     );
