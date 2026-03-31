@@ -1,4 +1,4 @@
-﻿import { useState, useContext } from 'react';
+﻿import { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,11 +14,12 @@ import { useTranslation } from 'react-i18next';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 
-const Navbar = ({ toggleDarkMode, darkMode }) => {
+const Navbar = ({ toggleDarkMode, darkMode, isTransparent = false }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState({ women: false, men: false, accessories: false });
     const [miniCartOpen, setMiniCartOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [scrolled, setScrolled] = useState(false);
 
     const { t, i18n } = useTranslation();
     const { getItemCount, cartItems } = useContext(CartContext);
@@ -50,8 +51,20 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
         accessories: ['Bolsos', 'Joyas', 'Relojes', 'Gafas'],
     };
 
+    useEffect(() => {
+        if (!isTransparent) return;
+        const onScroll = () => setScrolled(window.scrollY > 60);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, [isTransparent]);
+
+    const showSolid = !isTransparent || scrolled || isMobileMenuOpen;
+
     return (
-        <nav className="bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl shadow-xl fixed w-full z-50 top-0 border-b border-gray-100 dark:border-gray-800 transition-all duration-300">
+        <nav className={`fixed w-full z-50 top-0 transition-all duration-500 ${showSolid
+            ? 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl shadow-xl border-b border-gray-100 dark:border-gray-800'
+            : 'bg-transparent border-b border-white/10'
+            }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 items-center">
                     {/* Logo Premium */}
@@ -61,7 +74,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                     >
                         <motion.div
                             whileHover={{ scale: 1.05 }}
-                            className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-white flex items-center gap-1"
+                            className={`text-3xl font-bold tracking-tighter flex items-center gap-1 transition-colors duration-300 ${showSolid ? 'text-gray-900 dark:text-white' : 'text-white'}`}
                         >
                             PATRY
                             <span className="text-blue-600 group-hover:rotate-12 transition-transform">♡</span>
@@ -70,7 +83,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                     </Link>
 
                     {/* Desktop Navigation - Ultra elegante */}
-                    <div className="hidden md:flex items-center space-x-10 text-sm font-medium">
+                    <div className={`hidden md:flex items-center space-x-10 text-sm font-medium transition-colors duration-300 ${showSolid ? 'text-gray-800 dark:text-gray-200' : 'text-white/90'}`}>
                         {[
                             { key: 'women', label: t('women') },
                             { key: 'men', label: t('men') },
@@ -127,9 +140,12 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder={t('search')}
-                                className="bg-transparent border-b border-gray-300 dark:border-gray-700 focus:border-blue-600 w-56 focus:w-72 outline-none px-3 py-2 text-sm transition-all duration-300 placeholder:text-gray-400"
+                                className={`bg-transparent border-b focus:border-blue-600 w-56 focus:w-72 outline-none px-3 py-2 text-sm transition-all duration-300 ${showSolid
+                                    ? 'border-gray-300 dark:border-gray-700 placeholder:text-gray-400 text-gray-900 dark:text-white'
+                                    : 'border-white/30 placeholder:text-white/50 text-white'
+                                    }`}
                             />
-                            <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors">
+                            <button type="submit" className={`absolute right-0 top-1/2 -translate-y-1/2 transition-colors ${showSolid ? 'text-gray-400 hover:text-blue-600' : 'text-white/60 hover:text-white'}`}>
                                 <SearchIcon className="w-5 h-5" />
                             </button>
                         </form>
@@ -137,7 +153,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                         {/* Wishlist */}
                         <Link to="/wishlist" className="relative group">
                             <motion.div whileHover={{ scale: 1.2 }} transition={{ type: "spring", stiffness: 400 }}>
-                                <Heart className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-rose-500 transition-colors" />
+                                <Heart className={`w-6 h-6 group-hover:text-rose-500 transition-colors ${showSolid ? 'text-gray-700 dark:text-gray-300' : 'text-white/80'}`} />
                             </motion.div>
                             {wishlistItems.length > 0 && (
                                 <motion.span
@@ -158,7 +174,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                         >
                             <Link to="/cart" className="relative group">
                                 <motion.div whileHover={{ scale: 1.15 }}>
-                                    <ShoppingCart className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors" />
+                                    <ShoppingCart className={`w-6 h-6 group-hover:text-blue-600 transition-colors ${showSolid ? 'text-gray-700 dark:text-gray-300' : 'text-white/80'}`} />
                                 </motion.div>
                                 {getItemCount() > 0 && (
                                     <motion.span
@@ -216,14 +232,14 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                         </div>
 
                         {/* Profile */}
-                        <Link to="/profile" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">
+                        <Link to="/profile" className={`transition-colors ${showSolid ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600' : 'text-white/80 hover:text-white'}`}>
                             <User className="w-6 h-6" />
                         </Link>
 
                         {/* Theme Toggle */}
                         <button
                             onClick={toggleDarkMode}
-                            className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+                            className={`transition-colors ${showSolid ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600' : 'text-white/80 hover:text-white'}`}
                             aria-label={t('toggleTheme')}
                         >
                             {darkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
@@ -232,7 +248,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                         {/* Language */}
                         <select
                             onChange={(e) => changeLanguage(e.target.value)}
-                            className="bg-transparent text-sm text-gray-700 dark:text-gray-300 border-none focus:outline-none cursor-pointer"
+                            className={`bg-transparent text-sm border-none focus:outline-none cursor-pointer transition-colors ${showSolid ? 'text-gray-700 dark:text-gray-300' : 'text-white/80'}`}
                             aria-label={t('language')}
                         >
                             <option value="en">EN</option>
@@ -244,7 +260,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+                            className={`transition-colors ${showSolid ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600' : 'text-white/80 hover:text-white'}`}
                             aria-label={t('menu')}
                         >
                             {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}

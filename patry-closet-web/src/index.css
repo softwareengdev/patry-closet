@@ -7,75 +7,189 @@ html, body, #root {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow-x: hidden; /* Evita scroll horizontal */
+    overflow-x: hidden;
     background-color: #ffffff;
 }
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+    font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #ffffff;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: #ffffff;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* ─── Hero Swiper Overrides ─── */
+.hero-swiper {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+.hero-swiper .swiper-slide {
+    overflow: hidden;
+    position: relative;
 }
-button:hover {
-  border-color: #646cff;
+
+.hero-swiper .swiper-pagination {
+    bottom: 40px !important;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+.hero-swiper .swiper-pagination-bullet {
+    width: 32px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.4);
+    opacity: 1;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 6px !important;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+    background: #ffffff;
+    width: 48px;
+}
+
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease;
+    width: 48px !important;
+    height: 48px !important;
+}
+
+.hero-swiper .swiper-button-next:hover,
+.hero-swiper .swiper-button-prev:hover {
+    color: #ffffff !important;
+}
+
+.hero-swiper .swiper-button-next::after,
+.hero-swiper .swiper-button-prev::after {
+    font-size: 20px !important;
+    font-weight: 300;
+}
+
+/* Ken Burns zoom effect on active slide image */
+.hero-swiper .swiper-slide-active .hero-slide-image {
+    animation: heroKenBurns 8s ease-in-out forwards;
+}
+
+@keyframes heroKenBurns {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.06);
+    }
+}
+
+/* Slide content entrance animations */
+.hero-swiper .swiper-slide-active .hero-content-animate {
+    animation: heroContentFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-swiper .swiper-slide-active .hero-content-animate-delay-1 {
+    animation: heroContentFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+    opacity: 0;
+}
+
+.hero-swiper .swiper-slide-active .hero-content-animate-delay-2 {
+    animation: heroContentFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+    opacity: 0;
+}
+
+.hero-swiper .swiper-slide-active .hero-content-animate-delay-3 {
+    animation: heroContentFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+    opacity: 0;
+}
+
+@keyframes heroContentFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* CTA Button Style — Zara inspired */
+.cta-shop-now {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 40px;
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    text-decoration: none;
+}
+
+.cta-shop-now::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: #ffffff;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+}
+
+.cta-shop-now:hover::before {
+    width: 100%;
+}
+
+.cta-shop-now:hover {
+    color: #000000;
+    border-color: #ffffff;
+}
+
+.cta-shop-now span,
+.cta-shop-now svg {
+    position: relative;
+    z-index: 1;
+}
+
+/* Scroll indicator pulse */
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(6px); }
+}
+
+.scroll-indicator {
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* Progress bar for autoplay */
+.hero-progress-bar {
+    transition: width 0.1s linear;
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+    :root {
+        color: #1a1a1a;
+        background-color: #ffffff;
+    }
 }

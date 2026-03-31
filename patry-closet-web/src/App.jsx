@@ -1,5 +1,5 @@
-﻿import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
@@ -8,13 +8,14 @@ import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
 import Cart from './components/Cart';
 import Blog from './components/Blog';
-/*import WishlistPage from './components/WishlistPage'; // ← nuevo*/
 
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 
 function App() {
     const [darkMode, setDarkMode] = useState(false);
+    const location = useLocation();
+    const isHome = location.pathname === '/';
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
@@ -37,20 +38,19 @@ function App() {
         <WishlistProvider>
             <CartProvider>
                 <div className={`w-full min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-white'}`}>
-                    <Navbar toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-                    <main className="pt-20 w-full"> {/* ← cambiado a pt-20 porque navbar es h-20 */}
+                    <Navbar toggleDarkMode={toggleDarkMode} darkMode={darkMode} isTransparent={isHome} />
+                    <main className={isHome ? 'w-full' : 'pt-20 w-full'}>
                         <Routes>
                             <Route path="/" element={
                                 <>
                                     <HeroSection />
-                                    <FeaturedProducts onQuickView={() => { }} /> {/* ← prop obligatoria */}
+                                    <FeaturedProducts onQuickView={() => { }} />
                                     <ContactSection />
                                 </>
                             } />
                             <Route path="/products" element={<ProductsPage />} />
                             <Route path="/products/:id" element={<ProductDetail />} />
                             <Route path="/cart" element={<Cart />} />
-                            {/*<Route path="/wishlist" element={<WishlistPage />} />*/}
                             <Route path="/blog" element={<Blog />} />
                         </Routes>
                     </main>
