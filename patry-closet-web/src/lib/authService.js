@@ -512,6 +512,101 @@ const authService = {
         await delay();
         return preferences;
     },
+
+    /* ─── Server Cart & Wishlist (mock — returns demo data for authenticated users) ─── */
+
+    /**
+     * Get the user's server-side cart.
+     * When backend exists, this fetches cart items stored on the server.
+     * For now returns demo items for the demo user, empty for new users.
+     */
+    async getServerCart() {
+        await delay(300);
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
+        if (!token) return [];
+
+        try {
+            const decoded = JSON.parse(atob(token.split('.')[1]));
+            // Demo user has a pre-populated server cart
+            if (decoded.email === DEMO_USER.email || decoded.sub === DEMO_USER.id) {
+                return [
+                    {
+                        id: '1',
+                        name: 'Silk Wrap Dress',
+                        title: 'Silk Wrap Dress',
+                        price: 89.99,
+                        originalPrice: 119.99,
+                        image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400',
+                        size: 'M',
+                        color: 'Black',
+                        quantity: 1,
+                        category: 'vestidos',
+                    },
+                ];
+            }
+            return [];
+        } catch {
+            return [];
+        }
+    },
+
+    /**
+     * Sync local cart to server.
+     * When backend exists, this sends the merged cart to be persisted.
+     */
+    async syncCart(items) {
+        await delay(200);
+        return { success: true, itemCount: items.length };
+    },
+
+    /**
+     * Get the user's server-side wishlist.
+     */
+    async getServerWishlist() {
+        await delay(300);
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
+        if (!token) return [];
+
+        try {
+            const decoded = JSON.parse(atob(token.split('.')[1]));
+            if (decoded.email === DEMO_USER.email || decoded.sub === DEMO_USER.id) {
+                return [
+                    {
+                        id: '3',
+                        name: 'Leather Crossbody Bag',
+                        title: 'Leather Crossbody Bag',
+                        price: 129.99,
+                        image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400',
+                        category: 'bolsos',
+                        inStock: true,
+                        badge: 'Best Seller',
+                    },
+                    {
+                        id: '5',
+                        name: 'Oversized Wool Coat',
+                        title: 'Oversized Wool Coat',
+                        price: 199.99,
+                        originalPrice: 249.99,
+                        image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400',
+                        category: 'abrigos',
+                        inStock: true,
+                        badge: 'New',
+                    },
+                ];
+            }
+            return [];
+        } catch {
+            return [];
+        }
+    },
+
+    /**
+     * Sync local wishlist to server.
+     */
+    async syncWishlist(items) {
+        await delay(200);
+        return { success: true, itemCount: items.length };
+    },
 };
 
 export default authService;

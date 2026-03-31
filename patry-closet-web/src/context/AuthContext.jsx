@@ -107,6 +107,8 @@ export const AuthProvider = ({ children }) => {
             storeTokens(tokens);
             setUser(userData);
             scheduleRefresh();
+            // Notify cart & wishlist contexts to merge server data
+            window.dispatchEvent(new CustomEvent('auth:login', { detail: { user: userData } }));
             return userData;
         } catch (err) {
             const msg = err?.response?.data?.message || 'Login failed. Please try again.';
@@ -123,6 +125,7 @@ export const AuthProvider = ({ children }) => {
             storeTokens(tokens);
             setUser(userData);
             scheduleRefresh();
+            window.dispatchEvent(new CustomEvent('auth:login', { detail: { user: userData } }));
             return userData;
         } catch (err) {
             const msg = err?.response?.data?.message || 'Registration failed. Please try again.';
@@ -139,6 +142,7 @@ export const AuthProvider = ({ children }) => {
             storeTokens(tokens);
             setUser(userData);
             scheduleRefresh();
+            window.dispatchEvent(new CustomEvent('auth:login', { detail: { user: userData } }));
             return userData;
         } catch (err) {
             const msg = err?.response?.data?.message || `${provider} login failed.`;
@@ -156,6 +160,8 @@ export const AuthProvider = ({ children }) => {
         clearTokens();
         stopRefresh();
         setError(null);
+        // Notify cart & wishlist contexts to handle cleanup
+        window.dispatchEvent(new CustomEvent('auth:logout'));
     }, [clearTokens, stopRefresh]);
 
     /* ─── Logout from all devices ─── */
@@ -167,6 +173,7 @@ export const AuthProvider = ({ children }) => {
         clearTokens();
         stopRefresh();
         setError(null);
+        window.dispatchEvent(new CustomEvent('auth:logout'));
     }, [clearTokens, stopRefresh]);
 
     /* ─── Profile update ─── */

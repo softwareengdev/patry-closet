@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiSearch as SearchIcon,
@@ -152,6 +152,7 @@ const Navbar = ({ isTransparent = false }) => {
     const { mode, setMode, isDark, isHighContrast } = useContext(ThemeContext);
     const { user, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
@@ -333,7 +334,9 @@ const Navbar = ({ isTransparent = false }) => {
                                         if (isAuthenticated) {
                                             setUserMenuOpen(!userMenuOpen);
                                         } else {
-                                            navigate('/login');
+                                            const currentPath = location.pathname + location.search;
+                                            const redirect = currentPath !== '/' ? `?redirect=${encodeURIComponent(currentPath)}` : '';
+                                            navigate(`/login${redirect}`);
                                         }
                                     }}
                                     aria-label={isAuthenticated ? t('account.myAccount', 'My Account') : t('auth.signIn', 'Sign In')}
@@ -650,7 +653,7 @@ const Navbar = ({ isTransparent = false }) => {
                                     ) : (
                                         <div className="pb-3 border-b border-gray-100 dark:border-gray-800 flex gap-2">
                                             <Link
-                                                to="/login"
+                                                to={`/login${location.pathname !== '/' ? `?redirect=${encodeURIComponent(location.pathname + location.search)}` : ''}`}
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                 className="flex-1 text-center py-2.5 text-sm font-medium bg-black dark:bg-white text-white dark:text-black rounded-lg"
                                             >

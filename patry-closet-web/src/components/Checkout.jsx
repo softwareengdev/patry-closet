@@ -1000,6 +1000,7 @@ function Checkout() {
           {t('haveAccount') || 'Have an account?'}{' '}
           <button
             type="button"
+            onClick={() => navigate('/login?redirect=%2Fcheckout')}
             className="text-black dark:text-white font-medium underline underline-offset-2 hover:no-underline"
           >
             {t('signIn') || 'Sign in'}

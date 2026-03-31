@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import { createContext, useState, useEffect, useCallback, useContext, useRef } from 'react';
+import authService from '../lib/authService';
 
 export const WishlistContext = createContext();
 
@@ -13,6 +14,8 @@ export const useWishlist = () => {
 export const WishlistProvider = ({ children }) => {
     const [wishlistItems, setWishlistItems] = useState([]);
     const [stockNotifications, setStockNotifications] = useState(new Set());
+    const [isMerging, setIsMerging] = useState(false);
+    const hasMergedRef = useRef(false);
 
     // Load wishlist and stock notifications from localStorage on mount
     useEffect(() => {
@@ -32,6 +35,53 @@ export const WishlistProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('stockNotifications', JSON.stringify([...stockNotifications]));
     }, [stockNotifications]);
+
+    /* ─── Merge server wishlist on login ─── */
+    const mergeServerWishlist = useCallback(async () => {
+        if (hasMergedRef.current) return;
+        setIsMerging(true);
+        try {
+            const serverItems = await authService.getServerWishlist();
+            if (serverItems && serverItems.length > 0) {
+                setWishlistItems(prev => {
+                    const merged = [...prev];
+                    for (const serverItem of serverItems) {
+                        if (!merged.find(p => p.id === serverItem.id)) {
+                            merged.push(serverItem);
+                        }
+                    }
+                    return merged;
+                });
+            }
+            hasMergedRef.current = true;
+            // Sync merged result to server
+            const currentItems = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            await authService.syncWishlist(currentItems).catch(() => {});
+        } catch {
+            // Server unavailable — keep local wishlist
+        } finally {
+            setIsMerging(false);
+        }
+    }, []);
+
+    /* ─── Listen for auth events ─── */
+    useEffect(() => {
+        const handleLogin = () => {
+            hasMergedRef.current = false;
+            mergeServerWishlist();
+        };
+        const handleLogout = () => {
+            hasMergedRef.current = false;
+            // Keep local wishlist for guest browsing continuity
+        };
+
+        window.addEventListener('auth:login', handleLogin);
+        window.addEventListener('auth:logout', handleLogout);
+        return () => {
+            window.removeEventListener('auth:login', handleLogin);
+            window.removeEventListener('auth:logout', handleLogout);
+        };
+    }, [mergeServerWishlist]);
 
     const toggleWishlist = useCallback((product) => {
         setWishlistItems(prev =>
@@ -125,6 +175,7 @@ export const WishlistProvider = ({ children }) => {
         <WishlistContext.Provider value={{
             wishlistItems,
             stockNotifications,
+            isMerging,
             toggleWishlist,
             isInWishlist,
             removeFromWishlist,

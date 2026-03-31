@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import authService from '../lib/authService';
 
 export const CartContext = createContext();
 
@@ -13,7 +14,9 @@ export const CartProvider = ({ children }) => {
     const [coupon, setCoupon] = useState(null);
     const [miniCartOpen, setMiniCartOpen] = useState(false);
     const [flyToCartAnimation, setFlyToCartAnimation] = useState(null);
+    const [isMerging, setIsMerging] = useState(false);
     const flyTimerRef = useRef(null);
+    const hasMergedRef = useRef(false);
 
     // Hydrate cart from localStorage on mount
     useEffect(() => {
@@ -34,6 +37,66 @@ export const CartProvider = ({ children }) => {
             if (flyTimerRef.current) clearTimeout(flyTimerRef.current);
         };
     }, []);
+
+    /* ─── Merge server cart on login ─── */
+    const mergeServerCart = useCallback(async () => {
+        if (hasMergedRef.current) return;
+        setIsMerging(true);
+        try {
+            const serverItems = await authService.getServerCart();
+            if (serverItems && serverItems.length > 0) {
+                setCartItems(prev => {
+                    const merged = [...prev];
+                    for (const serverItem of serverItems) {
+                        const existingIdx = merged.findIndex(
+                            item => item.id === serverItem.id
+                                && item.size === serverItem.size
+                                && item.color === serverItem.color,
+                        );
+                        if (existingIdx === -1) {
+                            merged.push(serverItem);
+                        } else {
+                            // Keep higher quantity (user intent)
+                            merged[existingIdx] = {
+                                ...merged[existingIdx],
+                                quantity: Math.max(merged[existingIdx].quantity, serverItem.quantity),
+                            };
+                        }
+                    }
+                    return merged;
+                });
+            }
+            hasMergedRef.current = true;
+            // Sync merged result to server
+            const currentItems = JSON.parse(localStorage.getItem('cart') || '[]');
+            await authService.syncCart(currentItems).catch(() => {});
+        } catch {
+            // Server unavailable — keep local cart
+        } finally {
+            setIsMerging(false);
+        }
+    }, []);
+
+    /* ─── Listen for auth events ─── */
+    useEffect(() => {
+        const handleLogin = () => {
+            hasMergedRef.current = false;
+            mergeServerCart();
+        };
+        const handleLogout = () => {
+            hasMergedRef.current = false;
+            // Keep local cart items for guest experience (items stay for next login merge)
+            // Only clear coupon since it may be user-specific
+            setCoupon(null);
+        };
+
+        window.addEventListener('auth:login', handleLogin);
+        window.addEventListener('auth:logout', handleLogout);
+        return () => {
+            window.removeEventListener('auth:login', handleLogin);
+            window.removeEventListener('auth:logout', handleLogout);
+        };
+    }, [mergeServerCart]);
 
     const addToCart = useCallback((product, size, color) => {
         setCartItems(prev => {
@@ -138,6 +201,7 @@ export const CartProvider = ({ children }) => {
         miniCartOpen,
         setMiniCartOpen,
         flyToCartAnimation,
+        isMerging,
         addToCart,
         removeFromCart,
         updateQuantity,
