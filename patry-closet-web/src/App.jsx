@@ -7,6 +7,7 @@ import FeaturedProducts from './components/FeaturedProducts';
 import ProductsPage from './components/ProductsPage';
 import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
+import FooterSection from './components/FooterSection';
 import Cart from './components/Cart';
 import Blog from './components/Blog';
 import WishlistPage from './components/WishlistPage';
@@ -60,6 +61,7 @@ function AppContent() {
                                 <HeroSection />
                                 <FeaturedProducts />
                                 <ContactSection />
+                                <FooterSection />
                             </motion.div>
                         } />
                         <Route path="/products" element={
