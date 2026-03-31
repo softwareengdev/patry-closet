@@ -94,5 +94,12 @@
   "heroSubtitleSlide4": "A curated selection of exclusive pieces. Limited runs, unlimited style. Available while they last.",
   "shopNow": "Shop Now",
   "shopCollection": "Shop Collection",
-  "discoverMore": "Discover More"
+  "discoverMore": "Discover More",
+  "featuredProducts": "Featured Products",
+  "curatedSelection": "Curated for you",
+  "viewAll": "View All",
+  "addedToCart": "Added to cart",
+  "quickView": "Quick View",
+  "badgeNew": "New",
+  "badgeBestSeller": "Best Seller"
 }

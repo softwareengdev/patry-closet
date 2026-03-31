@@ -44,7 +44,7 @@ function App() {
                             <Route path="/" element={
                                 <>
                                     <HeroSection />
-                                    <FeaturedProducts onQuickView={() => { }} />
+                                    <FeaturedProducts />
                                     <ContactSection />
                                 </>
                             } />

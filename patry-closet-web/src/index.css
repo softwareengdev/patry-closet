@@ -187,6 +187,21 @@ body {
     transition: width 0.1s linear;
 }
 
+/* ─── Product Card Shimmer ─── */
+@keyframes shimmerWave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.shimmer-wave {
+    animation: shimmerWave 1.5s ease-in-out infinite;
+}
+
+/* ─── Product card transitions ─── */
+.product-card-image-swap {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @media (prefers-color-scheme: light) {
     :root {
         color: #1a1a1a;
