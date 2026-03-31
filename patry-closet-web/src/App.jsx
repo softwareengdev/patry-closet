@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useContext } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
@@ -11,52 +12,61 @@ import Blog from './components/Blog';
 
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 
-function App() {
-    const [darkMode, setDarkMode] = useState(false);
+const pageTransition = {
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -8 },
+    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+};
+
+function AppContent() {
+    const { isDark, isHighContrast } = useContext(ThemeContext);
     const location = useLocation();
     const isHome = location.pathname === '/';
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') setDarkMode(true);
-    }, []);
-
-    useEffect(() => {
-        if (darkMode) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [darkMode]);
-
-    const toggleDarkMode = () => setDarkMode(!darkMode);
-
     return (
-        <WishlistProvider>
-            <CartProvider>
-                <div className={`w-full min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-white'}`}>
-                    <Navbar toggleDarkMode={toggleDarkMode} darkMode={darkMode} isTransparent={isHome} />
-                    <main className={isHome ? 'w-full' : 'pt-20 w-full'}>
-                        <Routes>
-                            <Route path="/" element={
-                                <>
-                                    <HeroSection />
-                                    <FeaturedProducts />
-                                    <ContactSection />
-                                </>
-                            } />
-                            <Route path="/products" element={<ProductsPage />} />
-                            <Route path="/products/:id" element={<ProductDetail />} />
-                            <Route path="/cart" element={<Cart />} />
-                            <Route path="/blog" element={<Blog />} />
-                        </Routes>
-                    </main>
-                </div>
-            </CartProvider>
-        </WishlistProvider>
+        <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
+            <Navbar isTransparent={isHome} />
+            <main className={isHome ? 'w-full' : 'pt-20 w-full'}>
+                <AnimatePresence mode="wait">
+                    <Routes location={location} key={location.pathname}>
+                        <Route path="/" element={
+                            <motion.div {...pageTransition}>
+                                <HeroSection />
+                                <FeaturedProducts />
+                                <ContactSection />
+                            </motion.div>
+                        } />
+                        <Route path="/products" element={
+                            <motion.div {...pageTransition}><ProductsPage /></motion.div>
+                        } />
+                        <Route path="/products/:id" element={
+                            <motion.div {...pageTransition}><ProductDetail /></motion.div>
+                        } />
+                        <Route path="/cart" element={
+                            <motion.div {...pageTransition}><Cart /></motion.div>
+                        } />
+                        <Route path="/blog" element={
+                            <motion.div {...pageTransition}><Blog /></motion.div>
+                        } />
+                    </Routes>
+                </AnimatePresence>
+            </main>
+        </div>
+    );
+}
+
+function App() {
+    return (
+        <ThemeProvider>
+            <WishlistProvider>
+                <CartProvider>
+                    <AppContent />
+                </CartProvider>
+            </WishlistProvider>
+        </ThemeProvider>
     );
 }
 

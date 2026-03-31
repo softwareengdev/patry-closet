@@ -208,3 +208,55 @@ body {
         background-color: #ffffff;
     }
 }
+
+/* ─── High Contrast Mode ─── */
+.high-contrast {
+    --hc-bg: #000000;
+    --hc-fg: #FFFFFF;
+    --hc-border: #FFFF00;
+    --hc-link: #00FFFF;
+    --hc-accent: #FFD700;
+}
+
+.high-contrast * {
+    border-color: var(--hc-border) !important;
+}
+
+.high-contrast a:not(.cta-shop-now) {
+    color: var(--hc-link) !important;
+    text-decoration: underline;
+}
+
+.high-contrast a:not(.cta-shop-now):hover {
+    color: var(--hc-accent) !important;
+}
+
+.high-contrast button:focus-visible,
+.high-contrast a:focus-visible,
+.high-contrast input:focus-visible,
+.high-contrast select:focus-visible {
+    outline: 3px solid var(--hc-accent) !important;
+    outline-offset: 2px;
+}
+
+.high-contrast img {
+    filter: contrast(1.15);
+}
+
+/* ─── Enhanced Focus Styles (all themes) ─── */
+:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* ─── Micro-interaction utility classes ─── */
+.btn-hover-lift {
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
+.btn-hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.btn-hover-lift:active {
+    transform: translateY(0) scale(0.98);
+}
