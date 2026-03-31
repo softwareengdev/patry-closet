@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
@@ -9,7 +9,6 @@ import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
 import FooterSection from './components/FooterSection';
 import Cart from './components/Cart';
-import Blog from './components/Blog';
 import WishlistPage from './components/WishlistPage';
 import Checkout from './components/Checkout';
 
@@ -19,6 +18,10 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import AccountPage from './pages/AccountPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+
+// Code-split blog pages (heavy markdown deps loaded on demand)
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
 
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -31,6 +34,12 @@ const pageTransition = {
     exit: { opacity: 0, y: -8 },
     transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
 };
+
+const PageLoader = () => (
+    <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+);
 
 /* ─── Skip to content link (A11Y) ─── */
 const SkipToContent = () => (
@@ -80,7 +89,10 @@ function AppContent() {
                             <motion.div {...pageTransition}><Checkout /></motion.div>
                         } />
                         <Route path="/blog" element={
-                            <motion.div {...pageTransition}><Blog /></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><BlogPage /></Suspense></motion.div>
+                        } />
+                        <Route path="/blog/:slug" element={
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><BlogPostPage /></Suspense></motion.div>
                         } />
 
                         {/* Auth routes */}

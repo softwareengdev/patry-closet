@@ -9,6 +9,7 @@ import { ThemeContext } from '../context/ThemeContext';
 const BLOG_POSTS = [
     {
         id: 1,
+        slug: 'fall-2026-fashion-trends-you-need-to-know',
         titleKey: 'footer.blogTitle1',
         titleFallback: 'Fall 2026 Fashion Trends',
         image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=500&q=80',
@@ -17,6 +18,7 @@ const BLOG_POSTS = [
     },
     {
         id: 2,
+        slug: 'complete-event-dressing-guide-weddings-galas-parties',
         titleKey: 'footer.blogTitle2',
         titleFallback: 'Event Style Guide',
         image: 'https://images.unsplash.com/photo-1529139574466-a303d20ff24f?auto=format&fit=crop&w=500&q=80',
@@ -25,6 +27,7 @@ const BLOG_POSTS = [
     },
     {
         id: 3,
+        slug: 'sustainable-fashion-guide-building-conscious-wardrobe',
         titleKey: 'footer.blogTitle3',
         titleFallback: 'Sustainability in Fashion',
         image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=500&q=80',
@@ -128,7 +131,7 @@ const FooterSection = () => {
                                         {t(post.excerptKey, post.excerptFallback)}
                                     </p>
                                     <Link
-                                        to="/blog"
+                                        to={`/blog/${post.slug}`}
                                         className={`text-xs font-medium inline-flex items-center gap-1 transition-colors ${
                                             isDark ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'
                                         }`}
