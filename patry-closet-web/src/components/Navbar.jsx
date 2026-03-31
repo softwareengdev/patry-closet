@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { ThemeContext } from '../context/ThemeContext';
+import SearchAutocomplete from './SearchAutocomplete';
 
 /* ─── Mega-menu category data ─── */
 const megaMenuData = {
@@ -140,7 +141,6 @@ const Navbar = ({ isTransparent = false }) => {
     const [activeMega, setActiveMega] = useState(null);
     const [miniCartOpen, setMiniCartOpen] = useState(false);
     const [themePickerOpen, setThemePickerOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
     const [searchOpen, setSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [mobileExpanded, setMobileExpanded] = useState(null);
@@ -153,18 +153,8 @@ const Navbar = ({ isTransparent = false }) => {
 
     const megaTimeoutRef = useRef(null);
     const themePickerRef = useRef(null);
-    const searchInputRef = useRef(null);
 
     const changeLanguage = (lng) => i18n.changeLanguage(lng);
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (searchTerm.trim()) {
-            navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
-            setSearchTerm('');
-            setSearchOpen(false);
-        }
-    };
 
     const lastItems = cartItems.slice(-3);
 
@@ -202,11 +192,6 @@ const Navbar = ({ isTransparent = false }) => {
         return () => document.removeEventListener('mousedown', handler);
     }, [themePickerOpen]);
 
-    /* ─── Focus search input ─── */
-    useEffect(() => {
-        if (searchOpen && searchInputRef.current) searchInputRef.current.focus();
-    }, [searchOpen]);
-
     const showSolid = !isTransparent || scrolled || isMobileMenuOpen || activeMega;
     const navTextClass = showSolid
         ? `${isHighContrast ? 'text-hc-fg' : 'text-gray-800 dark:text-gray-200'}`
@@ -220,6 +205,8 @@ const Navbar = ({ isTransparent = false }) => {
     return (
         <>
             <nav
+                role="navigation"
+                aria-label="Main navigation"
                 className={`fixed w-full z-50 top-0 transition-all duration-500 ${showSolid
                     ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl shadow-sm border-b border-gray-100 dark:border-gray-800'}`
                     : 'bg-transparent border-b border-white/10'
@@ -442,31 +429,10 @@ const Navbar = ({ isTransparent = false }) => {
                     </div>
                 </div>
 
-                {/* ─── Search bar (full-width expandable) ─── */}
+                {/* ─── Smart Search Autocomplete ─── */}
                 <AnimatePresence>
                     {searchOpen && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                            className={`overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950'}`}
-                        >
-                            <form onSubmit={handleSearch} className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-4 flex items-center gap-4">
-                                <SearchIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                                <input
-                                    ref={searchInputRef}
-                                    type="text"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder={t('searchProducts')}
-                                    className="flex-1 bg-transparent text-lg font-light outline-none placeholder:text-gray-400"
-                                />
-                                <button type="button" onClick={() => setSearchOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </form>
-                        </motion.div>
+                        <SearchAutocomplete isOpen={searchOpen} onClose={() => setSearchOpen(false)} isHighContrast={isHighContrast} />
                     )}
                 </AnimatePresence>
 

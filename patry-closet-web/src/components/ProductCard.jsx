@@ -68,21 +68,21 @@ const LazyImage = ({ src, alt, className, onLoad: externalOnLoad, ...props }) =>
 const ProductBadge = ({ badge, discount }) => {
     if (discount > 0) {
         return (
-            <span className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1">
+            <span className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1" role="status" aria-label={`${discount}% discount`}>
                 -{discount}%
             </span>
         );
     }
     if (badge === 'new') {
         return (
-            <span className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1">
+            <span className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1" role="status">
                 New
             </span>
         );
     }
     if (badge === 'bestSeller') {
         return (
-            <span className="absolute top-3 left-3 z-10 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1">
+            <span className="absolute top-3 left-3 z-10 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1" role="status">
                 Best Seller
             </span>
         );
@@ -154,8 +154,8 @@ const SizeStrip = ({ sizes, onSelect }) => {
 
 /* ─── Star rating mini ─── */
 const MiniRating = ({ rating, count }) => (
-    <div className="flex items-center gap-1">
-        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+    <div className="flex items-center gap-1" role="img" aria-label={`Rating: ${rating} out of 5, ${count} reviews`}>
+        <Star className="w-3 h-3 text-amber-400 fill-amber-400" aria-hidden="true" />
         <span className="text-[11px] text-gray-500 font-medium">{rating}</span>
         <span className="text-[11px] text-gray-400">({count})</span>
     </div>
@@ -216,6 +216,8 @@ const ProductCard = ({ product, onQuickView }) => {
             className="group relative bg-white dark:bg-gray-900 overflow-hidden"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            role="article"
+            aria-label={`${product.name} - $${product.price.toFixed(2)}`}
         >
             {/* ─── Image Area ─── */}
             <Link to={`/products/${product.id}`} className="block relative overflow-hidden aspect-[3/4]">

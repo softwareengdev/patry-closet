@@ -260,3 +260,68 @@ body {
 .btn-hover-lift:active {
     transform: translateY(0) scale(0.98);
 }
+
+/* ─── Faceted Price Slider ─── */
+.facet-price-slider .track-0 {
+    background: #d1d5db;
+    border-radius: 9999px;
+}
+.facet-price-slider .track-1 {
+    background: #1A1A1A;
+    border-radius: 9999px;
+}
+.facet-price-slider .track-2 {
+    background: #d1d5db;
+    border-radius: 9999px;
+}
+.dark .facet-price-slider .track-0 { background: #374151; }
+.dark .facet-price-slider .track-1 { background: #ffffff; }
+.dark .facet-price-slider .track-2 { background: #374151; }
+
+/* ─── Custom scrollbar (thin) ─── */
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+.dark .scrollbar-thin::-webkit-scrollbar-thumb { background: #374151; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ─── Screen reader only class (enhanced) ─── */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ─── Touch-friendly targets ─── */
+@media (pointer: coarse) {
+    button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ─── PWA safe area insets ─── */
+@supports (padding-top: env(safe-area-inset-top)) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
