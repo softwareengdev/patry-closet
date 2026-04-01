@@ -162,9 +162,15 @@ const Navbar = ({ isTransparent = false }) => {
 
     const changeLanguage = (lng) => i18n.changeLanguage(lng);
 
-    /* ─── Scroll detection ─── */
+    /* ─── Scroll detection (premium: tracks scroll progress for smooth transitions) ─── */
+    const [scrollProgress, setScrollProgress] = useState(0);
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 60);
+        const onScroll = () => {
+            const y = window.scrollY;
+            setScrolled(y > 60);
+            // Smooth 0→1 progress over 0-120px for graduated effects
+            setScrollProgress(Math.min(y / 120, 1));
+        };
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
@@ -223,21 +229,32 @@ const Navbar = ({ isTransparent = false }) => {
             <nav
                 role="navigation"
                 aria-label="Main navigation"
-                className={`fixed w-full z-50 top-0 transition-all duration-500 ${showSolid
-                    ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl shadow-sm border-b border-gray-100 dark:border-gray-800'}`
-                    : 'bg-transparent border-b border-white/10'
+                className={`fixed w-full z-50 top-0 transition-all duration-500 ease-out ${showSolid
+                    ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800'}`
+                    : 'bg-transparent backdrop-blur-[2px] border-b border-white/10'
                 }`}
+                style={{
+                    boxShadow: showSolid && !isHighContrast
+                        ? `0 1px ${4 + scrollProgress * 8}px rgba(0,0,0,${0.02 + scrollProgress * 0.06})`
+                        : 'none',
+                }}
             >
                 <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
-                    <div className="flex justify-between h-16 lg:h-20 items-center">
+                    <div
+                        className="flex justify-between items-center transition-all duration-500 ease-out"
+                        style={{ height: isTransparent && !scrolled ? '80px' : '64px' }}
+                    >
 
-                        {/* ─── Logo ─── */}
+                        {/* ─── Logo (premium: shrinks on scroll) ─── */}
                         <Link to="/" className="flex-shrink-0 group" onClick={closeMega}>
                             <motion.div
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                                className={`text-2xl lg:text-3xl font-bold tracking-tighter flex items-center gap-0.5 transition-colors duration-300 ${showSolid ? `${isHighContrast ? 'text-hc-fg' : 'text-gray-900 dark:text-white'}` : 'text-white'}`}
+                                animate={{
+                                    scale: isTransparent && !scrolled ? 1 : 0.92,
+                                }}
+                                whileHover={{ scale: isTransparent && !scrolled ? 1.03 : 0.95 }}
+                                whileTap={{ scale: 0.9 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                                className={`text-2xl lg:text-3xl font-bold tracking-tighter flex items-center gap-0.5 transition-colors duration-300 origin-left ${showSolid ? `${isHighContrast ? 'text-hc-fg' : 'text-gray-900 dark:text-white'}` : 'text-white'}`}
                             >
                                 PATRY
                                 <span className={`transition-transform duration-300 group-hover:rotate-12 ${isHighContrast ? 'text-hc-accent' : 'text-rose'}`}>♡</span>

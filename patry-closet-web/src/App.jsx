@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
+import CuratedStories from './components/CuratedStories';
 import ProductsPage from './components/ProductsPage';
 import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
@@ -69,6 +70,7 @@ function AppContent() {
                             <motion.div {...pageTransition}>
                                 <HeroSection />
                                 <FeaturedProducts />
+                                <CuratedStories />
                                 <ContactSection />
                                 <FooterSection />
                             </motion.div>
