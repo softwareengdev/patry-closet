@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -51,14 +52,6 @@ const BlogPostPage = () => {
     }
   }, [post]);
 
-  // Dynamic document title
-  useEffect(() => {
-    if (post) {
-      document.title = `${t(post.titleKey, post.titleFallback)} — Patry Closet`;
-    }
-    return () => { document.title = 'Patry Closet'; };
-  }, [post, t]);
-
   if (isLoading) return <PostSkeleton isDark={isDark} />;
 
   if (error || !post) {
@@ -94,8 +87,59 @@ const BlogPostPage = () => {
     post.category
   );
 
+  const articleTitle = t(post.titleKey, post.titleFallback);
+  const articleDescription = t(post.excerptKey, post.excerptFallback);
+  const articleUrl = `https://patrycloset.com/blog/${post.slug}`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: articleTitle,
+    description: articleDescription,
+    image: post.coverImage,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    author: {
+      '@type': 'Person',
+      name: post.author.name,
+      jobTitle: post.author.role,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Patry Closet',
+      url: 'https://patrycloset.com',
+      logo: { '@type': 'ImageObject', url: 'https://patrycloset.com/icons/icon-512x512.png' },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': articleUrl },
+    wordCount: post.content?.split(/\s+/).length || 0,
+    articleSection: categoryLabel,
+    keywords: post.tags?.join(', '),
+  };
+
   return (
     <article className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+      {/* ─── SEO META + JSON-LD ─── */}
+      <Helmet>
+        <title>{articleTitle} — Patry Closet</title>
+        <meta name="description" content={articleDescription} />
+        <link rel="canonical" href={articleUrl} />
+        <meta property="og:title" content={articleTitle} />
+        <meta property="og:description" content={articleDescription} />
+        <meta property="og:image" content={post.coverImage} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={articleUrl} />
+        <meta property="article:published_time" content={post.publishedAt} />
+        <meta property="article:modified_time" content={post.updatedAt || post.publishedAt} />
+        <meta property="article:author" content={post.author.name} />
+        <meta property="article:section" content={categoryLabel} />
+        {post.tags?.map(tag => <meta key={tag} property="article:tag" content={tag} />)}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={articleTitle} />
+        <meta name="twitter:description" content={articleDescription} />
+        <meta name="twitter:image" content={post.coverImage} />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
+
       {/* ─── HERO ─── */}
       <header ref={heroRef} className="relative overflow-hidden">
         {/* Cover image */}

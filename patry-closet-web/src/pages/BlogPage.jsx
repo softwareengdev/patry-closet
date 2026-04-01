@@ -1,13 +1,14 @@
-import { useState, useContext, useRef, useCallback, useEffect } from 'react';
+import { useState, useContext, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import { BookOpen, ChevronLeft, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import { ThemeContext } from '../context/ThemeContext';
 import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
 import BlogSidebar from '../components/blog/BlogSidebar';
-import { useBlogPosts, useFeaturedPosts } from '../hooks/useBlog';
+import { useInfiniteBlogPosts, useFeaturedPosts } from '../hooks/useBlog';
 
 const BlogPage = () => {
   const { t } = useTranslation();
@@ -16,20 +17,34 @@ const BlogPage = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const heroRef = useRef(null);
   const heroInView = useInView(heroRef, { once: true });
+  const loadMoreRef = useRef(null);
 
   // Read filters from URL params
-  const filters = {
-    page: parseInt(searchParams.get('page')) || 1,
+  const filters = useMemo(() => ({
     perPage: 6,
     category: searchParams.get('category') || '',
     season: searchParams.get('season') || '',
     tag: searchParams.get('tag') || '',
     query: searchParams.get('q') || '',
     sort: searchParams.get('sort') || 'newest',
-  };
+  }), [searchParams]);
 
-  const { data, isLoading, isFetching } = useBlogPosts(filters);
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteBlogPosts(filters);
+
   const { data: featuredPosts } = useFeaturedPosts();
+
+  // Flatten paginated results into a single array
+  const allPosts = useMemo(
+    () => data?.pages?.flatMap(page => page.items) || [],
+    [data]
+  );
+  const total = data?.pages?.[0]?.total || 0;
 
   // Sync filters to URL
   const handleFilterChange = useCallback((newFilters) => {
@@ -39,37 +54,66 @@ const BlogPage = () => {
     if (newFilters.tag) params.set('tag', newFilters.tag);
     if (newFilters.query) params.set('q', newFilters.query);
     if (newFilters.sort && newFilters.sort !== 'newest') params.set('sort', newFilters.sort);
-    if (newFilters.page > 1) params.set('page', newFilters.page.toString());
     setSearchParams(params, { replace: true });
+    // Scroll to grid on filter change
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   }, [setSearchParams]);
 
-  // Scroll to top on page change
+  // Infinite scroll: IntersectionObserver on sentinel
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [filters.page]);
+    if (!loadMoreRef.current || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) fetchNextPage();
+      },
+      { rootMargin: '400px' }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // GA4 analytics
   useEffect(() => {
     if (typeof window.gtag === 'function') {
-      window.gtag('event', 'blog_view', { page: filters.page, category: filters.category });
+      window.gtag('event', 'blog_view', { category: filters.category });
     }
-  }, [filters.page, filters.category]);
+  }, [filters.category]);
 
-  const posts = data?.items || [];
-  const total = data?.total || 0;
-  const totalPages = data?.totalPages || 1;
-
-  // Featured hero post (first featured, not shown in main grid)
   const heroPost = featuredPosts?.[0];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+      {/* ─── SEO META ─── */}
+      <Helmet>
+        <title>{t('blog.heroTitle', 'Style, Trends & Stories')} — Patry Closet</title>
+        <meta name="description" content={t('blog.heroSubtitle', 'Discover the latest in fashion, sustainability, and the art of dressing well.')} />
+        <link rel="canonical" href="https://patrycloset.com/blog" />
+        <meta property="og:title" content={`${t('blog.heroTitle', 'Style, Trends & Stories')} — Patry Closet`} />
+        <meta property="og:description" content={t('blog.heroSubtitle', 'Discover the latest in fashion, sustainability, and the art of dressing well.')} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://patrycloset.com/blog" />
+        {heroPost && <meta property="og:image" content={heroPost.coverImage} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Blog',
+          name: 'Patry Closet Journal',
+          description: t('blog.heroSubtitle', 'Discover the latest in fashion, sustainability, and the art of dressing well.'),
+          url: 'https://patrycloset.com/blog',
+          publisher: {
+            '@type': 'Organization',
+            name: 'Patry Closet',
+            url: 'https://patrycloset.com',
+          },
+        })}</script>
+      </Helmet>
+
       {/* ─── HERO SECTION ─── */}
       <section
         ref={heroRef}
         className="relative overflow-hidden bg-gray-900 text-white"
       >
-        {/* Background image */}
         {heroPost && (
           <div className="absolute inset-0">
             <img
@@ -105,7 +149,6 @@ const BlogPage = () => {
             </p>
           </motion.div>
 
-          {/* Featured post card */}
           {heroPost && (
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -165,38 +208,55 @@ const BlogPage = () => {
           <div className="flex-1 min-w-0">
             {isLoading ? (
               <BlogGridSkeleton />
-            ) : posts.length === 0 ? (
+            ) : allPosts.length === 0 ? (
               <EmptyState t={t} isDark={isDark} />
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {posts.map((post, i) => (
+                  {allPosts.map((post, i) => (
                     <BlogCard
                       key={post.id}
                       post={post}
                       index={i}
-                      variant={i === 0 && filters.page === 1 && !filters.category ? 'featured' : 'default'}
+                      variant={i === 0 && !filters.category ? 'featured' : 'default'}
                     />
                   ))}
                 </div>
 
-                {/* Loading overlay during pagination */}
-                {isFetching && !isLoading && (
-                  <div className="mt-6 flex justify-center">
-                    <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
+                {/* Infinite scroll sentinel + loading */}
+                <div ref={loadMoreRef} className="mt-8 flex flex-col items-center gap-3">
+                  {isFetchingNextPage && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center gap-2 text-sm text-gray-400"
+                    >
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t('blog.loadingMore', 'Loading more articles...')}
+                    </motion.div>
+                  )}
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <Pagination
-                    page={filters.page}
-                    totalPages={totalPages}
-                    onPageChange={p => handleFilterChange({ ...filters, page: p })}
-                    isDark={isDark}
-                    t={t}
-                  />
-                )}
+                  {/* Manual load more button (fallback + accessibility) */}
+                  {hasNextPage && !isFetchingNextPage && (
+                    <button
+                      onClick={() => fetchNextPage()}
+                      className={`px-6 py-2.5 rounded-lg text-xs font-semibold transition-all
+                        ${isDark
+                          ? 'bg-gray-800 text-gray-300 hover:bg-gray-750 hover:text-white border border-gray-700'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-200'
+                        }`}
+                    >
+                      {t('blog.loadMore', 'Load More Articles')}
+                    </button>
+                  )}
+
+                  {/* End of results */}
+                  {!hasNextPage && allPosts.length > 0 && (
+                    <p className="text-xs text-gray-400 dark:text-gray-600">
+                      {t('blog.endOfResults', 'You\'ve reached the end')} · {total} {t('blog.articles', 'articles')}
+                    </p>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -210,49 +270,6 @@ const BlogPage = () => {
     </div>
   );
 };
-
-// ─── PAGINATION ───
-const Pagination = ({ page, totalPages, onPageChange, isDark, t }) => (
-  <nav className="flex items-center justify-center gap-2 mt-10" aria-label="Pagination">
-    <button
-      onClick={() => onPageChange(page - 1)}
-      disabled={page <= 1}
-      className={`p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed
-        ${isDark ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-600'}`}
-      aria-label={t('blog.prevPage', 'Previous page')}
-    >
-      <ChevronLeft className="w-4 h-4" />
-    </button>
-
-    {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-      <button
-        key={p}
-        onClick={() => onPageChange(p)}
-        className={`w-9 h-9 rounded-lg text-xs font-semibold transition-all
-          ${p === page
-            ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
-            : isDark
-              ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-          }`}
-        aria-current={p === page ? 'page' : undefined}
-        aria-label={`${t('blog.page', 'Page')} ${p}`}
-      >
-        {p}
-      </button>
-    ))}
-
-    <button
-      onClick={() => onPageChange(page + 1)}
-      disabled={page >= totalPages}
-      className={`p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed
-        ${isDark ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-600'}`}
-      aria-label={t('blog.nextPage', 'Next page')}
-    >
-      <ChevronRight className="w-4 h-4" />
-    </button>
-  </nav>
-);
 
 // ─── SKELETON GRID ───
 const BlogGridSkeleton = () => (

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import {
   blogPosts,
   getPostBySlug,
@@ -60,6 +60,7 @@ async function fetchBlogPosts({ page = 1, perPage = 6, category, season, tag, qu
     totalPages,
     hasNextPage: page < totalPages,
     hasPrevPage: page > 1,
+    nextPage: page < totalPages ? page + 1 : undefined,
   };
 }
 
@@ -85,7 +86,17 @@ export function useBlogPosts(filters = {}) {
     queryKey: ['blog-posts', filters],
     queryFn: () => fetchBlogPosts(filters),
     staleTime: 5 * 60 * 1000,
-    keepPreviousData: true,
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** Infinite scroll variant — loads pages as user scrolls */
+export function useInfiniteBlogPosts(filters = {}) {
+  return useInfiniteQuery({
+    queryKey: ['blog-posts-infinite', filters],
+    queryFn: ({ pageParam = 1 }) => fetchBlogPosts({ ...filters, page: pageParam }),
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

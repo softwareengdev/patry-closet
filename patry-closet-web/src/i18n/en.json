@@ -584,5 +584,14 @@
   "blog.post9.excerpt": "Elevate your WFH wardrobe without sacrificing comfort. Video-call ready meets all-day wearable.",
   "blog.post10.title": "The Denim Guide: How to Find Your Perfect Jeans",
   "blog.post10.excerpt": "Straight, wide-leg, or skinny? Dark wash or vintage? Our definitive guide to finding jeans that fit like they were made for you.",
+  "blog.loadMore": "Load More Articles",
+  "blog.loadingMore": "Loading more articles...",
+  "blog.endOfResults": "You've reached the end",
+  "contact.ticketRef": "Reference",
+  "contact.recaptchaNotice": "Protected by reCAPTCHA. Google",
+  "contact.privacy": "Privacy",
+  "contact.terms": "Terms",
+  "contact.pushTitle": "✅ Message Sent — Patry Closet",
+  "contact.pushBody": "We received your message and will reply within 2 hours.",
   "locale": "en-US"
 }

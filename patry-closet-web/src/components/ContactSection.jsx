@@ -2,12 +2,13 @@ import { useState, useContext, useRef, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useMutation } from '@tanstack/react-query';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import {
     Mail, Phone, MapPin, Send, Clock, MessageCircle,
     AlertCircle, CheckCircle, X, ImagePlus, Loader2,
-    ChevronDown, Sparkles, ArrowRight, Paperclip,
+    ChevronDown, Sparkles, ArrowRight, Paperclip, Shield,
 } from 'lucide-react';
 import { FaWhatsapp, FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
@@ -33,6 +34,79 @@ const SUBJECT_KEYS = [
     'returns',
     'other',
 ];
+
+/* ─── reCAPTCHA v3 (invisible) ─── */
+const RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Google test key
+
+const loadRecaptchaScript = () => {
+    if (document.getElementById('recaptcha-v3-script')) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.id = 'recaptcha-v3-script';
+        script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+};
+
+const getRecaptchaToken = async (action = 'contact_submit') => {
+    try {
+        await loadRecaptchaScript();
+        if (!window.grecaptcha) return null;
+        return await new Promise(resolve => {
+            window.grecaptcha.ready(() => {
+                window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action }).then(resolve).catch(() => resolve(null));
+            });
+        });
+    } catch {
+        return null;
+    }
+};
+
+/* ─── Push Notification (PWA) ─── */
+const sendPushNotification = async (title, body) => {
+    try {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'default') {
+            await Notification.requestPermission();
+        }
+        if (Notification.permission === 'granted') {
+            const reg = await navigator.serviceWorker?.ready;
+            if (reg) {
+                reg.showNotification(title, {
+                    body,
+                    icon: '/icons/icon-192x192.png',
+                    badge: '/icons/icon-192x192.png',
+                    tag: 'contact-form',
+                    vibrate: [100, 50, 100],
+                });
+            } else {
+                new Notification(title, { body });
+            }
+        }
+    } catch { /* Notification not critical */ }
+};
+
+/* ─── Contact API (mock → will connect to .NET backend) ─── */
+const submitContactForm = async ({ formData, attachments, recaptchaToken }) => {
+    // Simulate API call with FormData
+    const payload = new FormData();
+    Object.entries(formData).forEach(([key, val]) => {
+        if (key !== 'honeypot') payload.append(key, val);
+    });
+    if (recaptchaToken) payload.append('recaptchaToken', recaptchaToken);
+    attachments.forEach((file, i) => payload.append(`attachment_${i}`, file));
+
+    // Mock network delay — replace with: await axios.post('/api/contact', payload)
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Mock: 5% chance of failure for realistic error handling
+    if (Math.random() < 0.05) throw new Error('Network error');
+
+    return { success: true, ticketId: `PC-${Date.now().toString(36).toUpperCase()}` };
+};
 
 /* ─── Zod Schema ─── */
 const createContactSchema = (t) => z.object({
@@ -130,9 +204,15 @@ const ContactSection = () => {
 
     const [attachments, setAttachments] = useState([]);
     const [submitState, setSubmitState] = useState('idle'); // idle | sending | success | error
+    const [ticketId, setTicketId] = useState(null);
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef(null);
     const mapInView = useInView(mapRef, { once: true, margin: '200px' });
+
+    // Load reCAPTCHA script on mount
+    useEffect(() => {
+        loadRecaptchaScript().catch(() => {});
+    }, []);
 
     // Lazy-load the map when it comes near viewport
     useEffect(() => {
@@ -176,28 +256,23 @@ const ContactSection = () => {
         setAttachments(prev => prev.filter((_, i) => i !== index));
     }, []);
 
-    /* ─── Form submission ─── */
-    const onSubmit = async (data) => {
-        if (data.honeypot) return; // Bot detected
-
-        setSubmitState('sending');
-        try {
-            // Mock API call — replace with real endpoint when backend exists
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-
+    /* ─── React Query mutation for form submission ─── */
+    const contactMutation = useMutation({
+        mutationFn: submitContactForm,
+        onMutate: () => {
+            setSubmitState('sending');
+        },
+        onSuccess: (result) => {
             // Analytics event (GA4-ready)
             if (typeof window !== 'undefined' && window.gtag) {
                 window.gtag('event', 'contact_form_submit', {
                     event_category: 'engagement',
-                    event_label: data.subject,
+                    event_label: watch('subject'),
+                    ticket_id: result.ticketId,
                 });
             }
 
-            console.log('[ContactSection] Form submitted:', {
-                ...data,
-                attachments: attachments.map(f => f.name),
-            });
-
+            setTicketId(result.ticketId);
             setSubmitState('success');
             setAttachments([]);
             reset({
@@ -208,9 +283,30 @@ const ContactSection = () => {
                 message: '',
                 honeypot: '',
             });
-        } catch {
+
+            // Push notification (PWA)
+            sendPushNotification(
+                t('contact.pushTitle', '✅ Message Sent — Patry Closet'),
+                t('contact.pushBody', 'We received your message and will reply within 2 hours.'),
+            );
+        },
+        onError: () => {
             setSubmitState('error');
-        }
+        },
+    });
+
+    /* ─── Form submission with reCAPTCHA ─── */
+    const onSubmit = async (data) => {
+        if (data.honeypot) return; // Bot detected
+
+        // Get reCAPTCHA token (non-blocking — fails gracefully)
+        const recaptchaToken = await getRecaptchaToken('contact_submit');
+
+        contactMutation.mutate({
+            formData: data,
+            attachments,
+            recaptchaToken,
+        });
     };
 
     const handleNewMessage = () => {
@@ -307,6 +403,11 @@ const ContactSection = () => {
                                     <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">
                                         {t('contact.successMessage', 'Thank you for reaching out. Our team will get back to you within 2 business hours.')}
                                     </p>
+                                    {ticketId && (
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-6 font-mono">
+                                            {t('contact.ticketRef', 'Reference')}: {ticketId}
+                                        </p>
+                                    )}
                                     <button
                                         onClick={handleNewMessage}
                                         className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors ${
@@ -558,6 +659,17 @@ const ContactSection = () => {
                                                 </>
                                             )}
                                         </motion.button>
+                                        {/* reCAPTCHA v3 disclosure */}
+                                        <p className="mt-3 text-[10px] text-gray-400 dark:text-gray-600 text-center flex items-center justify-center gap-1">
+                                            <Shield className="w-3 h-3" />
+                                            {t('contact.recaptchaNotice', 'Protected by reCAPTCHA. Google')}{' '}
+                                            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600 dark:hover:text-gray-400">
+                                                {t('contact.privacy', 'Privacy')}
+                                            </a>{' & '}
+                                            <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600 dark:hover:text-gray-400">
+                                                {t('contact.terms', 'Terms')}
+                                            </a>
+                                        </p>
                                     </motion.div>
                                 </motion.form>
                             )}

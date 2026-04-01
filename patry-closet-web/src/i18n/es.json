@@ -584,5 +584,14 @@
   "blog.post9.excerpt": "Eleva tu guardarropa de teletrabajo sin sacrificar la comodidad. Preparada para videollamadas y cómoda todo el día.",
   "blog.post10.title": "La Guía del Denim: Cómo Encontrar tus Jeans Perfectos",
   "blog.post10.excerpt": "¿Rectos, anchos o pitillo? ¿Lavado oscuro o vintage? Nuestra guía definitiva para encontrar jeans que te queden como hechos a medida.",
+  "blog.loadMore": "Cargar Más Artículos",
+  "blog.loadingMore": "Cargando más artículos...",
+  "blog.endOfResults": "Has llegado al final",
+  "contact.ticketRef": "Referencia",
+  "contact.recaptchaNotice": "Protegido por reCAPTCHA. Google",
+  "contact.privacy": "Privacidad",
+  "contact.terms": "Términos",
+  "contact.pushTitle": "✅ Mensaje Enviado — Patry Closet",
+  "contact.pushBody": "Hemos recibido tu mensaje y responderemos en menos de 2 horas.",
   "locale": "es-ES"
 }
