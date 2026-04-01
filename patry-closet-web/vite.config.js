@@ -4,6 +4,29 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    resolve: {
+        dedupe: [
+            'react',
+            'react-dom',
+            'react-dom/client',
+            'react/jsx-runtime',
+            'react/jsx-dev-runtime',
+            'react-router-dom',
+        ],
+    },
+    optimizeDeps: {
+        include: [
+            'react',
+            'react-dom',
+            'react-dom/client',
+            'react/jsx-runtime',
+            'react/jsx-dev-runtime',
+            'react-helmet-async',
+            '@tanstack/react-query',
+            'react-router-dom',
+            'framer-motion',
+        ],
+    },
     plugins: [
         react(),
         VitePWA({
