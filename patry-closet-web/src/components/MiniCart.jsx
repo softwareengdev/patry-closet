@@ -56,13 +56,13 @@ const MiniCart = () => {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                        className="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white dark:bg-gray-900 shadow-2xl z-[56] flex flex-col"
+                        className="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-warm-50 dark:bg-gray-900 shadow-2xl z-[56] flex flex-col"
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('cart')}
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-warm-300 dark:border-gray-800">
                             <div className="flex items-center gap-3">
                                 <ShoppingBag className="w-5 h-5" />
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -71,7 +71,7 @@ const MiniCart = () => {
                             </div>
                             <button
                                 onClick={() => setMiniCartOpen(false)}
-                                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                className="p-2 rounded-full hover:bg-warm-300 dark:hover:bg-gray-800 transition-colors"
                                 aria-label={t('close')}
                             >
                                 <X className="w-5 h-5" />
@@ -81,7 +81,7 @@ const MiniCart = () => {
                         {/* Empty State */}
                         {cartItems.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-                                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                                <div className="w-16 h-16 rounded-full bg-warm-300 dark:bg-gray-800 flex items-center justify-center mb-4">
                                     <ShoppingBag className="w-8 h-8 text-gray-400" />
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('emptyCart')}</h3>
@@ -113,7 +113,7 @@ const MiniCart = () => {
                                                 <Link
                                                     to={`/products/${item.id}`}
                                                     onClick={() => setMiniCartOpen(false)}
-                                                    className="flex-shrink-0 w-20 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800"
+                                                    className="flex-shrink-0 w-20 h-24 rounded-xl overflow-hidden bg-warm-300 dark:bg-gray-800"
                                                 >
                                                     <img
                                                         src={item.image}
@@ -135,7 +135,7 @@ const MiniCart = () => {
                                                         {item.color && item.color !== '-' && (
                                                             <div className="flex items-center gap-1">
                                                                 <span
-                                                                    className="w-3 h-3 rounded-full border border-gray-200 dark:border-gray-600"
+                                                                    className="w-3 h-3 rounded-full border border-warm-400 dark:border-gray-600"
                                                                     style={{ backgroundColor: COLOR_MAP[item.color] || item.color }}
                                                                 />
                                                                 <span className="text-xs text-gray-500">{item.color}</span>
@@ -148,11 +148,11 @@ const MiniCart = () => {
 
                                                     {/* Quantity & Price */}
                                                     <div className="flex items-center justify-between mt-2">
-                                                        <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg">
+                                                        <div className="flex items-center border border-warm-400 dark:border-gray-700 rounded-lg">
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)}
                                                                 disabled={item.quantity <= 1}
-                                                                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-l-lg disabled:opacity-30 transition-colors"
+                                                                className="p-1.5 hover:bg-warm-300 dark:hover:bg-gray-800 rounded-l-lg disabled:opacity-30 transition-colors"
                                                                 aria-label={t('decreaseQuantity')}
                                                             >
                                                                 <Minus className="w-3 h-3" />
@@ -162,7 +162,7 @@ const MiniCart = () => {
                                                             </span>
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)}
-                                                                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-r-lg transition-colors"
+                                                                className="p-1.5 hover:bg-warm-300 dark:hover:bg-gray-800 rounded-r-lg transition-colors"
                                                                 aria-label={t('increaseQuantity')}
                                                             >
                                                                 <Plus className="w-3 h-3" />
@@ -193,7 +193,7 @@ const MiniCart = () => {
                                 </div>
 
                                 {/* Footer Summary */}
-                                <div className="border-t border-gray-100 dark:border-gray-800 px-6 py-4 space-y-3 bg-gray-50/50 dark:bg-gray-800/30">
+                                <div className="border-t border-warm-300 dark:border-gray-800 px-6 py-4 space-y-3 bg-warm-200/50 dark:bg-gray-800/30">
                                     {/* Coupon indicator */}
                                     {coupon && (
                                         <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm">
@@ -223,7 +223,7 @@ const MiniCart = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="flex justify-between pt-2 border-t border-warm-400 dark:border-gray-700">
                                         <span className="font-semibold text-gray-900 dark:text-white">{t('total')}</span>
                                         <span className="text-lg font-bold text-gray-900 dark:text-white">${getGrandTotal().toFixed(2)}</span>
                                     </div>
@@ -234,7 +234,7 @@ const MiniCart = () => {
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                                 {t('freeShippingProgress', { amount: (50 - getSubtotal()).toFixed(2) })}
                                             </p>
-                                            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div className="w-full h-1.5 bg-warm-400 dark:bg-gray-700 rounded-full overflow-hidden">
                                                 <div
                                                     className="h-full bg-accent-900 dark:bg-white rounded-full transition-all duration-500"
                                                     style={{ width: `${Math.min(100, (getSubtotal() / 50) * 100)}%` }}

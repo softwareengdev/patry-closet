@@ -94,7 +94,7 @@ function StepIndicator({ current, t }) {
                     ? 'bg-black dark:bg-white text-white dark:text-black'
                     : active
                       ? 'bg-black dark:bg-white text-white dark:text-black ring-4 ring-black/10 dark:ring-white/20'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
+                      : 'bg-warm-300 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -137,12 +137,12 @@ function FormField({ label, id, type = 'text', value, onChange, error, required,
           aria-label={label}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-err` : undefined}
-          className={`w-full rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 py-2.5 focus:outline-none focus:ring-2 transition-colors ${
+          className={`w-full rounded-lg border bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 py-2.5 focus:outline-none focus:ring-2 transition-colors ${
             Icon ? 'pl-10 pr-3' : 'px-3'
           } ${
             error
               ? 'border-red-500 focus:ring-red-500/40'
-              : 'border-gray-300 dark:border-gray-600 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white'
+              : 'border-warm-500 dark:border-gray-600 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white'
           }`}
           {...rest}
         />
@@ -182,7 +182,7 @@ function OrderSummary({ data, collapsible = false, t }) {
       <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
         {items.map((item, idx) => (
           <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="flex gap-3">
-            <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-warm-300 dark:bg-gray-800">
               {item.image || item.images?.[0] ? (
                 <img
                   src={item.image || item.images[0]}
@@ -212,7 +212,7 @@ function OrderSummary({ data, collapsible = false, t }) {
       </div>
 
       {/* Totals */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2 text-sm">
+      <div className="border-t border-warm-400 dark:border-gray-700 pt-3 space-y-2 text-sm">
         <div className="flex justify-between text-gray-600 dark:text-gray-400">
           <span>{t('subtotal') || 'Subtotal'}</span>
           <span>{fmt(subtotal)}</span>
@@ -247,7 +247,7 @@ function OrderSummary({ data, collapsible = false, t }) {
       </div>
 
       {/* Grand total */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+      <div className="border-t border-warm-400 dark:border-gray-700 pt-3">
         <div className="flex justify-between items-center">
           <span className="text-base font-bold text-gray-900 dark:text-white">{t('grandTotal')}</span>
           <span className="text-lg font-bold text-gray-900 dark:text-white">{fmt(grandTotal)}</span>
@@ -261,12 +261,12 @@ function OrderSummary({ data, collapsible = false, t }) {
 
       {/* Free shipping progress */}
       {shipping > 0 && subtotal < freeShipThreshold && (
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+        <div className="bg-warm-200 dark:bg-gray-800/50 rounded-lg p-3">
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
             Add <span className="font-semibold text-gray-900 dark:text-white">{fmt(remaining)}</span> more
             for free shipping!
           </p>
-          <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-warm-400 dark:bg-gray-700 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-black dark:bg-white rounded-full"
               initial={{ width: 0 }}
@@ -281,7 +281,7 @@ function OrderSummary({ data, collapsible = false, t }) {
 
   if (collapsible) {
     return (
-      <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-900">
+      <div className="border border-warm-400 dark:border-gray-700 rounded-xl overflow-hidden bg-warm-50 dark:bg-gray-900">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -315,7 +315,7 @@ function OrderSummary({ data, collapsible = false, t }) {
   }
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 bg-white dark:bg-gray-900">
+    <div className="border border-warm-400 dark:border-gray-700 rounded-xl p-6 bg-warm-50 dark:bg-gray-900">
       <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
         <ShoppingBag className="w-5 h-5" />
         {t('orderSummary') || 'Order Summary'}
@@ -446,7 +446,7 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
             onChange={handleChange}
             aria-label={t('country') || 'Country'}
             autoComplete="country"
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
+            className="w-full rounded-lg border border-warm-500 dark:border-gray-600 bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
           >
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>
@@ -474,7 +474,7 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
             name="saveAddress"
             checked={data.saveAddress}
             onChange={handleChange}
-            className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white accent-black dark:accent-white"
+            className="w-4 h-4 rounded border-warm-500 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white accent-black dark:accent-white"
           />
           <span className="text-sm text-gray-700 dark:text-gray-300">
             {t('saveAddress') || 'Save this address for future orders'}
@@ -485,7 +485,7 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
       <button
         type="button"
         onClick={onContinue}
-        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
       >
         {t('continueToPayment') || 'Continue to Payment'}
         <CreditCard className="w-4 h-4" />
@@ -554,7 +554,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
           <button
             type="button"
             disabled
-            className="relative flex items-center justify-center gap-2 py-3 bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium"
+            className="relative flex items-center justify-center gap-2 py-3 bg-warm-50 dark:bg-gray-800 text-black dark:text-white border border-warm-500 dark:border-gray-600 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium"
           >
             Google Pay
             <span className="absolute -top-2 -right-2 text-[10px] bg-gray-500 text-white px-1.5 py-0.5 rounded-full leading-tight">
@@ -567,10 +567,10 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
       {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          <div className="w-full border-t border-warm-400 dark:border-gray-700" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 dark:text-gray-400">
+          <span className="bg-warm-50 dark:bg-gray-900 px-4 text-gray-500 dark:text-gray-400">
             {t('orPayWithCard') || 'or pay with card'}
           </span>
         </div>
@@ -582,10 +582,10 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
           {t('cardDetails') || 'Card Details'}
         </label>
         <div
-          className={`border rounded-lg p-3.5 bg-white dark:bg-gray-800 transition-colors focus-within:ring-2 focus-within:border-black dark:focus-within:border-white ${
+          className={`border rounded-lg p-3.5 bg-warm-50 dark:bg-gray-800 transition-colors focus-within:ring-2 focus-within:border-black dark:focus-within:border-white ${
             cardComplete
               ? 'border-green-400 dark:border-green-500 focus-within:ring-green-500/20'
-              : 'border-gray-300 dark:border-gray-600 focus-within:ring-black/20 dark:focus-within:ring-white/20'
+              : 'border-warm-500 dark:border-gray-600 focus-within:ring-black/20 dark:focus-within:ring-white/20'
           }`}
         >
           <CardElement options={cardOptions} onChange={(e) => setCardComplete(e.complete)} />
@@ -623,13 +623,13 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
               onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
               placeholder="PATRY10"
               aria-label={t('couponCode') || 'Coupon code'}
-              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
+              className="flex-1 rounded-lg border border-warm-500 dark:border-gray-600 bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
               onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
             />
             <button
               type="button"
               onClick={handleApplyCoupon}
-              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="px-4 py-2 bg-warm-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg text-sm font-medium hover:bg-warm-400 dark:hover:bg-gray-600 transition-colors"
             >
               {t('apply') || 'Apply'}
             </button>
@@ -651,7 +651,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
       </div>
 
       {/* Security badges */}
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 py-3 border-t border-b border-gray-100 dark:border-gray-800">
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 py-3 border-t border-b border-warm-300 dark:border-gray-800">
         <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
           <Lock className="w-3.5 h-3.5" />
           {t('secureCheckout') || 'Secure Checkout'}
@@ -671,7 +671,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
         type="button"
         onClick={onPlaceOrder}
         disabled={processing || !cardComplete}
-        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {processing ? (
           <>
@@ -745,7 +745,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
       </div>
 
       {/* Order number */}
-      <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2.5">
+      <div className="inline-flex items-center gap-2 bg-warm-300 dark:bg-gray-800 rounded-lg px-4 py-2.5">
         <Package className="w-4 h-4 text-gray-500" />
         <span className="text-sm text-gray-600 dark:text-gray-400">
           {t('orderNumber') || 'Order'}:
@@ -756,7 +756,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
       </div>
 
       {/* Order details card */}
-      <div className="text-left bg-gray-50 dark:bg-gray-800/50 rounded-xl p-5 space-y-4 max-w-md mx-auto">
+      <div className="text-left bg-warm-200 dark:bg-gray-800/50 rounded-xl p-5 space-y-4 max-w-md mx-auto">
         {/* Shipping address */}
         <div>
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
@@ -793,7 +793,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
         </div>
 
         {/* Total */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex justify-between text-base font-bold text-gray-900 dark:text-white">
+        <div className="border-t border-warm-400 dark:border-gray-700 pt-3 flex justify-between text-base font-bold text-gray-900 dark:text-white">
           <span>{t('total')}</span>
           <span>{fmt(order.grandTotal)}</span>
         </div>
@@ -813,14 +813,14 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
         <button
           type="button"
           onClick={() => navigate('/products')}
-          className="flex-1 bg-black dark:bg-white text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+          className="flex-1 bg-black dark:bg-white text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
         >
           {t('continueShopping') || 'Continue Shopping'}
         </button>
         <button
           type="button"
           disabled
-          className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 font-semibold py-3 rounded-lg cursor-not-allowed"
+          className="flex-1 border border-warm-500 dark:border-gray-600 text-gray-400 dark:text-gray-500 font-semibold py-3 rounded-lg cursor-not-allowed"
         >
           {t('viewOrder') || 'View Order'}
         </button>
@@ -973,7 +973,7 @@ function Checkout() {
           </p>
           <Link
             to="/products"
-            className="inline-flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
           >
             <ShoppingBag className="w-4 h-4" />
             {t('shopNow') || 'Shop Now'}
@@ -992,7 +992,7 @@ function Checkout() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white font-serif">
             {t('checkout')}
           </h1>
-          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded mt-1 inline-block">
+          <span className="text-xs text-gray-500 dark:text-gray-400 bg-warm-300 dark:bg-gray-800 px-2 py-0.5 rounded mt-1 inline-block">
             {t('guestCheckout') || 'Guest Checkout'}
           </span>
         </div>

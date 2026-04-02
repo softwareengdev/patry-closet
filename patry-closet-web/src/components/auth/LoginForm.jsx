@@ -123,7 +123,7 @@ const LoginForm = () => {
                             className={`w-full pl-11 pr-4 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                 errors.email
                                     ? 'border-red-400 focus:border-red-500'
-                                    : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                    : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                             }`}
                             aria-invalid={!!errors.email}
                             aria-describedby={errors.email ? 'login-email-error' : undefined}
@@ -161,7 +161,7 @@ const LoginForm = () => {
                             className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                 errors.password
                                     ? 'border-red-400 focus:border-red-500'
-                                    : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                    : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                             }`}
                             aria-invalid={!!errors.password}
                             aria-describedby={errors.password ? 'login-password-error' : undefined}
@@ -189,7 +189,7 @@ const LoginForm = () => {
                         id="remember-me"
                         type="checkbox"
                         {...register('rememberMe')}
-                        className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white accent-black dark:accent-white"
+                        className="w-4 h-4 rounded border-warm-500 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white accent-black dark:accent-white"
                     />
                     <label htmlFor="remember-me" className="text-sm text-gray-600 dark:text-gray-400">
                         {t('auth.rememberMe', 'Remember me for 30 days')}
@@ -202,10 +202,10 @@ const LoginForm = () => {
                     disabled={isSubmitting}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? (
-                        <div className="w-5 h-5 border-2 border-gray-400 border-t-white dark:border-t-black rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
                     ) : (
                         <>
                             {t('auth.signIn', 'Sign In')}

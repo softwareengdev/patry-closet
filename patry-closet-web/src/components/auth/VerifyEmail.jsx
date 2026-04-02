@@ -61,8 +61,8 @@ const VerifyEmail = () => {
             {/* ═══ Verifying ═══ */}
             {status === 'verifying' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <div className="w-10 h-10 border-4 border-gray-200 dark:border-gray-700 border-t-black dark:border-t-white rounded-full animate-spin" />
+                    <div className="w-20 h-20 bg-warm-300 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="w-10 h-10 border-4 border-warm-400 dark:border-gray-700 border-t-black dark:border-t-white rounded-full animate-spin" />
                     </div>
                     <h2 className="text-2xl font-bold mb-2">{t('auth.verifyingEmail', 'Verifying Your Email...')}</h2>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">
@@ -91,7 +91,7 @@ const VerifyEmail = () => {
                         <p className="font-semibold text-lg mb-6">{email}</p>
                     )}
 
-                    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 mb-6 text-left">
+                    <div className="bg-warm-200 dark:bg-gray-800/50 rounded-xl p-4 mb-6 text-left">
                         <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                             {t('auth.checkInbox', "Check your inbox and click the verification link. If you don't see it, check your spam folder.")}
                         </p>

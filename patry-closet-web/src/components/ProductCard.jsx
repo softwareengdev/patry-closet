@@ -9,7 +9,7 @@ import { COLOR_MAP } from './ProductsPage';
 
 /* ─── Shimmer placeholder ─── */
 const ShimmerPlaceholder = () => (
-    <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 animate-pulse">
+    <div className="absolute inset-0 bg-warm-300 dark:bg-gray-800 animate-pulse">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent shimmer-wave" />
     </div>
 );
@@ -56,7 +56,7 @@ const LazyImage = ({ src, alt, className, onLoad: externalOnLoad, ...props }) =>
                 />
             )}
             {error && (
-                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
+                <div className="absolute inset-0 bg-warm-400 dark:bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
                     Image unavailable
                 </div>
             )}
@@ -107,7 +107,7 @@ const ColorSwatches = ({ colors, selected, onSelect, compact = false }) => {
                     <button
                         key={colorName}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelect(colorName); }}
-                        className={`relative w-5 h-5 rounded-full transition-all duration-200 ${isSelected ? 'ring-2 ring-offset-1 ring-black dark:ring-white scale-110' : 'hover:scale-110'} ${isLight ? 'border border-gray-300' : ''}`}
+                        className={`relative w-5 h-5 rounded-full transition-all duration-200 ${isSelected ? 'ring-2 ring-offset-1 ring-black dark:ring-white scale-110' : 'hover:scale-110'} ${isLight ? 'border border-warm-500' : ''}`}
                         style={{ backgroundColor: hex }}
                         title={colorName}
                         aria-label={colorName}
@@ -135,14 +135,14 @@ const SizeStrip = ({ sizes, onSelect }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800 px-3 py-2.5 z-10"
+            className="absolute bottom-0 left-0 right-0 bg-warm-50/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-warm-300 dark:border-gray-800 px-3 py-2.5 z-10"
         >
             <div className="flex items-center justify-center gap-1.5 flex-wrap">
                 {sizes.map((size) => (
                     <button
                         key={size}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelect(size); }}
-                        className="px-2.5 py-1 text-[11px] font-medium border border-gray-200 dark:border-gray-700 hover:border-black dark:hover:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-200 uppercase tracking-wide"
+                        className="px-2.5 py-1 text-[11px] font-medium border border-warm-400 dark:border-gray-700 hover:border-black dark:hover:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-200 uppercase tracking-wide"
                     >
                         {size}
                     </button>
@@ -213,7 +213,7 @@ const ProductCard = ({ product, onQuickView }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="group relative bg-white dark:bg-gray-900 overflow-hidden"
+            className="group relative bg-warm-50 dark:bg-gray-900 overflow-hidden"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             role="article"
@@ -243,7 +243,7 @@ const ProductCard = ({ product, onQuickView }) => {
                 {/* Wishlist button */}
                 <button
                     onClick={handleWishlistClick}
-                    className="absolute top-3 right-3 z-10 p-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
+                    className="absolute top-3 right-3 z-10 p-2 bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-warm-50 dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
                     aria-label={t('wishlist')}
                 >
                     <motion.div animate={wishlistAnimating ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
@@ -262,7 +262,7 @@ const ProductCard = ({ product, onQuickView }) => {
                             exit={{ opacity: 0, y: 8 }}
                             transition={{ duration: 0.2 }}
                             onClick={handleQuickViewClick}
-                            className="absolute top-3 right-12 z-10 p-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
+                            className="absolute top-3 right-12 z-10 p-2 bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-warm-50 dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
                             aria-label="Quick view"
                         >
                             <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />

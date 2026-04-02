@@ -67,7 +67,7 @@ const PaymentsTab = () => {
         return (
             <div className="space-y-4 max-w-2xl">
                 {[1, 2].map(i => (
-                    <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`} />
+                    <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`} />
                 ))}
             </div>
         );
@@ -97,7 +97,7 @@ const PaymentsTab = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="mb-6 overflow-hidden"
                     >
-                        <div className={`p-5 rounded-xl border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+                        <div className={`p-5 rounded-xl border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                             <div className="flex items-center gap-2 mb-4">
                                 <ShieldCheck className="w-5 h-5 text-green-500" />
                                 <span className="text-sm font-medium">{t('account.securePayment', 'Secure payment via Stripe')}</span>
@@ -105,7 +105,7 @@ const PaymentsTab = () => {
                             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                                 {t('account.stripeNote', 'Card details are securely processed by Stripe. We never store your full card number.')}
                             </p>
-                            <div className={`p-4 rounded-lg border mb-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}`}>
+                            <div className={`p-4 rounded-lg border mb-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-warm-500 bg-warm-50'}`}>
                                 <div className="h-10 flex items-center text-sm text-gray-400">
                                     {t('account.stripeElementPlaceholder', 'Stripe CardElement would render here with real backend')}
                                 </div>
@@ -116,7 +116,7 @@ const PaymentsTab = () => {
                                     {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                                     {t('account.addCard', 'Add Card')}
                                 </motion.button>
-                                <button onClick={() => setShowAddForm(false)} className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
+                                <button onClick={() => setShowAddForm(false)} className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 rounded-lg text-sm">
                                     {t('account.cancel', 'Cancel')}
                                 </button>
                             </div>
@@ -137,8 +137,8 @@ const PaymentsTab = () => {
                             exit={{ opacity: 0, x: -20 }}
                             className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                                 pm.isDefault
-                                    ? isDark ? 'border-white/30 bg-gray-800/50' : 'border-black/20 bg-gray-50'
-                                    : isDark ? 'border-gray-800' : 'border-gray-200'
+                                    ? isDark ? 'border-white/30 bg-gray-800/50' : 'border-black/20 bg-warm-200'
+                                    : isDark ? 'border-gray-800' : 'border-warm-400'
                             }`}
                         >
                             <div className="shrink-0">

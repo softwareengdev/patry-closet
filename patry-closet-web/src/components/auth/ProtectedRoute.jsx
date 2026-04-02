@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                 >
-                    <div className="w-12 h-12 border-4 border-gray-200 dark:border-gray-700 border-t-black dark:border-t-white rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-warm-400 dark:border-gray-700 border-t-black dark:border-t-white rounded-full animate-spin" />
                     <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
                 </motion.div>
             </div>

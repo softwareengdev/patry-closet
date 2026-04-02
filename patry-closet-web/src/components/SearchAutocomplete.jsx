@@ -178,7 +178,7 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className={`overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950'}`}
+            className={`overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-950'}`}
         >
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
                 {/* Search input */}
@@ -228,7 +228,7 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
                                             role="option"
                                             aria-selected={activeIndex === itemIndex}
                                             onClick={() => handleSubmit(term)}
-                                            className={`px-3 py-1.5 text-sm border rounded-full transition-colors ${activeIndex === itemIndex ? 'bg-accent-900 text-white border-accent-900 dark:bg-white dark:text-black' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400'}`}
+                                            className={`px-3 py-1.5 text-sm border rounded-full transition-colors ${activeIndex === itemIndex ? 'bg-accent-900 text-white border-accent-900 dark:bg-white dark:text-black' : 'border-warm-400 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-warm-500'}`}
                                         >
                                             {term}
                                         </button>
@@ -260,7 +260,7 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
                                             role="option"
                                             aria-selected={activeIndex === itemIndex}
                                             onClick={() => handleSubmit(term)}
-                                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${activeIndex === itemIndex ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${activeIndex === itemIndex ? 'bg-warm-300 dark:bg-gray-800' : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                                         >
                                             <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                                             <span className="text-gray-700 dark:text-gray-300">{term}</span>
@@ -288,7 +288,7 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
                                             role="option"
                                             aria-selected={activeIndex === itemIndex}
                                             onClick={() => handleCategoryClick(cat)}
-                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeIndex === itemIndex ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeIndex === itemIndex ? 'bg-warm-300 dark:bg-gray-800' : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                                         >
                                             <span className="text-lg">{cat.icon}</span>
                                             <span className="font-medium">
@@ -318,7 +318,7 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
                                             role="option"
                                             aria-selected={activeIndex === itemIndex}
                                             onClick={() => handleProductClick(product)}
-                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeIndex === itemIndex ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeIndex === itemIndex ? 'bg-warm-300 dark:bg-gray-800' : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                                         >
                                             <img
                                                 src={product.image}
@@ -355,7 +355,7 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
                             role="option"
                             aria-selected={activeIndex === allItems.length - 1}
                             onClick={() => handleSubmit()}
-                            className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeIndex === allItems.length - 1 ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                            className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeIndex === allItems.length - 1 ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'bg-warm-300 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-warm-400 dark:hover:bg-gray-700'}`}
                         >
                             {t('viewAllResults')} "{debouncedQuery}"
                             <ArrowRight className="w-4 h-4" />

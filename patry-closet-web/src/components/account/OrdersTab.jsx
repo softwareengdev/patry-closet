@@ -11,7 +11,7 @@ const STATUS_CONFIG = {
     shipped: { color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400', icon: Truck, label: 'Shipped' },
     delivered: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle, label: 'Delivered' },
     cancelled: { color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: XCircle, label: 'Cancelled' },
-    returned: { color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400', icon: RotateCcw, label: 'Returned' },
+    returned: { color: 'bg-warm-300 text-gray-700 dark:bg-gray-800 dark:text-gray-400', icon: RotateCcw, label: 'Returned' },
 };
 
 const OrdersTab = () => {
@@ -42,12 +42,12 @@ const OrdersTab = () => {
         return (
             <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                    <div key={i} className={`rounded-xl p-5 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                    <div key={i} className={`rounded-xl p-5 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                         <div className="flex gap-4">
-                            <div className={`w-16 h-16 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                            <div className={`w-16 h-16 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
                             <div className="flex-1 space-y-2">
-                                <div className={`h-4 w-32 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-                                <div className={`h-3 w-48 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                                <div className={`h-4 w-32 rounded ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
+                                <div className={`h-3 w-48 rounded ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@ const OrdersTab = () => {
                         className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                             filter === f
                                 ? 'bg-black dark:bg-white text-white dark:text-black'
-                                : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-warm-300 text-gray-600 hover:bg-warm-400'
                         }`}>
                         {f === 'all' ? t('account.allOrders', 'All') : STATUS_CONFIG[f]?.label || f}
                     </button>
@@ -90,13 +90,13 @@ const OrdersTab = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className={`rounded-xl border overflow-hidden ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white'}`}
+                                className={`rounded-xl border overflow-hidden ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-50'}`}
                             >
                                 {/* Header */}
                                 <button onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
-                                    className="w-full p-4 sm:p-5 flex items-center gap-4 text-left hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                    className="w-full p-4 sm:p-5 flex items-center gap-4 text-left hover:bg-warm-200/50 dark:hover:bg-gray-800/50 transition-colors">
                                     {/* First item image */}
-                                    <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-800">
+                                    <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-warm-300 dark:bg-gray-800">
                                         <img src={order.items[0]?.image} alt="" className="w-full h-full object-cover" />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -123,10 +123,10 @@ const OrdersTab = () => {
                                             transition={{ duration: 0.2 }}
                                             className="overflow-hidden"
                                         >
-                                            <div className={`px-5 pb-5 border-t ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                            <div className={`px-5 pb-5 border-t ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                 {/* Tracking */}
                                                 {order.trackingNumber && (
-                                                    <div className={`mt-4 p-3 rounded-lg flex items-center justify-between ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                                    <div className={`mt-4 p-3 rounded-lg flex items-center justify-between ${isDark ? 'bg-gray-800' : 'bg-warm-200'}`}>
                                                         <div className="flex items-center gap-2">
                                                             <Truck className="w-4 h-4 text-purple-500" />
                                                             <span className="text-xs font-medium">{t('account.tracking', 'Tracking')}: {order.trackingNumber}</span>
@@ -142,7 +142,7 @@ const OrdersTab = () => {
                                                 <div className="mt-4 space-y-3">
                                                     {order.items.map((item, i) => (
                                                         <div key={i} className="flex items-center gap-3">
-                                                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
+                                                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-warm-300 dark:bg-gray-800 shrink-0">
                                                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                                             </div>
                                                             <div className="flex-1 min-w-0">
@@ -155,7 +155,7 @@ const OrdersTab = () => {
                                                 </div>
 
                                                 {/* Totals */}
-                                                <div className={`mt-4 pt-3 border-t space-y-1 ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                                <div className={`mt-4 pt-3 border-t space-y-1 ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                     <div className="flex justify-between text-xs text-gray-500"><span>{t('subtotal', 'Subtotal')}</span><span>{formatCurrency(order.subtotal)}</span></div>
                                                     {order.discount > 0 && <div className="flex justify-between text-xs text-green-600"><span>{t('discount', 'Discount')}</span><span>-{formatCurrency(order.discount)}</span></div>}
                                                     <div className="flex justify-between text-xs text-gray-500"><span>{t('shipping', 'Shipping')}</span><span>{order.shipping === 0 ? t('freeShipping', 'Free') : formatCurrency(order.shipping)}</span></div>
@@ -171,7 +171,7 @@ const OrdersTab = () => {
                                                 )}
 
                                                 {/* Payment info */}
-                                                <div className={`mt-3 pt-3 border-t flex items-center gap-2 text-xs text-gray-500 ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                                <div className={`mt-3 pt-3 border-t flex items-center gap-2 text-xs text-gray-500 ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                     <span className="capitalize">{order.paymentMethod?.brand}</span>
                                                     <span>•••• {order.paymentMethod?.last4}</span>
                                                 </div>

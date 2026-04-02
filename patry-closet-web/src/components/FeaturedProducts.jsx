@@ -15,7 +15,7 @@ const FeaturedProducts = () => {
         .slice(0, 8);
 
     return (
-        <section className="py-20 sm:py-28 bg-white dark:bg-gray-950 w-full">
+        <section className="py-20 sm:py-28 bg-warm-100 dark:bg-gray-950 w-full">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
                 {/* Section header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-12 sm:mb-16">

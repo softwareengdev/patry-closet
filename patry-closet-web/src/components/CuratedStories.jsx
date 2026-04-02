@@ -192,7 +192,7 @@ const CuratedStories = () => {
           ? 'bg-hc-bg'
           : isDark
             ? 'bg-gray-900'
-            : 'bg-neutral-50'
+            : 'bg-warm-200'
       }`}
       aria-label={t('stories.sectionLabel', 'Curated stories')}
     >
@@ -303,7 +303,7 @@ const CuratedStories = () => {
             className={`flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-colors border ${
               isDark
                 ? 'border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                : 'border-warm-400 text-gray-600 hover:bg-warm-300 hover:text-gray-900'
             }`}
           >
             {t('stories.seeMoreMobile', 'Explore All Collections')}

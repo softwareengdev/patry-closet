@@ -1,4 +1,4 @@
-﻿// src/components/QuickViewModal.jsx
+// src/components/QuickViewModal.jsx
 import { useState, useContext, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, ShoppingCart, Star } from 'lucide-react';
@@ -61,19 +61,19 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.4, ease: "easeOut" }}
-                        className="bg-white dark:bg-gray-950 w-full max-w-6xl mx-4 rounded-3xl overflow-hidden shadow-2xl relative"
+                        className="bg-warm-50 dark:bg-gray-950 w-full max-w-6xl mx-4 rounded-3xl overflow-hidden shadow-2xl relative"
                     >
                         {/* Botón cerrar premium */}
                         <button
                             onClick={onClose}
-                            className="absolute top-6 right-6 z-50 p-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl hover:scale-110 transition-all shadow-lg"
+                            className="absolute top-6 right-6 z-50 p-3 bg-warm-50/90 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl hover:scale-110 transition-all shadow-lg"
                         >
                             <X className="w-6 h-6" />
                         </button>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[85vh]">
                             {/* === GALERÍA CON ZOOM === */}
-                            <div className="relative bg-gray-50 dark:bg-gray-900 p-8 flex items-center justify-center overflow-hidden">
+                            <div className="relative bg-warm-200 dark:bg-gray-900 p-8 flex items-center justify-center overflow-hidden">
                                 <TransformWrapper
                                     initialScale={1}
                                     minScale={0.8}
@@ -98,7 +98,7 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                         <button
                                             key={idx}
                                             onClick={() => setSelectedImage(idx)}
-                                            className={`w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-blue-600 scale-110' : 'border-transparent hover:border-gray-300'}`}
+                                            className={`w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-blue-600 scale-110' : 'border-transparent hover:border-warm-500'}`}
                                         >
                                             <img src={img} alt="" className="w-full h-full object-cover" />
                                         </button>
@@ -141,7 +141,7 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                             <button
                                                 key={color}
                                                 onClick={() => setSelectedColor(color)}
-                                                className={`w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color ? 'border-blue-600 scale-110' : 'border-transparent hover:border-gray-300'}`}
+                                                className={`w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color ? 'border-blue-600 scale-110' : 'border-transparent hover:border-warm-500'}`}
                                                 style={{ backgroundColor: color.toLowerCase() }}
                                             />
                                         ))}
@@ -158,7 +158,7 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                                 onClick={() => setSelectedSize(size)}
                                                 className={`px-6 py-3 rounded-2xl font-medium transition-all ${selectedSize === size
                                                     ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                    : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                                                    : 'bg-warm-300 dark:bg-gray-800 hover:bg-warm-400 dark:hover:bg-gray-700'}`}
                                             >
                                                 {size}
                                             </button>
@@ -170,9 +170,9 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                 <div className="mt-auto pt-10 border-t dark:border-gray-800">
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center border dark:border-gray-700 rounded-2xl">
-                                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-5 py-4 text-2xl hover:bg-gray-100 dark:hover:bg-gray-800 rounded-l-2xl">-</button>
+                                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-5 py-4 text-2xl hover:bg-warm-300 dark:hover:bg-gray-800 rounded-l-2xl">-</button>
                                             <span className="px-8 font-semibold text-xl">{quantity}</span>
-                                            <button onClick={() => setQuantity(quantity + 1)} className="px-5 py-4 text-2xl hover:bg-gray-100 dark:hover:bg-gray-800 rounded-r-2xl">+</button>
+                                            <button onClick={() => setQuantity(quantity + 1)} className="px-5 py-4 text-2xl hover:bg-warm-300 dark:hover:bg-gray-800 rounded-r-2xl">+</button>
                                         </div>
 
                                         <button

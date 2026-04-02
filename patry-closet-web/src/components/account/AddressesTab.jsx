@@ -24,8 +24,8 @@ const AddressCard = ({ address, isDefault, onEdit, onDelete, onSetDefault, isDar
             exit={{ opacity: 0, scale: 0.95 }}
             className={`relative p-5 rounded-xl border-2 transition-all ${
                 isDefault
-                    ? isDark ? 'border-white/30 bg-gray-800/50' : 'border-black/20 bg-gray-50'
-                    : isDark ? 'border-gray-800 hover:border-gray-700' : 'border-gray-200 hover:border-gray-300'
+                    ? isDark ? 'border-white/30 bg-gray-800/50' : 'border-black/20 bg-warm-200'
+                    : isDark ? 'border-gray-800 hover:border-gray-700' : 'border-warm-400 hover:border-warm-500'
             }`}
         >
             {isDefault && (
@@ -34,7 +34,7 @@ const AddressCard = ({ address, isDefault, onEdit, onDelete, onSetDefault, isDar
                 </span>
             )}
             <div className="flex items-start gap-3 mb-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isDark ? 'bg-gray-700' : 'bg-warm-300'}`}>
                     <MapPin className="w-5 h-5 text-green-500" />
                 </div>
                 <div className="min-w-0">
@@ -49,7 +49,7 @@ const AddressCard = ({ address, isDefault, onEdit, onDelete, onSetDefault, isDar
             </p>
             {address.phone && <p className="text-xs text-gray-400 mt-1">{address.phone}</p>}
 
-            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-warm-300 dark:border-gray-800">
                 <button onClick={() => onEdit(address)} className="text-xs font-medium hover:underline underline-offset-2 flex items-center gap-1">
                     <Edit3 className="w-3 h-3" /> {t('account.edit', 'Edit')}
                 </button>
@@ -129,7 +129,7 @@ const AddressesTab = () => {
 
     const inputClass = (error) =>
         `w-full px-3 py-2.5 rounded-lg border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 text-sm ${
-            error ? 'border-red-400' : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+            error ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
         }`;
 
     return (
@@ -157,7 +157,7 @@ const AddressesTab = () => {
                         className="mb-6 overflow-hidden"
                     >
                         <form onSubmit={handleSubmit(onSubmit)} noValidate
-                            className={`p-5 rounded-xl border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+                            className={`p-5 rounded-xl border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold">{editingAddress ? t('account.editAddress', 'Edit Address') : t('account.newAddress', 'New Address')}</h3>
                                 <button type="button" onClick={() => { setShowForm(false); setEditingAddress(null); reset(); }}>
@@ -233,7 +233,7 @@ const AddressesTab = () => {
                                     {t('account.saveAddress', 'Save Address')}
                                 </motion.button>
                                 <button type="button" onClick={() => { setShowForm(false); setEditingAddress(null); reset(); }}
-                                    className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
+                                    className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 rounded-lg text-sm">
                                     {t('account.cancel', 'Cancel')}
                                 </button>
                             </div>

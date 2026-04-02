@@ -12,7 +12,7 @@ const RelatedPosts = ({ posts }) => {
   if (!posts || posts.length === 0) return null;
 
   return (
-    <section className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800">
+    <section className="mt-16 pt-12 border-t border-warm-400 dark:border-gray-800">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
           {t('blog.relatedArticles', 'You Might Also Like')}
@@ -36,7 +36,7 @@ const RelatedPosts = ({ posts }) => {
             className={`group rounded-xl overflow-hidden border transition-all hover:shadow-lg
               ${isDark
                 ? 'bg-gray-900 border-gray-800 hover:border-gray-700 hover:shadow-black/20'
-                : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-gray-200/60'
+                : 'bg-warm-50 border-warm-300 hover:border-warm-400 hover:shadow-gray-200/60'
               }`}
           >
             <Link to={`/blog/${post.slug}`} className="block">

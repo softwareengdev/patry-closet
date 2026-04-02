@@ -83,7 +83,7 @@ const BlogPage = () => {
   const heroPost = featuredPosts?.[0];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen bg-warm-200 dark:bg-gray-950 transition-colors">
       {/* ─── SEO META ─── */}
       <Helmet>
         <title>{t('blog.heroTitle', 'Style, Trends & Stories')} — Patry Closet</title>
@@ -158,7 +158,7 @@ const BlogPage = () => {
             >
               <Link
                 to={`/blog/${heroPost.slug}`}
-                className="group inline-flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 pr-6 hover:bg-white/10 transition-all"
+                className="group inline-flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 pr-6 hover:bg-warm-50/10 transition-all"
               >
                 <img
                   src={heroPost.coverImage}
@@ -243,7 +243,7 @@ const BlogPage = () => {
                       className={`px-6 py-2.5 rounded-lg text-xs font-semibold transition-all
                         ${isDark
                           ? 'bg-gray-800 text-gray-300 hover:bg-gray-750 hover:text-white border border-gray-700'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-200'
+                          : 'bg-warm-50 text-gray-700 hover:bg-warm-200 hover:text-gray-900 border border-warm-400'
                         }`}
                     >
                       {t('blog.loadMore', 'Load More Articles')}
@@ -275,18 +275,18 @@ const BlogPage = () => {
 const BlogGridSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
     {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className={`rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 ${i === 0 ? 'sm:col-span-2 sm:grid sm:grid-cols-2' : ''}`}>
-        <div className={`bg-gray-200 dark:bg-gray-800 animate-pulse ${i === 0 ? 'aspect-auto min-h-[200px]' : 'aspect-[16/10]'}`} />
+      <div key={i} className={`rounded-xl overflow-hidden border border-warm-300 dark:border-gray-800 ${i === 0 ? 'sm:col-span-2 sm:grid sm:grid-cols-2' : ''}`}>
+        <div className={`bg-warm-400 dark:bg-gray-800 animate-pulse ${i === 0 ? 'aspect-auto min-h-[200px]' : 'aspect-[16/10]'}`} />
         <div className="p-5 space-y-3">
           <div className="flex gap-2">
-            <div className="h-3 w-16 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
-            <div className="h-3 w-12 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+            <div className="h-3 w-16 bg-warm-400 dark:bg-gray-800 rounded animate-pulse" />
+            <div className="h-3 w-12 bg-warm-400 dark:bg-gray-800 rounded animate-pulse" />
           </div>
-          <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
-          <div className="h-3 w-full bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+          <div className="h-4 w-3/4 bg-warm-400 dark:bg-gray-800 rounded animate-pulse" />
+          <div className="h-3 w-full bg-warm-400 dark:bg-gray-800 rounded animate-pulse" />
           <div className="flex items-center gap-2 pt-2">
-            <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse" />
-            <div className="h-3 w-20 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+            <div className="w-7 h-7 rounded-full bg-warm-400 dark:bg-gray-800 animate-pulse" />
+            <div className="h-3 w-20 bg-warm-400 dark:bg-gray-800 rounded animate-pulse" />
           </div>
         </div>
       </div>
@@ -300,7 +300,7 @@ const EmptyState = ({ t, isDark }) => (
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     className={`text-center py-16 px-6 rounded-xl border
-      ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-100'}`}
+      ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-50 border-warm-300'}`}
   >
     <BookOpen className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">

@@ -67,7 +67,7 @@ const TableOfContents = ({ content }) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3, duration: 0.4 }}
       className={`sticky top-24 rounded-xl border p-4 ${
-        isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-100'
+        isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-50 border-warm-300'
       }`}
       aria-label={t('blog.tableOfContents', 'Table of contents')}
     >

@@ -28,7 +28,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
   const allTags = getAllTags().slice(0, 12);
 
   const cardClass = `rounded-xl border p-5 ${
-    isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-100'
+    isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-50 border-warm-300'
   }`;
 
   return (
@@ -45,7 +45,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
               key={post.id}
               to={`/blog/${post.slug}`}
               className={`group flex gap-3 p-2 -mx-2 rounded-lg transition-colors
-                ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}
+                ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
             >
               <img
                 src={post.coverImage}
@@ -82,7 +82,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all
                   ${isActive
                     ? isDark ? 'bg-amber-500/20 text-amber-300' : 'bg-amber-50 text-amber-700'
-                    : isDark ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    : isDark ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-warm-200'
                   }`}
               >
                 <span>{t(cat.labelKey, cat.fallback)}</span>
@@ -111,7 +111,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
                 className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all
                   ${isActive
                     ? isDark ? 'bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40' : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
-                    : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-750 hover:text-gray-300' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                    : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-750 hover:text-gray-300' : 'bg-warm-300 text-gray-500 hover:bg-warm-400'
                   }`}
               >
                 #{tag}
@@ -141,7 +141,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
             type="email"
             placeholder={t('blog.newsletterPlaceholder', 'Your email')}
             className={`flex-1 px-3 py-2 text-xs rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
-              ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`}
+              ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-warm-50 border-warm-400 text-gray-900 placeholder:text-gray-400'}`}
             aria-label={t('blog.newsletterPlaceholder', 'Your email')}
           />
           <button

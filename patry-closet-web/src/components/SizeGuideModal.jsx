@@ -91,20 +91,20 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
                         exit={{ opacity: 0, scale: 0.92, y: 20 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl"
+                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-warm-50 dark:bg-gray-900 rounded-2xl shadow-2xl"
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('sizeGuide')}
                     >
                         {/* Header */}
-                        <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+                        <div className="sticky top-0 z-10 bg-warm-50 dark:bg-gray-900 border-b border-warm-300 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <Ruler className="w-5 h-5 text-accent-900 dark:text-white" />
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('sizeGuide')}</h2>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                className="p-2 rounded-full hover:bg-warm-300 dark:hover:bg-gray-800 transition-colors"
                                 aria-label={t('close')}
                             >
                                 <X className="w-5 h-5" />
@@ -113,14 +113,14 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
 
                         <div className="p-6 space-y-6">
                             {/* Tabs */}
-                            <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                            <div className="flex gap-1 p-1 bg-warm-300 dark:bg-gray-800 rounded-xl">
                                 {tabs.map((tab) => (
                                     <button
                                         key={tab.key}
                                         onClick={() => setActiveTab(tab.key)}
                                         className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${
                                             activeTab === tab.key
-                                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                                ? 'bg-warm-50 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                                         }`}
                                     >
@@ -130,10 +130,10 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
                             </div>
 
                             {/* Table */}
-                            <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                            <div className="overflow-x-auto rounded-xl border border-warm-400 dark:border-gray-700">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="bg-gray-50 dark:bg-gray-800">
+                                        <tr className="bg-warm-200 dark:bg-gray-800">
                                             {data.headers.map((h, i) => (
                                                 <th key={i} className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300 whitespace-nowrap">
                                                     {h}
@@ -147,10 +147,10 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
                                             return (
                                                 <tr
                                                     key={rIdx}
-                                                    className={`border-t border-gray-100 dark:border-gray-800 transition-colors ${
+                                                    className={`border-t border-warm-300 dark:border-gray-800 transition-colors ${
                                                         isSelected
                                                             ? 'bg-accent-900/5 dark:bg-white/5'
-                                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                                            : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                                     }`}
                                                 >
                                                     {row.map((cell, cIdx) => (

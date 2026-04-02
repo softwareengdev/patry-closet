@@ -96,7 +96,7 @@ const RegisterForm = () => {
                     className={`w-full ${Icon ? 'pl-11' : 'pl-4'} pr-4 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                         error
                             ? 'border-red-400 focus:border-red-500'
-                            : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                            : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                     }`}
                     aria-invalid={!!error}
                     aria-describedby={error ? `${id}-error` : undefined}
@@ -133,11 +133,11 @@ const RegisterForm = () => {
                 {[1, 2].map((s) => (
                     <div key={s} className="flex items-center gap-2 flex-1">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                            step >= s ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                            step >= s ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-warm-400 dark:bg-gray-700 text-gray-500'
                         }`}>
                             {step > s ? <Check className="w-4 h-4" /> : s}
                         </div>
-                        {s < 2 && <div className={`flex-1 h-0.5 ${step > 1 ? 'bg-black dark:bg-white' : 'bg-gray-200 dark:bg-gray-700'}`} />}
+                        {s < 2 && <div className={`flex-1 h-0.5 ${step > 1 ? 'bg-black dark:bg-white' : 'bg-warm-400 dark:bg-gray-700'}`} />}
                     </div>
                 ))}
             </div>
@@ -198,7 +198,7 @@ const RegisterForm = () => {
                                 onClick={handleNextStep}
                                 whileHover={{ scale: 1.01 }}
                                 whileTap={{ scale: 0.99 }}
-                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors mt-2"
+                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors mt-2"
                             >
                                 {t('auth.continue', 'Continue')}
                                 <ArrowRight className="w-4 h-4" />
@@ -230,7 +230,7 @@ const RegisterForm = () => {
                                         className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                             errors.password
                                                 ? 'border-red-400 focus:border-red-500'
-                                                : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                                : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`}
                                         aria-invalid={!!errors.password}
                                     />
@@ -251,7 +251,7 @@ const RegisterForm = () => {
                                                 <div
                                                     key={level}
                                                     className={`h-1 flex-1 rounded-full transition-colors ${
-                                                        level <= strength.score ? strength.color : 'bg-gray-200 dark:bg-gray-700'
+                                                        level <= strength.score ? strength.color : 'bg-warm-400 dark:bg-gray-700'
                                                     }`}
                                                 />
                                             ))}
@@ -283,7 +283,7 @@ const RegisterForm = () => {
                                         className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                             errors.confirmPassword
                                                 ? 'border-red-400 focus:border-red-500'
-                                                : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                                : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`}
                                         aria-invalid={!!errors.confirmPassword}
                                     />
@@ -317,7 +317,7 @@ const RegisterForm = () => {
                                             id="reg-dob"
                                             type="date"
                                             {...register('dateOfBirth')}
-                                            className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0"
+                                            className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0"
                                         />
                                     </div>
                                 </div>
@@ -329,7 +329,7 @@ const RegisterForm = () => {
                                     <select
                                         id="reg-gender"
                                         {...register('gender')}
-                                        className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0 appearance-none"
+                                        className="w-full px-4 py-3.5 rounded-xl border-2 border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0 appearance-none"
                                     >
                                         <option value="">{t('auth.selectGender', 'Select...')}</option>
                                         {GENDER_OPTIONS.map((o) => (
@@ -345,7 +345,7 @@ const RegisterForm = () => {
                                     id="accept-terms"
                                     type="checkbox"
                                     {...register('acceptTerms')}
-                                    className="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 accent-black dark:accent-white"
+                                    className="mt-1 w-4 h-4 rounded border-warm-500 dark:border-gray-600 accent-black dark:accent-white"
                                 />
                                 <label htmlFor="accept-terms" className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                                     {t('auth.acceptTermsPrefix', 'I agree to the')}{' '}
@@ -370,7 +370,7 @@ const RegisterForm = () => {
                                 <button
                                     type="button"
                                     onClick={() => setStep(1)}
-                                    className="px-6 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                    className="px-6 py-3.5 rounded-xl border-2 border-warm-400 dark:border-gray-700 text-sm font-medium hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     {t('auth.back', 'Back')}
                                 </button>
@@ -379,10 +379,10 @@ const RegisterForm = () => {
                                     disabled={isSubmitting}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="flex-1 py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors disabled:opacity-50"
+                                    className="flex-1 py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
                                 >
                                     {isSubmitting ? (
-                                        <div className="w-5 h-5 border-2 border-gray-400 border-t-white dark:border-t-black rounded-full animate-spin" />
+                                        <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
                                     ) : (
                                         <>
                                             {t('auth.createAccount', 'Create Account')}
@@ -419,7 +419,7 @@ const RegisterForm = () => {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white dark:bg-gray-900 rounded-2xl max-w-lg w-full max-h-[70vh] overflow-y-auto p-6 shadow-2xl"
+                            className="bg-warm-50 dark:bg-gray-900 rounded-2xl max-w-lg w-full max-h-[70vh] overflow-y-auto p-6 shadow-2xl"
                         >
                             <h2 className="text-xl font-bold mb-4">
                                 {showTermsModal ? t('auth.termsOfService', 'Terms of Service') : t('auth.privacyPolicy', 'Privacy Policy')}

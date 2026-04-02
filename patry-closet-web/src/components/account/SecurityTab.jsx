@@ -78,10 +78,10 @@ const SecurityTab = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">{t('account.securityDesc', 'Manage your password, 2FA, and active sessions')}</p>
 
             {/* ─── Change Password ─── */}
-            <div className={`p-5 rounded-xl border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className={`p-5 rounded-xl border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Lock className="w-5 h-5 text-blue-500" />
                         </div>
                         <div>
@@ -121,7 +121,7 @@ const SecurityTab = () => {
                                 <div className="relative">
                                     <input type={showPassword ? 'text' : 'password'} {...register('password')} autoComplete="new-password"
                                         className={`w-full px-3 pr-10 py-2.5 rounded-lg border-2 bg-transparent focus:outline-none text-sm ${
-                                            errors.password ? 'border-red-400' : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                            errors.password ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`} />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -130,7 +130,7 @@ const SecurityTab = () => {
                                 {passwordValue && (
                                     <div className="mt-1.5 flex gap-1">
                                         {[1, 2, 3, 4, 5].map(l => (
-                                            <div key={l} className={`h-1 flex-1 rounded-full ${l <= strength.score ? strength.color : 'bg-gray-200 dark:bg-gray-700'}`} />
+                                            <div key={l} className={`h-1 flex-1 rounded-full ${l <= strength.score ? strength.color : 'bg-warm-400 dark:bg-gray-700'}`} />
                                         ))}
                                     </div>
                                 )}
@@ -142,7 +142,7 @@ const SecurityTab = () => {
                                 <div className="relative">
                                     <input type={showConfirm ? 'text' : 'password'} {...register('confirmPassword')} autoComplete="new-password"
                                         className={`w-full px-3 pr-10 py-2.5 rounded-lg border-2 bg-transparent focus:outline-none text-sm ${
-                                            errors.confirmPassword ? 'border-red-400' : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                            errors.confirmPassword ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`} />
                                     <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                         {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -158,7 +158,7 @@ const SecurityTab = () => {
                                     {t('account.updatePassword', 'Update Password')}
                                 </motion.button>
                                 <button type="button" onClick={() => { setShowPasswordForm(false); reset(); }}
-                                    className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm">
+                                    className="px-4 py-2 border border-warm-400 dark:border-gray-700 rounded-lg text-sm">
                                     {t('account.cancel', 'Cancel')}
                                 </button>
                             </div>
@@ -168,10 +168,10 @@ const SecurityTab = () => {
             </div>
 
             {/* ─── Two-Factor Authentication ─── */}
-            <div className={`p-5 rounded-xl border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className={`p-5 rounded-xl border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Key className="w-5 h-5 text-amber-500" />
                         </div>
                         <div>
@@ -190,7 +190,7 @@ const SecurityTab = () => {
                         aria-checked={twoFAEnabled}
                         aria-label="Toggle two-factor authentication"
                     >
-                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform bg-white ${twoFAEnabled ? 'translate-x-5' : ''}`} />
+                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform bg-warm-50 ${twoFAEnabled ? 'translate-x-5' : ''}`} />
                     </button>
                 </div>
                 {twoFAEnabled && (
@@ -201,10 +201,10 @@ const SecurityTab = () => {
             </div>
 
             {/* ─── Active Sessions ─── */}
-            <div className={`p-5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className={`p-5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Shield className="w-5 h-5 text-gray-500" />
                         </div>
                         <div>
@@ -220,7 +220,7 @@ const SecurityTab = () => {
 
                 {loadingSessions ? (
                     <div className="space-y-3">
-                        {[1, 2].map(i => <div key={i} className={`h-14 rounded-lg animate-pulse ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`} />)}
+                        {[1, 2].map(i => <div key={i} className={`h-14 rounded-lg animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-400'}`} />)}
                     </div>
                 ) : (
                     <div className="space-y-2">
@@ -237,7 +237,7 @@ const SecurityTab = () => {
                                         className={`flex items-center gap-3 p-3 rounded-lg ${
                                             session.isCurrent
                                                 ? isDark ? 'bg-green-900/20 border border-green-800' : 'bg-green-50 border border-green-200'
-                                                : isDark ? 'bg-gray-800/50' : 'bg-white border border-gray-100'
+                                                : isDark ? 'bg-gray-800/50' : 'bg-warm-50 border border-warm-300'
                                         }`}
                                     >
                                         <DeviceIcon className={`w-5 h-5 shrink-0 ${session.isCurrent ? 'text-green-500' : 'text-gray-400'}`} />

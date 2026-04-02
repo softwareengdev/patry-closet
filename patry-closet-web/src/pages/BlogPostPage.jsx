@@ -56,7 +56,7 @@ const BlogPostPage = () => {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-warm-200 dark:bg-gray-950">
         <div className="text-center px-6">
           <BookOpen className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
@@ -117,7 +117,7 @@ const BlogPostPage = () => {
   };
 
   return (
-    <article className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+    <article className="min-h-screen bg-warm-50 dark:bg-gray-950 transition-colors">
       {/* ─── SEO META + JSON-LD ─── */}
       <Helmet>
         <title>{articleTitle} — Patry Closet</title>
@@ -220,7 +220,7 @@ const BlogPostPage = () => {
           {/* Main content */}
           <div ref={contentRef} className="flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
             {/* Share bar (top) */}
-            <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
+            <div className="mb-8 pb-6 border-b border-warm-400 dark:border-gray-800">
               <ShareButtons
                 title={t(post.titleKey, post.titleFallback)}
                 description={t(post.excerptKey, post.excerptFallback)}
@@ -264,7 +264,7 @@ const BlogPostPage = () => {
                     );
                   },
                   table: ({ node, ...props }) => (
-                    <div className="overflow-x-auto my-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="overflow-x-auto my-6 rounded-lg border border-warm-400 dark:border-gray-700">
                       <table {...props} className="w-full" />
                     </div>
                   ),
@@ -276,7 +276,7 @@ const BlogPostPage = () => {
 
             {/* Tags */}
             {post.tags?.length > 0 && (
-              <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800">
+              <div className="mt-10 pt-6 border-t border-warm-400 dark:border-gray-800">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Tag className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   {post.tags.map(tag => (
@@ -286,7 +286,7 @@ const BlogPostPage = () => {
                       className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all
                         ${isDark
                           ? 'bg-gray-800 text-gray-400 hover:bg-gray-750 hover:text-amber-400'
-                          : 'bg-gray-100 text-gray-500 hover:bg-amber-50 hover:text-amber-700'
+                          : 'bg-warm-300 text-gray-500 hover:bg-amber-50 hover:text-amber-700'
                         }`}
                     >
                       #{tag}
@@ -297,7 +297,7 @@ const BlogPostPage = () => {
             )}
 
             {/* Share bar (bottom) */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+            <div className="mt-8 pt-6 border-t border-warm-400 dark:border-gray-800">
               <ShareButtons
                 title={t(post.titleKey, post.titleFallback)}
                 description={t(post.excerptKey, post.excerptFallback)}
@@ -306,7 +306,7 @@ const BlogPostPage = () => {
             </div>
 
             {/* Author bio */}
-            <div className={`mt-10 p-6 rounded-xl border ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
+            <div className={`mt-10 p-6 rounded-xl border ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-200 border-warm-300'}`}>
               <div className="flex items-start gap-4">
                 <img
                   src={post.author.avatar}
@@ -346,7 +346,7 @@ const BlogPostPage = () => {
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-full hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-full hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
               >
                 {t('blog.shopNow', 'Shop Now')}
               </Link>
@@ -378,7 +378,7 @@ const ScrollToTop = ({ isDark }) => {
       className={`fixed bottom-6 right-6 p-3 rounded-full shadow-lg z-40 transition-colors
         ${isDark
           ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
-          : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+          : 'bg-warm-50 text-gray-600 hover:bg-warm-200 border border-warm-400'
         }`}
       aria-label="Scroll to top"
     >
@@ -389,11 +389,11 @@ const ScrollToTop = ({ isDark }) => {
 
 // ─── SKELETON ───
 const PostSkeleton = ({ isDark }) => (
-  <div className="min-h-screen bg-white dark:bg-gray-950">
-    <div className="h-[50vh] bg-gray-200 dark:bg-gray-800 animate-pulse" />
+  <div className="min-h-screen bg-warm-50 dark:bg-gray-950">
+    <div className="h-[50vh] bg-warm-400 dark:bg-gray-800 animate-pulse" />
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className={`h-4 rounded animate-pulse ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}
+        <div key={i} className={`h-4 rounded animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-400'}`}
           style={{ width: `${60 + Math.random() * 40}%` }} />
       ))}
     </div>

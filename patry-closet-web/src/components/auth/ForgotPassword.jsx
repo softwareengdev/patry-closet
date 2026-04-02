@@ -82,7 +82,7 @@ const ForgotPassword = () => {
                         exit={{ opacity: 0, x: -20 }}
                     >
                         <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <Lock className="w-8 h-8 text-gray-600 dark:text-gray-300" />
                             </div>
                             <h1 className="text-2xl font-bold mb-2">{t('auth.forgotPasswordTitle', 'Forgot your password?')}</h1>
@@ -114,7 +114,7 @@ const ForgotPassword = () => {
                                         className={`w-full pl-11 pr-4 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                             requestForm.formState.errors.email
                                                 ? 'border-red-400 focus:border-red-500'
-                                                : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                                : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`}
                                     />
                                 </div>
@@ -134,7 +134,7 @@ const ForgotPassword = () => {
                                 className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
-                                    <div className="w-5 h-5 border-2 border-gray-400 border-t-white dark:border-t-black rounded-full animate-spin" />
+                                    <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
                                 ) : (
                                     <>
                                         {t('auth.sendResetLink', 'Send Reset Link')}
@@ -198,7 +198,7 @@ const ForgotPassword = () => {
                         exit={{ opacity: 0, x: 20 }}
                     >
                         <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <ShieldCheck className="w-8 h-8 text-gray-600 dark:text-gray-300" />
                             </div>
                             <h1 className="text-2xl font-bold mb-2">{t('auth.setNewPassword', 'Set New Password')}</h1>
@@ -226,7 +226,7 @@ const ForgotPassword = () => {
                                         placeholder="••••••••"
                                         {...resetForm.register('password')}
                                         className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
-                                            resetForm.formState.errors.password ? 'border-red-400' : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                            resetForm.formState.errors.password ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`}
                                     />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -236,7 +236,7 @@ const ForgotPassword = () => {
                                 {passwordValue && (
                                     <div className="mt-2 flex gap-1">
                                         {[1, 2, 3, 4, 5].map((l) => (
-                                            <div key={l} className={`h-1 flex-1 rounded-full ${l <= strength.score ? strength.color : 'bg-gray-200 dark:bg-gray-700'}`} />
+                                            <div key={l} className={`h-1 flex-1 rounded-full ${l <= strength.score ? strength.color : 'bg-warm-400 dark:bg-gray-700'}`} />
                                         ))}
                                     </div>
                                 )}
@@ -258,7 +258,7 @@ const ForgotPassword = () => {
                                         placeholder="••••••••"
                                         {...resetForm.register('confirmPassword')}
                                         className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
-                                            resetForm.formState.errors.confirmPassword ? 'border-red-400' : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                            resetForm.formState.errors.confirmPassword ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`}
                                     />
                                     <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -280,7 +280,7 @@ const ForgotPassword = () => {
                                 className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
-                                    <div className="w-5 h-5 border-2 border-gray-400 border-t-white dark:border-t-black rounded-full animate-spin" />
+                                    <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
                                 ) : (
                                     t('auth.resetPassword', 'Reset Password')
                                 )}

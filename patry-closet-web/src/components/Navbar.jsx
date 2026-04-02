@@ -230,7 +230,7 @@ const Navbar = ({ isTransparent = false }) => {
                 role="navigation"
                 aria-label="Main navigation"
                 className={`fixed w-full z-50 top-0 transition-all duration-500 ease-out ${showSolid
-                    ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800'}`
+                    ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'bg-warm-50/95 dark:bg-gray-950/95 backdrop-blur-xl border-b border-warm-300 dark:border-gray-800'}`
                     : 'bg-transparent backdrop-blur-[2px] border-b border-white/10'
                 }`}
                 style={{
@@ -376,9 +376,9 @@ const Navbar = ({ isTransparent = false }) => {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 8, scale: 0.96 }}
                                             transition={{ duration: 0.15 }}
-                                            className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-50 overflow-hidden border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
+                                            className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-50 overflow-hidden border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'}`}
                                         >
-                                            <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                            <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                 <p className="text-sm font-semibold truncate">{user?.firstName} {user?.lastName}</p>
                                                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                                             </div>
@@ -392,20 +392,20 @@ const Navbar = ({ isTransparent = false }) => {
                                                         key={item.to}
                                                         to={item.to}
                                                         onClick={() => setUserMenuOpen(false)}
-                                                        className={`block px-4 py-2 text-sm transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}
+                                                        className={`block px-4 py-2 text-sm transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
                                                     >
                                                         {item.label}
                                                     </Link>
                                                 ))}
                                             </div>
-                                            <div className={`border-t ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                            <div className={`border-t ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                 <button
                                                     onClick={async () => {
                                                         setUserMenuOpen(false);
                                                         await logout();
                                                         navigate('/');
                                                     }}
-                                                    className={`w-full text-left px-4 py-2.5 text-sm text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}
+                                                    className={`w-full text-left px-4 py-2.5 text-sm text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
                                                 >
                                                     {t('account.logout', 'Sign Out')}
                                                 </button>
@@ -434,7 +434,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 8, scale: 0.96 }}
                                             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                                            className={`absolute right-0 mt-3 w-48 overflow-hidden z-50 ${isHighContrast ? 'bg-hc-bg border-2 border-hc-border' : 'bg-white dark:bg-gray-900 shadow-xl border border-gray-100 dark:border-gray-800 rounded-xl'}`}
+                                            className={`absolute right-0 mt-3 w-48 overflow-hidden z-50 ${isHighContrast ? 'bg-hc-bg border-2 border-hc-border' : 'bg-warm-50 dark:bg-gray-900 shadow-xl border border-warm-300 dark:border-gray-800 rounded-xl'}`}
                                         >
                                             <div className="p-1.5">
                                                 {Object.entries(themeIcons).map(([key, Icon]) => (
@@ -444,8 +444,8 @@ const Navbar = ({ isTransparent = false }) => {
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={() => { setMode(key); setThemePickerOpen(false); }}
                                                         className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg ${mode === key
-                                                            ? (isHighContrast ? 'bg-hc-accent text-black font-bold' : 'bg-gray-100 dark:bg-gray-800 font-medium')
-                                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                                            ? (isHighContrast ? 'bg-hc-accent text-black font-bold' : 'bg-warm-300 dark:bg-gray-800 font-medium')
+                                                            : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                                         }`}
                                                     >
                                                         <Icon className="w-4 h-4" />
@@ -509,7 +509,7 @@ const Navbar = ({ isTransparent = false }) => {
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                            className={`hidden lg:block overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950'}`}
+                            className={`hidden lg:block overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-950'}`}
                             onMouseEnter={() => handleMegaEnter(activeMega)}
                             onMouseLeave={handleMegaLeave}
                         >
@@ -584,7 +584,7 @@ const Navbar = ({ isTransparent = false }) => {
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                            className={`lg:hidden overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950'}`}
+                            className={`lg:hidden overflow-hidden border-t ${isHighContrast ? 'border-hc-border bg-hc-bg' : 'border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-950'}`}
                         >
                             <div className="px-6 py-6 space-y-1 max-h-[80vh] overflow-y-auto">
                                 <Link to="/" className="block py-3 text-base font-medium" onClick={() => setIsMobileMenuOpen(false)}>
@@ -593,7 +593,7 @@ const Navbar = ({ isTransparent = false }) => {
 
                                 {/* Category accordions */}
                                 {Object.entries(megaMenuData).map(([key, data]) => (
-                                    <div key={key} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                                    <div key={key} className="border-b border-warm-300 dark:border-gray-800 last:border-0">
                                         <button
                                             onClick={() => setMobileExpanded(mobileExpanded === key ? null : key)}
                                             className="w-full flex items-center justify-between py-3 text-base font-medium"
@@ -646,15 +646,15 @@ const Navbar = ({ isTransparent = false }) => {
                                     {t('sales')}
                                 </Link>
 
-                                <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                                <div className="pt-4 border-t border-warm-300 dark:border-gray-800 space-y-3">
                                     {/* Auth section mobile */}
                                     {isAuthenticated ? (
-                                        <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
+                                        <div className="pb-3 border-b border-warm-300 dark:border-gray-800">
                                             <div className="flex items-center gap-3 mb-2">
                                                 {user?.avatar ? (
                                                     <img src={user.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
                                                 ) : (
-                                                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                    <div className="w-8 h-8 rounded-full bg-warm-400 dark:bg-gray-700 flex items-center justify-center">
                                                         <User className="w-4 h-4 text-gray-500" />
                                                     </div>
                                                 )}
@@ -668,7 +668,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             </Link>
                                         </div>
                                     ) : (
-                                        <div className="pb-3 border-b border-gray-100 dark:border-gray-800 flex gap-2">
+                                        <div className="pb-3 border-b border-warm-300 dark:border-gray-800 flex gap-2">
                                             <Link
                                                 to={`/login${location.pathname !== '/' ? `?redirect=${encodeURIComponent(location.pathname + location.search)}` : ''}`}
                                                 onClick={() => setIsMobileMenuOpen(false)}
@@ -679,7 +679,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             <Link
                                                 to="/register"
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className="flex-1 text-center py-2.5 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-lg"
+                                                className="flex-1 text-center py-2.5 text-sm font-medium border border-warm-400 dark:border-gray-700 rounded-lg"
                                             >
                                                 {t('auth.register', 'Register')}
                                             </Link>
@@ -699,8 +699,8 @@ const Navbar = ({ isTransparent = false }) => {
                                                     key={key}
                                                     onClick={() => setMode(key)}
                                                     className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors ${mode === key
-                                                        ? (isHighContrast ? 'bg-hc-accent text-black font-bold' : 'bg-gray-100 dark:bg-gray-800 font-medium')
-                                                        : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                                        ? (isHighContrast ? 'bg-hc-accent text-black font-bold' : 'bg-warm-300 dark:bg-gray-800 font-medium')
+                                                        : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                                     }`}
                                                 >
                                                     <Icon className="w-4 h-4" />
@@ -716,7 +716,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             <button
                                                 key={code}
                                                 onClick={() => changeLanguage(code)}
-                                                className={`px-3 py-2 text-sm rounded-lg transition-colors ${i18n.language?.startsWith(code) ? 'bg-gray-100 dark:bg-gray-800 font-medium' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                                                className={`px-3 py-2 text-sm rounded-lg transition-colors ${i18n.language?.startsWith(code) ? 'bg-warm-300 dark:bg-gray-800 font-medium' : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                                             >
                                                 {label}
                                             </button>

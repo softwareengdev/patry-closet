@@ -25,9 +25,9 @@ const Cart = () => {
 
     if (cartItems.length === 0) {
         return (
-            <section className="py-20 bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+            <section className="py-20 bg-warm-200 dark:bg-gray-900 min-h-screen flex items-center justify-center">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md px-6">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-warm-300 dark:bg-gray-800 flex items-center justify-center">
                         <ShoppingBag className="w-10 h-10 text-gray-400" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('emptyCart')}</h2>
@@ -41,7 +41,7 @@ const Cart = () => {
     }
 
     return (
-        <section className="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <section className="py-8 bg-warm-200 dark:bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
                 <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-6" aria-label="Breadcrumb">
@@ -67,10 +67,10 @@ const Cart = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, x: -100, height: 0, marginBottom: 0 }}
                                     transition={{ duration: 0.3 }}
-                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
+                                    className="bg-warm-50 dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
                                 >
                                     <div className="flex gap-4 p-4 sm:p-6">
-                                        <Link to={`/products/${item.id}`} className="flex-shrink-0 w-24 h-28 sm:w-28 sm:h-32 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                        <Link to={`/products/${item.id}`} className="flex-shrink-0 w-24 h-28 sm:w-28 sm:h-32 rounded-xl overflow-hidden bg-warm-300 dark:bg-gray-700">
                                             <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                         </Link>
                                         <div className="flex-1 min-w-0">
@@ -89,22 +89,22 @@ const Cart = () => {
                                             <div className="flex items-center gap-3 mt-2">
                                                 {item.color && item.color !== '-' && (
                                                     <div className="flex items-center gap-1.5">
-                                                        <span className="w-3.5 h-3.5 rounded-full border border-gray-200 dark:border-gray-600" style={{ backgroundColor: COLOR_MAP[item.color] || item.color }} />
+                                                        <span className="w-3.5 h-3.5 rounded-full border border-warm-400 dark:border-gray-600" style={{ backgroundColor: COLOR_MAP[item.color] || item.color }} />
                                                         <span className="text-xs text-gray-500">{item.color}</span>
                                                     </div>
                                                 )}
                                                 {item.size && item.size !== '-' && (
-                                                    <span className="text-xs text-gray-500 px-2 py-0.5 border border-gray-200 dark:border-gray-700 rounded">{item.size}</span>
+                                                    <span className="text-xs text-gray-500 px-2 py-0.5 border border-warm-400 dark:border-gray-700 rounded">{item.size}</span>
                                                 )}
                                             </div>
 
                                             <div className="flex items-center justify-between mt-3">
-                                                <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg">
-                                                    <button onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)} disabled={item.quantity <= 1} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg disabled:opacity-30 transition-colors" aria-label={t('decreaseQuantity')}>
+                                                <div className="flex items-center border border-warm-400 dark:border-gray-700 rounded-lg">
+                                                    <button onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)} disabled={item.quantity <= 1} className="p-2 hover:bg-warm-300 dark:hover:bg-gray-700 rounded-l-lg disabled:opacity-30 transition-colors" aria-label={t('decreaseQuantity')}>
                                                         <Minus className="w-3.5 h-3.5" />
                                                     </button>
                                                     <span className="px-4 text-sm font-medium min-w-[2.5rem] text-center">{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-lg transition-colors" aria-label={t('increaseQuantity')}>
+                                                    <button onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)} className="p-2 hover:bg-warm-300 dark:hover:bg-gray-700 rounded-r-lg transition-colors" aria-label={t('increaseQuantity')}>
                                                         <Plus className="w-3.5 h-3.5" />
                                                     </button>
                                                 </div>
@@ -124,7 +124,7 @@ const Cart = () => {
 
                     {/* Order Summary */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 sticky top-24 space-y-5">
+                        <div className="bg-warm-50 dark:bg-gray-800 rounded-2xl shadow-sm p-6 sticky top-24 space-y-5">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('orderSummary')}</h2>
 
                             {/* Coupon */}
@@ -146,10 +146,10 @@ const Cart = () => {
                                             value={couponInput}
                                             onChange={(e) => setCouponInput(e.target.value)}
                                             placeholder={t('couponCode')}
-                                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-transparent focus:outline-none focus:border-accent-900 dark:focus:border-white transition-colors"
+                                            className="flex-1 px-3 py-2 text-sm border border-warm-400 dark:border-gray-700 rounded-xl bg-transparent focus:outline-none focus:border-accent-900 dark:focus:border-white transition-colors"
                                             onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
                                         />
-                                        <button onClick={handleApplyCoupon} className="px-4 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">{t('apply')}</button>
+                                        <button onClick={handleApplyCoupon} className="px-4 py-2 text-sm font-medium bg-warm-300 dark:bg-gray-700 rounded-xl hover:bg-warm-400 dark:hover:bg-gray-600 transition-colors">{t('apply')}</button>
                                     </div>
                                 )}
                                 {couponMsg && (
@@ -179,7 +179,7 @@ const Cart = () => {
                                 </div>
                             </div>
 
-                            <div className="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex justify-between pt-3 border-t border-warm-400 dark:border-gray-700">
                                 <span className="text-lg font-bold text-gray-900 dark:text-white">{t('total')}</span>
                                 <span className="text-lg font-bold text-gray-900 dark:text-white">${getGrandTotal().toFixed(2)}</span>
                             </div>
@@ -191,7 +191,7 @@ const Cart = () => {
                                         <Truck className="w-3.5 h-3.5" />
                                         {t('freeShippingProgress', { amount: (50 - getSubtotal()).toFixed(2) })}
                                     </div>
-                                    <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div className="w-full h-1.5 bg-warm-400 dark:bg-gray-700 rounded-full overflow-hidden">
                                         <div className="h-full bg-accent-900 dark:bg-white rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (getSubtotal() / 50) * 100)}%` }} />
                                     </div>
                                 </div>

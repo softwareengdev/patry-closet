@@ -58,7 +58,7 @@ const PRICE_MAX = 200;
 const FilterSection = ({ title, icon: Icon, defaultOpen = true, children, count = 0 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     return (
-        <div className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+        <div className="border-b border-warm-300 dark:border-gray-800 last:border-0">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex items-center justify-between py-4 text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -105,7 +105,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
     return (
         <>
             {/* Result count + reset */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-warm-300 dark:border-gray-800">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                     <span className="font-semibold text-gray-900 dark:text-white">{resultCount}</span> {t('resultsFound')}
                 </p>
@@ -123,7 +123,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                 <div className="space-y-1">
                     <button
                         onClick={() => onFilterChange('category', '')}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!filters.category ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!filters.category ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                     >
                         {t('all')}
                     </button>
@@ -131,7 +131,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                         <button
                             key={cat}
                             onClick={() => onFilterChange('category', cat)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${filters.category === cat ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${filters.category === cat ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                         >
                             <span>{cat}</span>
                             <span className="text-xs opacity-60">
@@ -175,7 +175,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                             <button
                                 key={colorName}
                                 onClick={() => toggleArrayFilter('colors', colorName)}
-                                className={`relative w-7 h-7 rounded-full transition-all duration-200 ${isSelected ? 'ring-2 ring-offset-2 ring-accent-900 dark:ring-white scale-110' : 'hover:scale-110'} ${isLight ? 'border border-gray-300' : ''}`}
+                                className={`relative w-7 h-7 rounded-full transition-all duration-200 ${isSelected ? 'ring-2 ring-offset-2 ring-accent-900 dark:ring-white scale-110' : 'hover:scale-110'} ${isLight ? 'border border-warm-500' : ''}`}
                                 style={{ backgroundColor: hex }}
                                 title={colorName}
                                 aria-label={`${t('color')}: ${colorName}`}
@@ -197,7 +197,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                             <button
                                 key={size}
                                 onClick={() => toggleArrayFilter('sizes', size)}
-                                className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-all duration-200 border ${isSelected ? 'bg-accent-900 text-white border-accent-900 dark:bg-white dark:text-black dark:border-white' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500'}`}
+                                className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-all duration-200 border ${isSelected ? 'bg-accent-900 text-white border-accent-900 dark:bg-white dark:text-black dark:border-white' : 'border-warm-400 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-warm-500 dark:hover:border-gray-500'}`}
                                 aria-pressed={isSelected}
                                 aria-label={`${t('size')}: ${size}`}
                             >
@@ -215,7 +215,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                         const isSelected = selectedBrands.includes(brand);
                         return (
                             <label key={brand} className="flex items-center gap-3 cursor-pointer group">
-                                <div className={`w-4.5 h-4.5 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-accent-900 border-accent-900 dark:bg-white dark:border-white' : 'border-gray-300 dark:border-gray-600 group-hover:border-gray-400'}`}>
+                                <div className={`w-4.5 h-4.5 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-accent-900 border-accent-900 dark:bg-white dark:border-white' : 'border-warm-500 dark:border-gray-600 group-hover:border-warm-500'}`}>
                                     {isSelected && <Check className="w-3 h-3 text-white dark:text-black" strokeWidth={3} />}
                                 </div>
                                 <input
@@ -245,7 +245,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                         <button
                             key={opt.value}
                             onClick={() => onFilterChange('badge', opt.value)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${filters.badge === opt.value ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${filters.badge === opt.value ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                         >
                             {opt.label}
                         </button>
@@ -257,7 +257,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
             <FilterSection title={t('availability')} icon={Package} defaultOpen={false} count={filters.inStock ? 1 : 0}>
                 <label className="flex items-center gap-3 cursor-pointer group">
                     <div className={`relative w-10 h-5 rounded-full transition-colors ${filters.inStock ? 'bg-accent-900 dark:bg-white' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                        <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 shadow transition-transform ${filters.inStock ? 'translate-x-5' : ''}`} />
+                        <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-warm-50 dark:bg-gray-900 shadow transition-transform ${filters.inStock ? 'translate-x-5' : ''}`} />
                     </div>
                     <input
                         type="checkbox"
@@ -286,7 +286,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                         <button
                             key={opt.value}
                             onClick={() => onSortChange(opt.value)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${sort === opt.value ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${sort === opt.value ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                         >
                             {opt.label}
                             {sort === opt.value && <Check className="w-3.5 h-3.5" />}
@@ -296,12 +296,12 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
             </FilterSection>
 
             {/* View mode */}
-            <div className="pt-5 mt-2 border-t border-gray-100 dark:border-gray-800">
+            <div className="pt-5 mt-2 border-t border-warm-300 dark:border-gray-800">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">{t('viewMode')}</p>
                 <div className="flex gap-2">
                     <button
                         onClick={() => onViewModeChange('grid')}
-                        className={`flex-1 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${viewMode === 'grid' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        className={`flex-1 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${viewMode === 'grid' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'bg-warm-300 dark:bg-gray-800 hover:bg-warm-400 dark:hover:bg-gray-700'}`}
                         aria-pressed={viewMode === 'grid'}
                         aria-label="Grid view"
                     >
@@ -309,7 +309,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                     </button>
                     <button
                         onClick={() => onViewModeChange('bento')}
-                        className={`flex-1 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${viewMode === 'bento' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        className={`flex-1 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${viewMode === 'bento' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'bg-warm-300 dark:bg-gray-800 hover:bg-warm-400 dark:hover:bg-gray-700'}`}
                         aria-pressed={viewMode === 'bento'}
                         aria-label="Bento view"
                     >
@@ -362,18 +362,18 @@ const MobileFilterDrawer = ({ isOpen, onClose, children }) => {
                         animate={{ x: 0 }}
                         exit={{ x: '-100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed top-0 left-0 h-full w-[85vw] max-w-sm bg-white dark:bg-gray-950 z-[70] shadow-2xl flex flex-col"
+                        className="fixed top-0 left-0 h-full w-[85vw] max-w-sm bg-warm-50 dark:bg-gray-950 z-[70] shadow-2xl flex flex-col"
                         role="dialog"
                         aria-modal="true"
                         aria-label="Filters"
                     >
-                        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center justify-between p-5 border-b border-warm-300 dark:border-gray-800">
                             <h2 className="text-lg font-bold flex items-center gap-2">
                                 <Filter className="w-5 h-5" /> Filters
                             </h2>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                className="p-2 hover:bg-warm-300 dark:hover:bg-gray-800 rounded-lg transition-colors"
                                 aria-label="Close filters"
                             >
                                 <X className="w-5 h-5" />
@@ -382,7 +382,7 @@ const MobileFilterDrawer = ({ isOpen, onClose, children }) => {
                         <div className="flex-1 overflow-y-auto p-5 overscroll-contain">
                             {children}
                         </div>
-                        <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+                        <div className="p-4 border-t border-warm-300 dark:border-gray-800">
                             <button
                                 onClick={onClose}
                                 className="w-full py-3 bg-accent-900 text-white dark:bg-white dark:text-black font-medium text-sm uppercase tracking-wider rounded-lg hover:opacity-90 transition-opacity"
@@ -566,18 +566,18 @@ const ProductsPage = () => {
     const srAnnouncement = `${filteredProducts.length} ${t('resultsFound')}`;
 
     return (
-        <section className="bg-gray-50 dark:bg-gray-950 min-h-screen" aria-label={t('productCatalog')}>
+        <section className="bg-warm-200 dark:bg-gray-950 min-h-screen" aria-label={t('productCatalog')}>
             {/* SR-only live region for results */}
             <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{srAnnouncement}</div>
 
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
                 {/* ─── Top bar: mobile filter toggle + sort + result count ─── */}
-                <div className="flex items-center justify-between py-5 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex items-center justify-between py-5 border-b border-warm-400 dark:border-gray-800">
                     <div className="flex items-center gap-4">
                         {/* Mobile filter toggle */}
                         <button
                             onClick={() => setMobileFiltersOpen(true)}
-                            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-warm-400 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-warm-200 dark:hover:bg-gray-800/50 transition-colors"
                             aria-label="Open filters"
                         >
                             <Filter className="w-4 h-4" />
@@ -596,7 +596,7 @@ const ProductsPage = () => {
                         <select
                             value={sort}
                             onChange={e => handleSortChange(e.target.value)}
-                            className="bg-transparent text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 dark:bg-gray-900 focus-visible:ring-2 focus-visible:ring-accent-900 focus-visible:outline-none"
+                            className="bg-transparent text-sm border border-warm-400 dark:border-gray-700 rounded-lg px-3 py-2 dark:bg-gray-900 focus-visible:ring-2 focus-visible:ring-accent-900 focus-visible:outline-none"
                             aria-label={t('sortBy')}
                         >
                             <option value="popularity-desc">{t('popularityDesc')}</option>
@@ -606,10 +606,10 @@ const ProductsPage = () => {
                             <option value="newest">{t('newest')}</option>
                             <option value="rating-desc">{t('ratingDesc')}</option>
                         </select>
-                        <div className="flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                        <div className="flex border border-warm-400 dark:border-gray-700 rounded-lg overflow-hidden">
                             <button
                                 onClick={() => setViewMode('grid')}
-                                className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                                className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                                 aria-pressed={viewMode === 'grid'}
                                 aria-label="Grid view"
                             >
@@ -617,7 +617,7 @@ const ProductsPage = () => {
                             </button>
                             <button
                                 onClick={() => setViewMode('bento')}
-                                className={`p-2 transition-colors ${viewMode === 'bento' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                                className={`p-2 transition-colors ${viewMode === 'bento' ? 'bg-accent-900 text-white dark:bg-white dark:text-black' : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                                 aria-pressed={viewMode === 'bento'}
                                 aria-label="Bento view"
                             >
@@ -643,7 +643,7 @@ const ProductsPage = () => {
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
-                                        className="inline-flex items-center gap-1.5 bg-white dark:bg-gray-900 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-gray-100 dark:border-gray-800"
+                                        className="inline-flex items-center gap-1.5 bg-warm-50 dark:bg-gray-900 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-warm-300 dark:border-gray-800"
                                         role="listitem"
                                     >
                                         {chip.label}
@@ -733,7 +733,7 @@ const ProductsPage = () => {
                         {isLoading && (
                             <div className="text-center py-12 text-gray-500" role="status">
                                 <div className="inline-flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-gray-300 border-t-accent-900 rounded-full animate-spin" />
+                                    <div className="w-4 h-4 border-2 border-warm-500 border-t-accent-900 rounded-full animate-spin" />
                                     {t('loadingMoreProducts')}
                                 </div>
                             </div>

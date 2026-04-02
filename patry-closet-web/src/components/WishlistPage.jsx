@@ -80,7 +80,7 @@ const WishlistPage = () => {
 
     if (displayItems.length === 0 && !isSharedView) {
         return (
-            <section className="py-20 bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+            <section className="py-20 bg-warm-200 dark:bg-gray-900 min-h-screen flex items-center justify-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -114,7 +114,7 @@ const WishlistPage = () => {
     }
 
     return (
-        <section className="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <section className="py-8 bg-warm-200 dark:bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
@@ -133,7 +133,7 @@ const WishlistPage = () => {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleShare}
-                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-warm-50 dark:bg-gray-800 border border-warm-400 dark:border-gray-700 rounded-xl hover:bg-warm-200 dark:hover:bg-gray-700 transition-colors"
                                 >
                                     <Share2 className="w-4 h-4" /> {t('share')}
                                 </motion.button>
@@ -152,7 +152,7 @@ const WishlistPage = () => {
                             </div>
                             <button
                                 onClick={clearWishlist}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-warm-50 dark:bg-gray-800 border border-warm-400 dark:border-gray-700 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                             >
                                 <Trash2 className="w-4 h-4" /> {t('clearAll')}
                             </button>
@@ -170,7 +170,7 @@ const WishlistPage = () => {
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                                className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group"
+                                className="bg-warm-50 dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group"
                             >
                                 {/* Image */}
                                 <Link to={`/products/${product.id}`} className="block relative aspect-[3/4] overflow-hidden">
@@ -191,7 +191,7 @@ const WishlistPage = () => {
                                     )}
                                     {!product.inStock && (
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                            <span className="px-4 py-2 bg-white/90 text-gray-900 text-sm font-semibold rounded-lg">
+                                            <span className="px-4 py-2 bg-warm-50/90 text-gray-900 text-sm font-semibold rounded-lg">
                                                 {t('outOfStock')}
                                             </span>
                                         </div>
@@ -229,7 +229,7 @@ const WishlistPage = () => {
                                                     className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
                                                         (selectedSizes[product.id] || product.sizes[0]) === size
                                                             ? 'border-accent-900 dark:border-white bg-accent-900/5 dark:bg-white/5 font-semibold'
-                                                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-400'
+                                                            : 'border-warm-400 dark:border-gray-700 hover:border-warm-500'
                                                     }`}
                                                 >
                                                     {size}
@@ -244,7 +244,7 @@ const WishlistPage = () => {
                                             {product.colors.slice(0, 5).map(c => (
                                                 <div
                                                     key={c}
-                                                    className="w-5 h-5 rounded-full border border-gray-200 dark:border-gray-600"
+                                                    className="w-5 h-5 rounded-full border border-warm-400 dark:border-gray-600"
                                                     style={{ backgroundColor: COLOR_MAP[c] || c }}
                                                     title={c}
                                                 />
@@ -281,7 +281,7 @@ const WishlistPage = () => {
                                                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${
                                                     stockNotifications?.has?.(product.id)
                                                         ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
-                                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                                        : 'bg-warm-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-warm-400 dark:hover:bg-gray-600'
                                                 }`}
                                             >
                                                 {stockNotifications?.has?.(product.id) ? (
@@ -295,7 +295,7 @@ const WishlistPage = () => {
                                             <motion.button
                                                 whileTap={{ scale: 0.95 }}
                                                 onClick={() => removeFromWishlist(product.id)}
-                                                className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-800 transition-colors"
+                                                className="p-2.5 rounded-xl border border-warm-400 dark:border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-800 transition-colors"
                                                 aria-label={t('removeFromWishlist')}
                                             >
                                                 <Trash2 className="w-4 h-4" />

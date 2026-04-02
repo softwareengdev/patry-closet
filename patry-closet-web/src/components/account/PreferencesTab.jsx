@@ -92,7 +92,7 @@ const PreferencesTab = () => {
                     ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
                     : isDark
                         ? 'border-gray-700 hover:border-gray-600 text-gray-300'
-                        : 'border-gray-200 hover:border-gray-400 text-gray-700'
+                        : 'border-warm-400 hover:border-warm-500 text-gray-700'
             } ${className}`}
         >
             {active && <Check className="w-3 h-3 inline mr-1" />}
@@ -190,7 +190,7 @@ const PreferencesTab = () => {
             </div>
 
             {/* Save */}
-            <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-4 pt-4 border-t border-warm-400 dark:border-gray-800">
                 <motion.button
                     onClick={handleSave}
                     disabled={saving}

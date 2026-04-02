@@ -93,7 +93,7 @@ const ShareButtons = ({ title, url, description, image, variant = 'horizontal' }
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className={`p-2 rounded-full transition-colors text-gray-400 ${p.color}
-              ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
+              ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-300'}`}
             title={`${t('blog.shareOn', 'Share on')} ${p.name}`}
             aria-label={`${t('blog.shareOn', 'Share on')} ${p.name}`}
           >
@@ -110,7 +110,7 @@ const ShareButtons = ({ title, url, description, image, variant = 'horizontal' }
         className={`p-2 rounded-full transition-colors
           ${copied
             ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
-            : `text-gray-400 ${isDark ? 'hover:bg-gray-800 hover:text-gray-300' : 'hover:bg-gray-100 hover:text-gray-600'}`
+            : `text-gray-400 ${isDark ? 'hover:bg-gray-800 hover:text-gray-300' : 'hover:bg-warm-300 hover:text-gray-600'}`
           }`}
         title={copied ? t('blog.linkCopied', 'Link copied!') : t('blog.copyLink', 'Copy link')}
         aria-label={t('blog.copyLink', 'Copy link')}

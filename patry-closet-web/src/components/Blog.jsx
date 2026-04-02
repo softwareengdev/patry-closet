@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 // Mock para artículos de blog (extiende con API real)
@@ -46,7 +46,7 @@ const Blog = () => {
     const { t } = useTranslation();
 
     return (
-        <section className="py-20 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <section className="py-20 bg-warm-200 dark:bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-gray-200">{t('ourBlog')}</h1>
                 <div className="space-y-16">
@@ -56,7 +56,7 @@ const Blog = () => {
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl"
+                            className="bg-warm-50 dark:bg-gray-800 p-8 rounded-xl shadow-2xl"
                         >
                             <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">{post.title}</h2>
                             <p className="text-gray-500 dark:text-gray-400 mb-4">{post.date} | {post.author}</p>

@@ -12,7 +12,7 @@ const TYPE_CONFIG = {
     stock: { icon: AlertCircle, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
     promo: { icon: Tag, color: 'text-pink-500', bg: 'bg-pink-100 dark:bg-pink-900/30' },
     price_drop: { icon: TrendingDown, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' },
-    system: { icon: Settings, color: 'text-gray-500', bg: 'bg-gray-100 dark:bg-gray-800' },
+    system: { icon: Settings, color: 'text-gray-500', bg: 'bg-warm-300 dark:bg-gray-800' },
 };
 
 const NotificationsTab = () => {
@@ -87,7 +87,7 @@ const NotificationsTab = () => {
                         </button>
                     )}
                     <button onClick={() => setShowPrefs(!showPrefs)}
-                        className={`p-2 rounded-lg transition-colors ${showPrefs ? 'bg-black dark:bg-white text-white dark:text-black' : isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                        className={`p-2 rounded-lg transition-colors ${showPrefs ? 'bg-black dark:bg-white text-white dark:text-black' : isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                         <Settings className="w-4 h-4" />
                     </button>
                 </div>
@@ -102,7 +102,7 @@ const NotificationsTab = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="mb-6 overflow-hidden"
                     >
-                        <div className={`p-5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+                        <div className={`p-5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                             <h3 className="font-semibold text-sm mb-4">{t('account.notifPreferences', 'Notification Preferences')}</h3>
                             <div className="space-y-3">
                                 {PREF_ITEMS.map(item => (
@@ -114,12 +114,12 @@ const NotificationsTab = () => {
                                         <button onClick={() => togglePref(item.key)}
                                             className={`relative w-11 h-6 rounded-full transition-colors ${prefs[item.key] ? 'bg-black dark:bg-white' : isDark ? 'bg-gray-700' : 'bg-gray-300'}`}
                                             role="switch" aria-checked={prefs[item.key]}>
-                                            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform bg-white dark:bg-black ${prefs[item.key] ? 'translate-x-5' : ''}`} />
+                                            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform bg-warm-50 dark:bg-black ${prefs[item.key] ? 'translate-x-5' : ''}`} />
                                         </button>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 flex gap-4">
+                            <div className="mt-4 pt-4 border-t border-warm-400 dark:border-gray-800 flex gap-4">
                                 <label className="flex items-center gap-2 text-sm">
                                     <input type="checkbox" checked={prefs.pushEnabled} onChange={() => togglePref('pushEnabled')} className="w-4 h-4 rounded accent-black dark:accent-white" />
                                     {t('account.pushNotif', 'Push notifications')}
@@ -138,7 +138,7 @@ const NotificationsTab = () => {
             {loading ? (
                 <div className="space-y-3">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`} />
+                        <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`} />
                     ))}
                 </div>
             ) : (
@@ -156,7 +156,7 @@ const NotificationsTab = () => {
                                     className={`flex items-start gap-3 p-4 rounded-xl transition-colors cursor-pointer ${
                                         !notif.read
                                             ? isDark ? 'bg-gray-800/80' : 'bg-blue-50/50'
-                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                            : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                     }`}
                                     onClick={() => markRead(notif.id)}
                                 >

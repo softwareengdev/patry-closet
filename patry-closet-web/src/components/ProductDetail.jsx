@@ -208,7 +208,7 @@ const ProductDetail = () => {
 
   return (
     <motion.article
-      className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20"
+      className="min-h-screen bg-warm-200 dark:bg-gray-950 pb-20"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -240,7 +240,7 @@ const ProductDetail = () => {
           {/* ════════════ LEFT: IMAGE GALLERY ════════════ */}
           <section aria-label="Product images" className="space-y-4">
             {/* Main image */}
-            <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-sm group">
+            <div className="relative rounded-2xl overflow-hidden bg-warm-50 dark:bg-gray-900 shadow-sm group">
               <TransformWrapper
                 key={selectedImage}
                 initialScale={1}
@@ -372,7 +372,7 @@ const ProductDetail = () => {
               {t('collectionDesc', 'collection. Crafted with attention to detail for the modern wardrobe.')}
             </p>
 
-            <hr className="border-gray-200 dark:border-gray-800" />
+            <hr className="border-warm-400 dark:border-gray-800" />
 
             {/* ── Color selector ─────────────────────────────────── */}
             {product.colors && product.colors.length > 0 && (
@@ -394,7 +394,7 @@ const ProductDetail = () => {
                           isActive
                             ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-950'
                             : 'hover:scale-110'
-                        } ${isLight ? 'border border-gray-300 dark:border-gray-600' : ''}`}
+                        } ${isLight ? 'border border-warm-500 dark:border-gray-600' : ''}`}
                         style={{ backgroundColor: hex }}
                         aria-label={`${t('selectColor', 'Select color')} ${color}`}
                         aria-pressed={isActive}
@@ -447,10 +447,10 @@ const ProductDetail = () => {
                         disabled={disabled}
                         className={`relative min-w-[3rem] px-4 py-2.5 rounded-lg text-sm font-medium border transition-all flex items-center justify-center gap-1.5 ${
                           disabled
-                            ? 'border-gray-200 dark:border-gray-700 text-gray-300 dark:text-gray-600 cursor-not-allowed line-through'
+                            ? 'border-warm-400 dark:border-gray-700 text-gray-300 dark:text-gray-600 cursor-not-allowed line-through'
                             : isActive
                             ? 'border-gray-900 dark:border-white bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-900 dark:hover:border-white'
+                            : 'border-warm-500 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-900 dark:hover:border-white'
                         }`}
                         aria-label={`${t('selectSize', 'Select size')} ${size}${
                           disabled ? ' – out of stock' : stock < 3 ? ' – low stock' : ''
@@ -476,11 +476,11 @@ const ProductDetail = () => {
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 {t('quantity', 'Quantity')}
               </p>
-              <div className="inline-flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+              <div className="inline-flex items-center border border-warm-500 dark:border-gray-600 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
-                  className="px-3.5 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="px-3.5 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-warm-300 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   aria-label="Decrease quantity"
                 >
                   <Minus size={16} />
@@ -491,7 +491,7 @@ const ProductDetail = () => {
                 <button
                   onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
                   disabled={quantity >= maxQty || isOutOfStock}
-                  className="px-3.5 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="px-3.5 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-warm-300 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   aria-label="Increase quantity"
                 >
                   <Plus size={16} />
@@ -512,7 +512,7 @@ const ProductDetail = () => {
                     ? 'bg-emerald-600 text-white'
                     : isOutOfStock
                     ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'
+                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-800'
                 }`}
                 aria-label={
                   isOutOfStock
@@ -542,7 +542,7 @@ const ProductDetail = () => {
                 className={`w-14 flex items-center justify-center rounded-xl border transition-colors ${
                   isInWishlist(product.id)
                     ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-500'
-                    : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-500 hover:border-red-300'
+                    : 'border-warm-500 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-500 hover:border-red-300'
                 }`}
                 aria-label={
                   isInWishlist(product.id)
@@ -567,7 +567,7 @@ const ProductDetail = () => {
               ].map(({ icon: Icon, label }) => (
                 <div
                   key={label}
-                  className="flex flex-col items-center gap-1 py-3 rounded-xl bg-gray-100 dark:bg-gray-900 text-center"
+                  className="flex flex-col items-center gap-1 py-3 rounded-xl bg-warm-300 dark:bg-gray-900 text-center"
                 >
                   <Icon size={18} className="text-gray-500 dark:text-gray-400" />
                   <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">{label}</span>
@@ -585,7 +585,7 @@ const ProductDetail = () => {
           <div
             role="tablist"
             aria-label="Product information tabs"
-            className="flex gap-1 border-b border-gray-200 dark:border-gray-800 overflow-x-auto scrollbar-hide"
+            className="flex gap-1 border-b border-warm-400 dark:border-gray-800 overflow-x-auto scrollbar-hide"
             onKeyDown={handleTabKeyboard}
           >
             {TAB_KEYS.map((key) => {
@@ -693,15 +693,15 @@ const ProductDetail = () => {
                     Shipping Methods
                   </h3>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                      <thead className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
+                    <table className="w-full text-sm border border-warm-400 dark:border-gray-700 rounded-lg overflow-hidden">
+                      <thead className="bg-warm-300 dark:bg-gray-800 text-gray-900 dark:text-white">
                         <tr>
                           <th className="text-left px-4 py-3 font-semibold">Method</th>
                           <th className="text-left px-4 py-3 font-semibold">Delivery</th>
                           <th className="text-left px-4 py-3 font-semibold">Cost</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      <tbody className="divide-y divide-warm-400 dark:divide-gray-700">
                         <tr>
                           <td className="px-4 py-3 font-medium">Standard</td>
                           <td className="px-4 py-3">5–7 business days</td>
@@ -800,7 +800,7 @@ const ProductDetail = () => {
                             {stars}
                           </span>
                           <Star size={12} className="text-amber-400" fill="currentColor" />
-                          <div className="flex-1 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2.5 bg-warm-400 dark:bg-gray-700 rounded-full overflow-hidden">
                             <motion.div
                               className="h-full bg-amber-400 rounded-full"
                               initial={{ width: 0 }}
@@ -816,14 +816,14 @@ const ProductDetail = () => {
                     </div>
                   </div>
 
-                  <hr className="border-gray-200 dark:border-gray-800" />
+                  <hr className="border-warm-400 dark:border-gray-800" />
 
                   {/* Individual reviews */}
                   <div className="space-y-6">
                     {MOCK_REVIEWS.map((review) => (
                       <div key={review.id} className="flex gap-4">
                         {/* Avatar */}
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warm-400 dark:bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300">
                           {review.name.charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -898,7 +898,7 @@ const ProductDetail = () => {
           >
             <button
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-10"
+              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white hover:bg-warm-50/20 transition-colors z-10"
               aria-label="Close fullscreen view"
             >
               <X size={24} />

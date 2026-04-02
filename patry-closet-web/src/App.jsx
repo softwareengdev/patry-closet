@@ -60,7 +60,7 @@ function AppContent() {
     const showNavbar = !isAuthPage;
 
     return (
-        <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
+        <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-warm-100 text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
             <SkipToContent />
             {showNavbar && <Navbar isTransparent={isHome} />}
             <main id="main-content" className={isHome || isAuthPage ? 'w-full' : 'pt-20 w-full'} role="main" tabIndex={-1}>

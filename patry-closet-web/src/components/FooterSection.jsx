@@ -2,7 +2,7 @@ import { useContext, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 import { FaInstagram, FaFacebook, FaTiktok, FaCcVisa, FaCcMastercard, FaCcPaypal, FaCcApplePay, FaCcStripe } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 
@@ -74,7 +74,7 @@ const FooterSection = () => {
             className={`py-16 sm:py-20 border-t ${
                 isDark
                     ? 'bg-gray-950 border-gray-900'
-                    : 'bg-gray-50 border-gray-200'
+                    : 'bg-warm-200 border-warm-400'
             }`}
             role="contentinfo"
         >
@@ -112,7 +112,7 @@ const FooterSection = () => {
                                 className={`group rounded-xl overflow-hidden border transition-all hover:shadow-lg ${
                                     isDark
                                         ? 'bg-gray-900 border-gray-800 hover:border-gray-700'
-                                        : 'bg-white border-gray-200 hover:border-gray-300'
+                                        : 'bg-warm-50 border-warm-400 hover:border-warm-500'
                                 }`}
                             >
                                 <div className="aspect-[16/10] overflow-hidden">
@@ -151,11 +151,11 @@ const FooterSection = () => {
                     initial="hidden"
                     animate={isInView ? 'visible' : 'hidden'}
                     className={`flex flex-col sm:flex-row items-center justify-between gap-4 py-8 border-y mb-10 ${
-                        isDark ? 'border-gray-800' : 'border-gray-200'
+                        isDark ? 'border-gray-800' : 'border-warm-400'
                     }`}
                 >
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Mail className="w-5 h-5 text-pink-500" />
                         </div>
                         <div>
@@ -172,13 +172,13 @@ const FooterSection = () => {
                             className={`flex-1 sm:w-56 px-4 py-2.5 rounded-lg border text-sm bg-transparent focus:outline-none ${
                                 isDark
                                     ? 'border-gray-700 focus:border-white placeholder-gray-600'
-                                    : 'border-gray-300 focus:border-black placeholder-gray-400'
+                                    : 'border-warm-500 focus:border-black placeholder-gray-400'
                             }`}
                             aria-label={t('footer.emailPlaceholder', 'Your email')}
                         />
                         <button className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                             isDark
-                                ? 'bg-white text-black hover:bg-gray-100'
+                                ? 'bg-warm-50 text-black hover:bg-warm-300'
                                 : 'bg-black text-white hover:bg-gray-900'
                         }`}>
                             {t('footer.subscribe', 'Subscribe')}
@@ -195,10 +195,11 @@ const FooterSection = () => {
                 >
                     {/* Brand + Social */}
                     <motion.div variants={fadeUp}>
-                        <div className="flex items-center gap-2 mb-3">
-                            <Sparkles className="w-5 h-5 text-pink-500" />
-                            <span className="font-serif text-lg tracking-wide">PATRY CLOSET</span>
-                        </div>
+                        <Link to="/" className="flex items-center gap-0.5 mb-3 group">
+                            <span className="text-xl font-bold tracking-tighter">PATRY</span>
+                            <span className="text-rose text-xl transition-transform duration-300 group-hover:rotate-12">♡</span>
+                            <span className="text-xl font-bold tracking-tighter">CLOSET</span>
+                        </Link>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-xs">
                             {t('footer.brandDesc', 'Curated fashion for the modern woman. Timeless elegance meets contemporary design.')}
                         </p>
@@ -213,7 +214,7 @@ const FooterSection = () => {
                                     className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
                                         isDark
                                             ? 'bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white'
-                                            : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900'
+                                            : 'bg-warm-300 hover:bg-warm-400 text-gray-500 hover:text-gray-900'
                                     }`}
                                 >
                                     <s.icon className="w-4 h-4" />
@@ -252,7 +253,7 @@ const FooterSection = () => {
                                 <div
                                     key={pm.label}
                                     className={`w-12 h-8 rounded flex items-center justify-center text-xl ${
-                                        isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-500'
+                                        isDark ? 'bg-gray-800 text-gray-400' : 'bg-warm-300 text-gray-500'
                                     }`}
                                     aria-label={pm.label}
                                 >
@@ -264,7 +265,7 @@ const FooterSection = () => {
                 </motion.div>
 
                 {/* Copyright */}
-                <div className={`mt-10 pt-6 border-t text-center ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+                <div className={`mt-10 pt-6 border-t text-center ${isDark ? 'border-gray-800' : 'border-warm-400'}`}>
                     <p className="text-xs text-gray-500 dark:text-gray-500">
                         © {new Date().getFullYear()} Patry Closet. {t('footer.allRightsReserved', 'All rights reserved.')}
                     </p>

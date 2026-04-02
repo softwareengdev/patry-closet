@@ -61,7 +61,7 @@ const ProfileTab = () => {
 
     const inputClass = (error) =>
         `w-full px-4 py-3 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 text-sm ${
-            error ? 'border-red-400 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-black dark:focus:border-white'
+            error ? 'border-red-400 focus:border-red-500' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
         }`;
 
     return (
@@ -72,7 +72,7 @@ const ProfileTab = () => {
             {/* Avatar */}
             <div className="flex items-center gap-6 mb-8">
                 <div className="relative group">
-                    <div className={`w-24 h-24 rounded-full overflow-hidden ring-4 ${isDark ? 'ring-gray-800 bg-gray-800' : 'ring-gray-100 bg-gray-100'}`}>
+                    <div className={`w-24 h-24 rounded-full overflow-hidden ring-4 ${isDark ? 'ring-gray-800 bg-gray-800' : 'ring-warm-300 bg-warm-300'}`}>
                         {user?.avatar ? (
                             <img src={user.avatar} alt={user?.firstName} className="w-full h-full object-cover" />
                         ) : (

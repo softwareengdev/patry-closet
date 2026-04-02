@@ -11,6 +11,20 @@ export default {
                 serif: ['Playfair Display', 'Georgia', 'serif'],
             },
             colors: {
+                /* ─── Warm Light Palette (fashion-grade off-whites) ─── */
+                warm: {
+                    50:  '#FEFDFB',  // cards / elevated surfaces
+                    100: '#FBF9F5',  // primary page background
+                    200: '#F6F3ED',  // alternating section backgrounds
+                    300: '#F0ECE5',  // inset / input backgrounds
+                    400: '#E8E3DA',  // primary borders
+                    500: '#DDD7CB',  // stronger borders / dividers
+                    600: '#C7BFB0',  // disabled / muted elements
+                    700: '#A39B8C',  // placeholder text
+                    800: '#746D60',  // secondary text
+                    900: '#4A453C',  // strong secondary text
+                    950: '#2D2A25',  // near-black warm
+                },
                 /* Fashion neutrals */
                 luxury: '#1A1A1A',
                 ivory: '#FDFBF7',

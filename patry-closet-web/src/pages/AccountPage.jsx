@@ -87,7 +87,7 @@ const AccountPage = () => {
                         <ChevronLeft className="w-5 h-5" />
                     </button>
                 )}
-                <div className={`w-12 h-12 rounded-full overflow-hidden ring-2 shrink-0 ${isDark ? 'ring-gray-800 bg-gray-800' : 'ring-gray-100 bg-gray-100'}`}>
+                <div className={`w-12 h-12 rounded-full overflow-hidden ring-2 shrink-0 ${isDark ? 'ring-gray-800 bg-gray-800' : 'ring-warm-300 bg-warm-300'}`}>
                     {user?.avatar ? (
                         <img src={user.avatar} alt={user?.firstName} className="w-full h-full object-cover" />
                     ) : (
@@ -130,8 +130,8 @@ const AccountPage = () => {
                                     onClick={() => handleTabClick(tab.key)}
                                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all text-left ${
                                         isActive
-                                            ? isDark ? 'bg-gray-800 font-semibold' : 'bg-gray-100 font-semibold'
-                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                            ? isDark ? 'bg-gray-800 font-semibold' : 'bg-warm-300 font-semibold'
+                                            : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                     }`}
                                 >
                                     <Icon className={`w-4 h-4 ${isActive ? config.color : 'text-gray-400'}`} />
@@ -145,7 +145,7 @@ const AccountPage = () => {
 
                         {/* Wishlist shortcut */}
                         <Link to="/wishlist"
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-gray-800/50 text-left">
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-warm-200 dark:hover:bg-gray-800/50 text-left">
                             <Heart className="w-4 h-4 text-pink-500" />
                             <span>{t('account.wishlist', 'Wishlist')}</span>
                         </Link>
@@ -172,10 +172,10 @@ const AccountPage = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     onClick={() => handleTabClick(tab.key)}
                                     className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
-                                        isDark ? 'border-gray-800 hover:border-gray-700' : 'border-gray-200 hover:border-gray-300'
+                                        isDark ? 'border-gray-800 hover:border-gray-700' : 'border-warm-400 hover:border-warm-500'
                                     }`}
                                 >
-                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                                         <Icon className={`w-4 h-4 ${config.color}`} />
                                     </div>
                                     <span className="flex-1 text-sm font-medium">{tab.label}</span>
@@ -188,9 +188,9 @@ const AccountPage = () => {
                         })}
                         <Link to="/wishlist"
                             className={`flex items-center gap-3 p-4 rounded-xl border text-left ${
-                                isDark ? 'border-gray-800 hover:border-gray-700' : 'border-gray-200 hover:border-gray-300'
+                                isDark ? 'border-gray-800 hover:border-gray-700' : 'border-warm-400 hover:border-warm-500'
                             }`}>
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                                 <Heart className="w-4 h-4 text-pink-500" />
                             </div>
                             <span className="flex-1 text-sm font-medium">{t('account.wishlist', 'Wishlist')}</span>
