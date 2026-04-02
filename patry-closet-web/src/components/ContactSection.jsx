@@ -360,11 +360,11 @@ const ContactSection = () => {
                     <motion.h2
                         id="contact-heading"
                         variants={fadeUp}
-                        className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4"
+                        className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight mb-4"
                     >
                         {t('contact.title', 'How can we help you?')}
                     </motion.h2>
-                    <motion.p variants={fadeUp} className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto text-base sm:text-lg">
+                    <motion.p variants={fadeUp} className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto text-sm sm:text-base font-light tracking-wide leading-relaxed">
                         {t('contact.subtitle', 'Questions about sizing, shipping, collaborations or press? We\'d love to hear from you.')}
                     </motion.p>
                 </motion.div>
@@ -397,7 +397,7 @@ const ContactSection = () => {
                                     >
                                         <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                                     </motion.div>
-                                    <h3 className="text-2xl font-bold mb-3">
+                                    <h3 className="font-serif text-2xl font-light tracking-tight mb-3">
                                         {t('contact.successTitle', 'Message Sent!')}
                                     </h3>
                                     <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">

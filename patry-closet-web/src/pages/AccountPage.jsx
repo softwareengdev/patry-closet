@@ -95,7 +95,7 @@ const AccountPage = () => {
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h1 className="text-lg sm:text-xl font-bold truncate">
+                    <h1 className="font-serif text-lg sm:text-xl font-light tracking-tight truncate">
                         {user?.firstName} {user?.lastName}
                     </h1>
                     <div className="flex items-center gap-2">

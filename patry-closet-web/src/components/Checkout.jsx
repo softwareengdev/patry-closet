@@ -736,7 +736,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
       </motion.div>
 
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-gray-900 dark:text-white">
           {t('orderConfirmed') || 'Order Confirmed!'}
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -989,10 +989,10 @@ function Checkout() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white font-serif">
+          <h1 className="font-serif text-3xl sm:text-4xl font-light tracking-tight text-gray-900 dark:text-white">
             {t('checkout')}
           </h1>
-          <span className="text-xs text-gray-500 dark:text-gray-400 bg-warm-300 dark:bg-gray-800 px-2 py-0.5 rounded mt-1 inline-block">
+          <span className="text-[11px] font-medium uppercase tracking-ultra-wide text-gray-400 dark:text-gray-500 mt-2 inline-block">
             {t('guestCheckout') || 'Guest Checkout'}
           </span>
         </div>

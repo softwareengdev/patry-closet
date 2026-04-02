@@ -37,7 +37,7 @@ const LoginPage = () => {
                         <p className="text-sm font-medium tracking-widest uppercase mb-3 text-white/80">
                             Welcome Back
                         </p>
-                        <h2 className="text-4xl font-serif leading-tight mb-4">
+                        <h2 className="text-4xl font-serif font-light tracking-tight leading-tight mb-4">
                             Your style awaits
                         </h2>
                         <p className="text-white/70 text-sm leading-relaxed">
