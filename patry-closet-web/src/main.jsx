@@ -10,6 +10,13 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './i18n/en.json';
 import es from './i18n/es.json';
+import { initGA4 } from './lib/analytics';
+
+// Initialize GA4 if user has already consented
+const cookieConsent = localStorage.getItem('cookie-consent');
+if (cookieConsent === 'accepted') {
+    initGA4();
+}
 
 i18n.use(initReactI18next).use(LanguageDetector).init({
     resources: { en: { translation: en }, es: { translation: es } },

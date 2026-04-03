@@ -46,6 +46,7 @@ const FOOTER_LINKS = [
     { labelKey: 'blog', fallback: 'Blog', to: '/blog' },
     { labelKey: 'privacyPolicy', fallback: 'Privacy Policy', to: '/privacy' },
     { labelKey: 'termsOfService', fallback: 'Terms of Service', to: '/terms' },
+    { labelKey: 'cookiePolicy', fallback: 'Cookie Policy', to: '/cookies' },
     { labelKey: 'faq', fallback: 'FAQ', to: '/faq' },
 ];
 

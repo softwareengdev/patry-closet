@@ -12,6 +12,8 @@ import FooterSection from './components/FooterSection';
 import Cart from './components/Cart';
 import WishlistPage from './components/WishlistPage';
 import Checkout from './components/Checkout';
+import CookieConsent from './components/CookieConsent';
+import SEOHead, { getOrganizationSchema, getWebSiteSchema } from './components/SEOHead';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -20,14 +22,19 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import AccountPage from './pages/AccountPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
-// Code-split blog pages (heavy markdown deps loaded on demand)
+// Code-split legal & blog pages (loaded on demand)
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const CookiesPage = lazy(() => import('./pages/CookiesPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
 
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
+import usePageTracking from './hooks/usePageTracking';
 
 const pageTransition = {
     initial: { opacity: 0, y: 12 },
@@ -59,15 +66,26 @@ function AppContent() {
     const isAuthPage = ['/login', '/register', '/forgot-password'].includes(location.pathname) || location.pathname.startsWith('/account/verify-email');
     const showNavbar = !isAuthPage;
 
+    usePageTracking();
+
+    const homeJsonLd = [getOrganizationSchema(), getWebSiteSchema()];
+
     return (
         <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-warm-100 text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
             <SkipToContent />
+            <CookieConsent />
             {showNavbar && <Navbar isTransparent={isHome} />}
             <main id="main-content" className={isHome || isAuthPage ? 'w-full' : 'pt-20 w-full'} role="main" tabIndex={-1}>
                 <AnimatePresence mode="wait">
                     <Routes location={location} key={location.pathname}>
                         <Route path="/" element={
                             <motion.div {...pageTransition}>
+                                <SEOHead
+                                    title="Moda Online — Colecciones Exclusivas"
+                                    description="PATRY♡CLOSET — Tienda de moda online con colecciones exclusivas para mujer, hombre y accesorios. Envío gratuito en pedidos +50€. Descubre las últimas tendencias."
+                                    canonical="/"
+                                    jsonLd={homeJsonLd}
+                                />
                                 <HeroSection />
                                 <FeaturedProducts />
                                 <CuratedStories />
@@ -95,6 +113,20 @@ function AppContent() {
                         } />
                         <Route path="/blog/:slug" element={
                             <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><BlogPostPage /></Suspense></motion.div>
+                        } />
+
+                        {/* Legal pages */}
+                        <Route path="/terms" element={
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><TermsPage /></Suspense></motion.div>
+                        } />
+                        <Route path="/privacy" element={
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><PrivacyPage /></Suspense></motion.div>
+                        } />
+                        <Route path="/cookies" element={
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><CookiesPage /></Suspense></motion.div>
+                        } />
+                        <Route path="/faq" element={
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><FAQPage /></Suspense></motion.div>
                         } />
 
                         {/* Auth routes */}

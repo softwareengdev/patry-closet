@@ -10,7 +10,7 @@ import {
     FiChevronDown as ChevronDown,
     FiChevronRight as ChevronRight
 } from "react-icons/fi";
-import { Sun, Moon, Heart, ArrowRight, Monitor, Eye } from 'lucide-react';
+import { Sun, Moon, Heart, ArrowRight, Monitor, Eye, Package, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -168,9 +168,9 @@ const Navbar = ({ isTransparent = false }) => {
         const onScroll = () => {
             const y = window.scrollY;
             setScrolled(y > 60);
-            // Smooth 0→1 progress over 0-120px for graduated effects
             setScrollProgress(Math.min(y / 120, 1));
         };
+        onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
@@ -215,6 +215,7 @@ const Navbar = ({ isTransparent = false }) => {
     }, [userMenuOpen]);
 
     const showSolid = !isTransparent || scrolled || isMobileMenuOpen || activeMega;
+    const solidBg = isDark ? 'rgba(3,7,18,0.97)' : 'rgba(254,253,251,0.97)';
     const navTextClass = showSolid
         ? `${isHighContrast ? 'text-hc-fg' : 'text-gray-800 dark:text-gray-200'}`
         : 'text-white/90';
@@ -230,10 +231,11 @@ const Navbar = ({ isTransparent = false }) => {
                 role="navigation"
                 aria-label="Main navigation"
                 className={`fixed w-full z-50 top-0 transition-all duration-500 ease-out ${showSolid
-                    ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'bg-warm-50/95 dark:bg-gray-950/95 backdrop-blur-xl border-b border-warm-300 dark:border-gray-800'}`
+                    ? `${isHighContrast ? 'bg-hc-bg border-b-2 border-hc-border' : 'backdrop-blur-xl border-b border-warm-300 dark:border-gray-800'}`
                     : 'bg-transparent backdrop-blur-[2px] border-b border-white/10'
                 }`}
                 style={{
+                    backgroundColor: showSolid && !isHighContrast ? solidBg : undefined,
                     boxShadow: showSolid && !isHighContrast
                         ? `0 1px ${4 + scrollProgress * 8}px rgba(0,0,0,${0.02 + scrollProgress * 0.06})`
                         : 'none',
@@ -382,31 +384,34 @@ const Navbar = ({ isTransparent = false }) => {
                                                 <p className="text-sm font-semibold truncate">{user?.firstName} {user?.lastName}</p>
                                                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                                             </div>
-                                            <div className="py-1">
+                                            <div className="py-1.5 px-1.5">
                                                 {[
-                                                    { label: t('account.myAccount', 'My Account'), to: '/account' },
-                                                    { label: t('account.orders', 'My Orders'), to: '/account/orders' },
-                                                    { label: t('account.wishlist', 'My Wishlist'), to: '/wishlist' },
+                                                    { label: t('account.myAccount', 'My Account'), to: '/account', icon: User },
+                                                    { label: t('account.orders', 'My Orders'), to: '/account/orders', icon: Package },
+                                                    { label: t('account.wishlist', 'My Wishlist'), to: '/wishlist', icon: Heart },
+                                                    { label: t('account.settings', 'Settings'), to: '/account/preferences', icon: Settings },
                                                 ].map((item) => (
                                                     <Link
                                                         key={item.to}
                                                         to={item.to}
                                                         onClick={() => setUserMenuOpen(false)}
-                                                        className={`block px-4 py-2 text-sm transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
+                                                        className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
                                                     >
+                                                        <item.icon className="w-4 h-4 text-gray-400" />
                                                         {item.label}
                                                     </Link>
                                                 ))}
                                             </div>
-                                            <div className={`border-t ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
+                                            <div className={`border-t px-1.5 py-1.5 ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                 <button
                                                     onClick={async () => {
                                                         setUserMenuOpen(false);
                                                         await logout();
                                                         navigate('/');
                                                     }}
-                                                    className={`w-full text-left px-4 py-2.5 text-sm text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
+                                                    className={`w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm rounded-lg text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
                                                 >
+                                                    <LogOut className="w-4 h-4" />
                                                     {t('account.logout', 'Sign Out')}
                                                 </button>
                                             </div>
