@@ -5,7 +5,7 @@ import { Heart, Eye, ShoppingCart, Star, Check } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { useTranslation } from 'react-i18next';
-import { COLOR_MAP } from './ProductsPage';
+import { COLOR_MAP } from '../data/products';
 
 /* ─── Shimmer placeholder ─── */
 const ShimmerPlaceholder = () => (

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CartContext } from '../context/CartContext';
-import { COLOR_MAP } from './ProductsPage';
+import { COLOR_MAP } from '../data/products';
 
 const MiniCart = () => {
     const { t } = useTranslation();

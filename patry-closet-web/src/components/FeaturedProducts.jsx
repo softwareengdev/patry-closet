@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import QuickViewModal from './QuickViewModal';
-import { mockProducts } from './ProductsPage';
+import { mockProducts } from '../data/products';
 
 const FeaturedProducts = () => {
     const { t } = useTranslation();

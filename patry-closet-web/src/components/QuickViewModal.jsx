@@ -7,7 +7,7 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { useTranslation } from 'react-i18next';
-import { COLOR_MAP } from './ProductsPage';
+import { COLOR_MAP } from '../data/products';
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
     const { t } = useTranslation();
@@ -20,12 +20,12 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
     const [quantity, setQuantity] = useState(1);
     const [addedSuccess, setAddedSuccess] = useState(false);
 
-    const productImages = product ? [
-        product.image,
-        'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=800&q=80',
-    ] : [];
+    const productImages = product ? (
+        product.images && product.images.length > 0 ? product.images : [
+            product.image,
+            product.hoverImage,
+        ].filter(Boolean)
+    ) : [];
 
     const availableColors = product?.colors || ['Negro', 'Blanco', 'Gris', 'Beige'];
     const availableSizes = product?.sizes || ['XS', 'S', 'M', 'L', 'XL'];

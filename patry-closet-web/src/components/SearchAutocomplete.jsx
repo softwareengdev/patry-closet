@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Clock, TrendingUp, X, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { mockProducts } from './ProductsPage';
+import { mockProducts } from '../data/products';
 
 const RECENT_SEARCHES_KEY = 'patry-recent-searches';
 const MAX_RECENT = 5;

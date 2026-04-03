@@ -4,6 +4,15 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    server: {
+        host: true,
+        port: 3000,
+        allowedHosts: ['patry-closet'],
+    },
+    preview: {
+        host: true,
+        port: 4173,
+    },
     resolve: {
         dedupe: [
             'react',

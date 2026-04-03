@@ -5,7 +5,7 @@ import { Heart, ShoppingCart, Trash2, Share2, Bell, BellRing, ChevronRight, Pack
 import { useTranslation } from 'react-i18next';
 import { WishlistContext } from '../context/WishlistContext';
 import { CartContext } from '../context/CartContext';
-import { mockProducts, COLOR_MAP } from './ProductsPage';
+import { mockProducts, COLOR_MAP } from '../data/products';
 import ProductCard from './ProductCard';
 
 const WishlistPage = () => {

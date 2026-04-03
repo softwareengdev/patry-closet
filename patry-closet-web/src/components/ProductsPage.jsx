@@ -9,50 +9,16 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ProductCard from './ProductCard';
 import QuickViewModal from './QuickViewModal';
-
-/* ─── Color map ─── */
-const COLOR_MAP = {
-    Rojo: '#DC2626', Azul: '#2563EB', Negro: '#1A1A1A', Gris: '#6B7280',
-    Rosa: '#EC4899', Verde: '#059669', Beige: '#D2B48C', Blanco: '#F5F5F5',
-    Marrón: '#8B4513', Plateado: '#C0C0C0', Crema: '#FFFDD0', Burdeos: '#800020',
-    Camel: '#C19A6B', Lavanda: '#E6E6FA', Oliva: '#808000',
-};
-
-/* ─── Mock products with brand + availability ─── */
-export const mockProducts = [
-    { id: 1, name: 'Vestido Elegante', price: 59.99, originalPrice: 89.99, discount: 33, image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Rojo', 'Negro', 'Burdeos'], sizes: ['XS', 'S', 'M', 'L'], badge: 'bestSeller', rating: 4.8, reviewCount: 234, popularity: 85, color: 'Rojo', size: 'M', brand: 'Patry Originals', inStock: true },
-    { id: 2, name: 'Camisa Moderna', price: 39.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1598033129183-c4f50c736c10?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Azul', 'Blanco', 'Gris'], sizes: ['S', 'M', 'L', 'XL'], badge: 'new', rating: 4.5, reviewCount: 89, popularity: 70, color: 'Azul', size: 'L', brand: 'Urban Edge', inStock: true },
-    { id: 3, name: 'Pantalón Trendy', price: 49.99, originalPrice: 69.99, discount: 29, image: 'https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Negro', 'Beige', 'Oliva'], sizes: ['XS', 'S', 'M', 'L'], badge: null, rating: 4.6, reviewCount: 156, popularity: 90, color: 'Negro', size: 'S', brand: 'Patry Originals', inStock: true },
-    { id: 4, name: 'Accesorio Chic', price: 19.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&w=600&q=80', category: 'Accesorios', colors: ['Rojo', 'Negro'], sizes: [], badge: 'new', rating: 4.2, reviewCount: 45, popularity: 60, color: 'Rojo', size: '-', brand: 'Luxe Atelier', inStock: true },
-    { id: 5, name: 'Vestido Verano', price: 69.99, originalPrice: 99.99, discount: 30, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Azul', 'Rosa', 'Crema'], sizes: ['S', 'M', 'L'], badge: 'bestSeller', rating: 4.9, reviewCount: 312, popularity: 95, color: 'Azul', size: 'M', brand: 'Patry Originals', inStock: true },
-    { id: 6, name: 'Chaqueta Casual', price: 89.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Gris', 'Negro', 'Camel'], sizes: ['M', 'L', 'XL'], badge: null, rating: 4.4, reviewCount: 98, popularity: 80, color: 'Gris', size: 'L', brand: 'Urban Edge', inStock: true },
-    { id: 7, name: 'Blusa Floral', price: 34.99, originalPrice: 49.99, discount: 30, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Rosa', 'Lavanda', 'Crema'], sizes: ['XS', 'S', 'M'], badge: 'new', rating: 4.3, reviewCount: 67, popularity: 75, color: 'Rosa', size: 'S', brand: 'Bloom Studio', inStock: true },
-    { id: 8, name: 'Pantalón Clásico', price: 54.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Negro', 'Gris', 'Beige'], sizes: ['S', 'M', 'L', 'XL'], badge: null, rating: 4.1, reviewCount: 54, popularity: 65, color: 'Negro', size: 'M', brand: 'Urban Edge', inStock: false },
-    { id: 9, name: 'Bolso de Cuero', price: 79.99, originalPrice: 119.99, discount: 33, image: 'https://images.unsplash.com/photo-1590080875833-48a57b66b84d?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80', category: 'Accesorios', colors: ['Marrón', 'Negro', 'Camel'], sizes: [], badge: 'bestSeller', rating: 4.7, reviewCount: 201, popularity: 88, color: 'Marrón', size: '-', brand: 'Luxe Atelier', inStock: true },
-    { id: 10, name: 'Zapatos Deportivos', price: 99.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1600181953597-6a1cf22bb056?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Blanco', 'Negro', 'Gris'], sizes: ['40', '41', '42', '43', '44'], badge: 'new', rating: 4.6, reviewCount: 178, popularity: 92, color: 'Blanco', size: '42', brand: 'Urban Edge', inStock: true },
-    { id: 11, name: 'Falda Plisada', price: 44.99, originalPrice: 59.99, discount: 25, image: 'https://images.unsplash.com/photo-1520975918318-3e9c9dbead13?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Verde', 'Negro', 'Beige'], sizes: ['XS', 'S', 'M', 'L'], badge: null, rating: 4.3, reviewCount: 89, popularity: 78, color: 'Verde', size: 'S', brand: 'Bloom Studio', inStock: true },
-    { id: 12, name: 'Cinturón de Piel', price: 25.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1514995669114-6081e934b693?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80', category: 'Accesorios', colors: ['Negro', 'Marrón'], sizes: [], badge: null, rating: 4.0, reviewCount: 32, popularity: 55, color: 'Negro', size: '-', brand: 'Luxe Atelier', inStock: true },
-    { id: 13, name: 'Abrigo Largo', price: 129.99, originalPrice: 179.99, discount: 28, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Beige', 'Negro', 'Camel'], sizes: ['S', 'M', 'L', 'XL'], badge: 'bestSeller', rating: 4.8, reviewCount: 267, popularity: 82, color: 'Beige', size: 'L', brand: 'Patry Originals', inStock: true },
-    { id: 14, name: 'Polo Deportivo', price: 29.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Verde', 'Azul', 'Blanco'], sizes: ['S', 'M', 'L', 'XL'], badge: null, rating: 4.2, reviewCount: 76, popularity: 68, color: 'Verde', size: 'M', brand: 'Urban Edge', inStock: false },
-    { id: 15, name: 'Sombrero Veraniego', price: 22.99, originalPrice: 34.99, discount: 34, image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=600&q=80', category: 'Accesorios', colors: ['Beige', 'Blanco', 'Negro'], sizes: [], badge: null, rating: 4.1, reviewCount: 41, popularity: 62, color: 'Beige', size: '-', brand: 'Luxe Atelier', inStock: true },
-    { id: 16, name: 'Blazer Formal', price: 109.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1593032465171-8b0f6b8a4ef1?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Gris', 'Negro', 'Azul'], sizes: ['M', 'L', 'XL'], badge: 'new', rating: 4.7, reviewCount: 145, popularity: 87, color: 'Gris', size: 'M', brand: 'Urban Edge', inStock: true },
-    { id: 17, name: 'Top Deportivo', price: 27.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Negro', 'Rosa', 'Blanco'], sizes: ['XS', 'S', 'M'], badge: null, rating: 4.0, reviewCount: 58, popularity: 72, color: 'Negro', size: 'S', brand: 'Bloom Studio', inStock: true },
-    { id: 18, name: 'Leggings Fitness', price: 35.99, originalPrice: 49.99, discount: 28, image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07b?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Gris', 'Negro', 'Azul'], sizes: ['XS', 'S', 'M', 'L'], badge: null, rating: 4.4, reviewCount: 112, popularity: 76, color: 'Gris', size: 'M', brand: 'Patry Originals', inStock: true },
-    { id: 19, name: 'Reloj Clásico', price: 149.99, originalPrice: 199.99, discount: 25, image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=600&q=80', category: 'Accesorios', colors: ['Plateado', 'Negro'], sizes: [], badge: 'bestSeller', rating: 4.9, reviewCount: 389, popularity: 91, color: 'Plateado', size: '-', brand: 'Luxe Atelier', inStock: true },
-    { id: 20, name: 'Sudadera Urbana', price: 59.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1618354691438-25bc0f99d21d?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80', category: 'Hombres', colors: ['Negro', 'Gris', 'Verde'], sizes: ['S', 'M', 'L', 'XL'], badge: 'new', rating: 4.5, reviewCount: 134, popularity: 84, color: 'Negro', size: 'L', brand: 'Urban Edge', inStock: true },
-    { id: 21, name: 'Vestido Floral', price: 74.99, originalPrice: 109.99, discount: 32, image: 'https://images.unsplash.com/photo-1520974735194-8d95cdf6d2ef?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=600&q=80', category: 'Mujeres', colors: ['Rosa', 'Crema', 'Lavanda'], sizes: ['XS', 'S', 'M', 'L'], badge: 'bestSeller', rating: 4.8, reviewCount: 278, popularity: 89, color: 'Rosa', size: 'M', brand: 'Bloom Studio', inStock: true },
-    { id: 22, name: 'Gorra Casual', price: 19.99, originalPrice: null, discount: 0, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3f76?auto=format&fit=crop&w=600&q=80', hoverImage: 'https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=600&q=80', category: 'Accesorios', colors: ['Azul', 'Negro', 'Blanco'], sizes: [], badge: null, rating: 3.9, reviewCount: 28, popularity: 58, color: 'Azul', size: '-', brand: 'Luxe Atelier', inStock: false },
-];
-
-export { COLOR_MAP };
+import { mockProducts, COLOR_MAP } from '../data/products';
 
 /* ─── Derive available facet values from product data ─── */
 const ALL_CATEGORIES = [...new Set(mockProducts.map(p => p.category))];
+const ALL_SUBCATEGORIES = [...new Set(mockProducts.map(p => p.subcategory))];
 const ALL_COLORS = [...new Set(mockProducts.flatMap(p => p.colors))];
 const ALL_SIZES = [...new Set(mockProducts.flatMap(p => p.sizes).filter(Boolean))];
 const ALL_BRANDS = [...new Set(mockProducts.map(p => p.brand))];
 const PRICE_MIN = 0;
-const PRICE_MAX = 200;
+const PRICE_MAX = 250;
 
 /* ─── Collapsible filter section ─── */
 const FilterSection = ({ title, icon: Icon, defaultOpen = true, children, count = 0 }) => {
@@ -484,10 +450,12 @@ const ProductsPage = () => {
             products = products.filter(p =>
                 p.name.toLowerCase().includes(q) ||
                 p.category.toLowerCase().includes(q) ||
-                p.brand.toLowerCase().includes(q)
+                p.brand.toLowerCase().includes(q) ||
+                (p.subcategory && p.subcategory.toLowerCase().includes(q)) ||
+                (p.description && p.description.toLowerCase().includes(q))
             );
         }
-        if (filters.category) products = products.filter(p => p.category === filters.category);
+        if (filters.category) products = products.filter(p => p.category === filters.category || p.subcategory === filters.category);
         if (filters.colors.length) products = products.filter(p => p.colors.some(c => filters.colors.includes(c)));
         if (filters.sizes.length) products = products.filter(p => p.sizes.length === 0 || p.sizes.some(s => filters.sizes.includes(s)));
         if (filters.brands.length) products = products.filter(p => filters.brands.includes(p.brand));

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useTranslation } from 'react-i18next';
-import { mockProducts, COLOR_MAP } from './ProductsPage';
+import { mockProducts, COLOR_MAP } from '../data/products';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import SizeGuideModal from './SizeGuideModal';
@@ -28,13 +28,13 @@ import ProductCard from './ProductCard';
 // Helpers
 // ---------------------------------------------------------------------------
 
-const getProductImages = (product) => [
-  product.image,
-  product.hoverImage,
-  'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1594633312681-86309903deb9?auto=format&fit=crop&w=800&q=80',
-];
+const getProductImages = (product) => {
+  if (product.images && product.images.length > 0) return product.images;
+  return [
+    product.image,
+    product.hoverImage,
+  ].filter(Boolean);
+};
 
 const getStockForSize = (productId, size) => {
   const hash = (productId * 7 + size.charCodeAt(0) * 13) % 20;
@@ -169,7 +169,7 @@ const ProductDetail = () => {
   const maxQty = Math.min(currentStock, 10);
 
   const relatedProducts = mockProducts
-    .filter((p) => p.category === product.category && p.id !== product.id)
+    .filter((p) => (p.subcategory === product.subcategory || p.category === product.category) && p.id !== product.id)
     .slice(0, 8);
 
   const categoryForSizeGuide =
@@ -367,9 +367,13 @@ const ProductDetail = () => {
 
             {/* Short description */}
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              {t('premiumPiece', 'A premium piece from our')}{' '}
-              <span className="font-medium text-gray-800 dark:text-gray-200">{product.category}</span>{' '}
-              {t('collectionDesc', 'collection. Crafted with attention to detail for the modern wardrobe.')}
+              {product.description || (
+                <>
+                  {t('premiumPiece', 'A premium piece from our')}{' '}
+                  <span className="font-medium text-gray-800 dark:text-gray-200">{product.category}</span>{' '}
+                  {t('collectionDesc', 'collection. Crafted with attention to detail for the modern wardrobe.')}
+                </>
+              )}
             </p>
 
             <hr className="border-warm-400 dark:border-gray-800" />
@@ -645,8 +649,8 @@ const ProductDetail = () => {
                       {t('description', 'Description')}
                     </h3>
                     <p className="leading-relaxed">
-                      {product.name} is an exceptional piece from our {product.category} collection.
-                      Designed with meticulous attention to detail, this garment combines contemporary
+                      {product.description || `${product.name} is an exceptional piece from our ${product.category} collection.`}
+                      {' '}Designed with meticulous attention to detail, this garment combines contemporary
                       aesthetics with timeless elegance. Perfect for any occasion, from casual outings to
                       formal events.
                     </p>

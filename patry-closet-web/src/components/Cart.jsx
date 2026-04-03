@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, ShoppingBag, Plus, Minus, ArrowRight, ChevronRight, Tag, X, Truck } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { useTranslation } from 'react-i18next';
-import { COLOR_MAP } from './ProductsPage';
+import { COLOR_MAP } from '../data/products';
 
 const Cart = () => {
     const { t } = useTranslation();
