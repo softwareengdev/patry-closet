@@ -10,6 +10,7 @@ using PatryCloset.Infrastructure.Persistence.Interceptors;
 using PatryCloset.Infrastructure.Persistence.Repositories;
 using PatryCloset.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
+using StackExchange.Redis;
 
 namespace PatryCloset.Infrastructure;
 
@@ -71,6 +72,8 @@ public static class DependencyInjection
         var redisConnection = configuration.GetConnectionString("Redis");
         if (!string.IsNullOrEmpty(redisConnection))
         {
+            var multiplexer = ConnectionMultiplexer.Connect(redisConnection);
+            services.AddSingleton<IConnectionMultiplexer>(multiplexer);
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = redisConnection;

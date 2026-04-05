@@ -1,10 +1,11 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using PatryCloset.Application.Common.Interfaces;
+using StackExchange.Redis;
 
 namespace PatryCloset.Infrastructure.Caching;
 
-public class CacheService(IDistributedCache cache) : ICacheService
+public class CacheService(IDistributedCache cache, IConnectionMultiplexer? redis = null) : ICacheService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -30,9 +31,20 @@ public class CacheService(IDistributedCache cache) : ICacheService
     public async Task RemoveAsync(string key, CancellationToken ct = default)
         => await cache.RemoveAsync(key, ct);
 
-    public Task RemoveByPrefixAsync(string prefix, CancellationToken ct = default)
+    public async Task RemoveByPrefixAsync(string prefix, CancellationToken ct = default)
     {
-        // Redis-specific prefix removal requires IConnectionMultiplexer; fallback is no-op for distributed cache
-        return Task.CompletedTask;
+        if (redis is null) return;
+
+        var endpoints = redis.GetEndPoints();
+        foreach (var endpoint in endpoints)
+        {
+            var server = redis.GetServer(endpoint);
+            var keys = server.Keys(pattern: $"{prefix}*");
+            var db = redis.GetDatabase();
+            foreach (var key in keys)
+            {
+                await db.KeyDeleteAsync(key);
+            }
+        }
     }
 }

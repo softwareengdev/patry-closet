@@ -11,6 +11,8 @@ public class Repository<T>(ApplicationDbContext context) : IRepository<T>
     protected readonly ApplicationDbContext Context = context;
     protected readonly DbSet<T> DbSet = context.Set<T>();
 
+    public IQueryable<T> AsQueryable() => DbSet.AsQueryable();
+
     public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await DbSet.FindAsync([id], ct);
 
@@ -20,23 +22,22 @@ public class Repository<T>(ApplicationDbContext context) : IRepository<T>
     public virtual async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         => await DbSet.Where(predicate).ToListAsync(ct);
 
-    public virtual async Task<T> AddAsync(T entity, CancellationToken ct = default)
+    public virtual Task<T> AddAsync(T entity, CancellationToken ct = default)
     {
-        await DbSet.AddAsync(entity, ct);
-        await Context.SaveChangesAsync(ct);
-        return entity;
+        DbSet.Add(entity);
+        return Task.FromResult(entity);
     }
 
-    public virtual async Task UpdateAsync(T entity, CancellationToken ct = default)
+    public virtual Task UpdateAsync(T entity, CancellationToken ct = default)
     {
         DbSet.Update(entity);
-        await Context.SaveChangesAsync(ct);
+        return Task.CompletedTask;
     }
 
-    public virtual async Task DeleteAsync(T entity, CancellationToken ct = default)
+    public virtual Task DeleteAsync(T entity, CancellationToken ct = default)
     {
         DbSet.Remove(entity);
-        await Context.SaveChangesAsync(ct);
+        return Task.CompletedTask;
     }
 
     public virtual async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default)
