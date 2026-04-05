@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Clock, TrendingUp, X, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getProducts } from '../lib/productsApi';
 import { mockProducts } from '../data/products';
 
 const RECENT_SEARCHES_KEY = 'patry-recent-searches';
@@ -80,13 +81,28 @@ const SearchAutocomplete = ({ isOpen, onClose, isHighContrast }) => {
         return () => clearTimeout(debounceRef.current);
     }, [query]);
 
-    /* Search results */
-    const productResults = useMemo(() => {
-        if (!debouncedQuery || debouncedQuery.length < 2) return [];
-        const q = debouncedQuery.toLowerCase();
-        return mockProducts
-            .filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))
-            .slice(0, MAX_PRODUCT_RESULTS);
+    /* Search results — async API with mock fallback */
+    const [productResults, setProductResults] = useState([]);
+    useEffect(() => {
+        if (!debouncedQuery || debouncedQuery.length < 2) {
+            setProductResults([]);
+            return;
+        }
+        let cancelled = false;
+        getProducts({ search: debouncedQuery, pageSize: MAX_PRODUCT_RESULTS })
+            .then(({ data }) => {
+                if (!cancelled) setProductResults(data.slice(0, MAX_PRODUCT_RESULTS));
+            })
+            .catch(() => {
+                if (cancelled) return;
+                const q = debouncedQuery.toLowerCase();
+                setProductResults(
+                    mockProducts
+                        .filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))
+                        .slice(0, MAX_PRODUCT_RESULTS)
+                );
+            });
+        return () => { cancelled = true; };
     }, [debouncedQuery]);
 
     const categoryResults = useMemo(() => {

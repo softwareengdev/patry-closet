@@ -11,6 +11,7 @@ import ProductCard from './ProductCard';
 import QuickViewModal from './QuickViewModal';
 import SEOHead, { getCollectionPageSchema, getBreadcrumbSchema } from './SEOHead';
 import { mockProducts, COLOR_MAP } from '../data/products';
+import { useProducts, useCategories } from '../hooks/useProducts';
 
 /* ─── Derive available facet values from product data ─── */
 const ALL_CATEGORIES = [...new Set(mockProducts.map(p => p.category))];
@@ -442,8 +443,31 @@ const ProductsPage = () => {
         setSearchParams({}, { replace: true });
     }, [setSearchParams]);
 
-    /* Filtering + sorting (memoized) */
+    /* Build API filters from component state */
+    const apiFilters = useMemo(() => ({
+        search: filters.search || undefined,
+        category: filters.category || undefined,
+        color: filters.colors?.length === 1 ? filters.colors[0] : undefined,
+        size: filters.sizes?.length === 1 ? filters.sizes[0] : undefined,
+        brand: filters.brands?.length === 1 ? filters.brands[0] : undefined,
+        badge: filters.badge || undefined,
+        inStock: filters.inStock || undefined,
+        minPrice: filters.price?.[0] > 0 ? filters.price[0] : undefined,
+        maxPrice: filters.price?.[1] < 250 ? filters.price[1] : undefined,
+        sortBy: sort.split('-')[0] || 'popularity',
+        sortDirection: sort.split('-')[1] || 'desc',
+        page: page,
+        pageSize: productsPerPage,
+    }), [filters, sort, page]);
+
+    const { data: apiResult, isLoading: apiLoading, isFetching } = useProducts(apiFilters);
+
+    /* Use API data when available, fall back to client-side filtering of mockProducts */
     const filteredProducts = useMemo(() => {
+        if (apiResult?.data?.length > 0) {
+            return apiResult.data;
+        }
+        // Fallback: client-side filtering (existing logic)
         let products = [...mockProducts];
 
         if (filters.search) {
@@ -474,31 +498,43 @@ const ProductsPage = () => {
             default: products.sort((a, b) => b.popularity - a.popularity);
         }
         return products;
-    }, [filters, sort]);
+    }, [apiResult, filters, sort]);
+
+    /* Pagination from API or client-side */
+    const totalFromApi = apiResult?.pagination?.totalCount;
+    const totalProducts = totalFromApi ?? filteredProducts.length;
 
     /* Paginated visible products */
-    const visibleProducts = useMemo(() =>
-        filteredProducts.slice(0, page * productsPerPage),
-        [filteredProducts, page]
-    );
+    const visibleProducts = useMemo(() => {
+        // API data is already paginated — show all items from the response
+        if (totalFromApi != null) {
+            return filteredProducts;
+        }
+        // Fallback: client-side infinite scroll pagination
+        return filteredProducts.slice(0, page * productsPerPage);
+    }, [filteredProducts, page, totalFromApi]);
 
-    /* Reset page on filter change */
-    useEffect(() => { setPage(1); }, [filteredProducts]);
+    /* Reset page on filter/sort change */
+    useEffect(() => { setPage(1); }, [filters, sort]);
 
     /* Infinite scroll */
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && visibleProducts.length < filteredProducts.length) {
-                setIsLoading(true);
-                setTimeout(() => {
-                    setPage(prev => prev + 1);
-                    setIsLoading(false);
-                }, 400);
+            if (entries[0].isIntersecting) {
+                const hasMoreApi = totalFromApi != null && apiResult?.pagination?.hasNext;
+                const hasMoreFallback = totalFromApi == null && visibleProducts.length < filteredProducts.length;
+                if (hasMoreApi || hasMoreFallback) {
+                    setIsLoading(true);
+                    setTimeout(() => {
+                        setPage(prev => prev + 1);
+                        setIsLoading(false);
+                    }, 400);
+                }
             }
         }, { threshold: 0.1 });
         if (observerRef.current) observer.observe(observerRef.current);
         return () => observer.disconnect();
-    }, [visibleProducts.length, filteredProducts.length]);
+    }, [visibleProducts.length, filteredProducts.length, totalFromApi, apiResult]);
 
     /* Active filter chips */
     const activeFilters = useMemo(() => {
@@ -532,7 +568,7 @@ const ProductsPage = () => {
     }, [sort, syncFiltersToURL]);
 
     /* Screen-reader announcement on filter results */
-    const srAnnouncement = `${filteredProducts.length} ${t('resultsFound')}`;
+    const srAnnouncement = `${totalProducts} ${t('resultsFound')}`;
 
     return (
         <section className="bg-warm-200 dark:bg-gray-950 min-h-screen" aria-label={t('productCatalog')}>
@@ -565,7 +601,7 @@ const ProductsPage = () => {
                             )}
                         </button>
                         <p className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
-                            <span className="font-semibold text-gray-900 dark:text-white">{filteredProducts.length}</span> {t('resultsFound')}
+                            <span className="font-semibold text-gray-900 dark:text-white">{totalProducts}</span> {t('resultsFound')}
                         </p>
                     </div>
 
@@ -657,7 +693,7 @@ const ProductsPage = () => {
                             onSortChange={handleSortChange}
                             viewMode={viewMode}
                             onViewModeChange={setViewMode}
-                            resultCount={filteredProducts.length}
+                            resultCount={totalProducts}
                             t={t}
                         />
                     </aside>
@@ -672,14 +708,14 @@ const ProductsPage = () => {
                             onSortChange={handleSortChange}
                             viewMode={viewMode}
                             onViewModeChange={setViewMode}
-                            resultCount={filteredProducts.length}
+                            resultCount={totalProducts}
                             t={t}
                         />
                     </MobileFilterDrawer>
 
                     {/* ─── Product grid ─── */}
-                    <div className="flex-1 min-w-0" role="region" aria-label="Product results">
-                        {filteredProducts.length === 0 ? (
+                    <div className={`flex-1 min-w-0 transition-opacity${isFetching ? ' opacity-60' : ''}`} role="region" aria-label="Product results">
+                        {filteredProducts.length === 0 && !apiLoading ? (
                             <div className="text-center py-20">
                                 <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">{t('noResults')}</p>
                                 <button

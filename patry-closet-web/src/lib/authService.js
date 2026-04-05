@@ -1,9 +1,13 @@
 /**
- * Mock Authentication Service
- * Simulates backend auth API for frontend development.
- * Replace with real API calls when patry-closet-server is ready.
+ * Hybrid Authentication Service
+ * Connects to the real backend API at /v1/auth/* and falls back
+ * to localStorage-based mocks when the server is unreachable.
  */
-import { jwtDecode } from 'jwt-decode';
+import api from './api.js';
+
+/* ═══════════════════════════════════════════════════════
+   CONFIGURATION
+   ═══════════════════════════════════════════════════════ */
 
 const STORAGE_KEYS = {
     USERS: 'patry_mock_users',
@@ -12,11 +16,86 @@ const STORAGE_KEYS = {
     REMEMBER: 'patry_remember_me',
 };
 
-const MOCK_DELAY = 800;
+/** Force mock mode via env var — useful for offline / CI */
+let useMock = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 
+const MOCK_DELAY = 800;
 const delay = (ms = MOCK_DELAY) => new Promise((r) => setTimeout(r, ms));
 
-/* ─── Mock JWT generation (NOT real — for UI development only) ─── */
+/* ═══════════════════════════════════════════════════════
+   BACKEND ↔ FRONTEND ADAPTERS
+   ═══════════════════════════════════════════════════════ */
+
+/**
+ * Returns true for network-level failures (server down, timeout, DNS)
+ * but NOT for HTTP 4xx/5xx responses from the backend.
+ */
+const isNetworkError = (err) => !err.response && Boolean(err.request || err.code);
+
+/**
+ * Activate mock mode on network failure so subsequent calls skip the
+ * roundtrip for the rest of the session.
+ */
+const activateMockOnNetworkError = (err) => {
+    if (isNetworkError(err)) {
+        useMock = true;
+        console.warn('[authService] Backend unreachable — switching to mock mode');
+    }
+};
+
+/** Map backend UserProfileResponse → frontend user shape */
+const adaptBackendUser = (bu) => ({
+    id: bu.id,
+    email: bu.email,
+    firstName: bu.firstName,
+    lastName: bu.lastName,
+    avatar: bu.avatarUrl || null,
+    phone: null,
+    dateOfBirth: null,
+    gender: null,
+    emailVerified: true,
+    twoFactorEnabled: false,
+    createdAt: bu.createdAt,
+    memberSince: new Date(bu.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    preferences: {
+        favoriteSizes: [],
+        favoriteColors: [],
+        favoriteBrands: [],
+        favoriteCategories: [],
+        stylePreferences: [],
+        notifications: {
+            orderUpdates: true,
+            promotions: true,
+            stockAlerts: true,
+            newArrivals: true,
+            priceDrops: true,
+            pushEnabled: false,
+            emailEnabled: true,
+        },
+    },
+    addresses: [],
+});
+
+/** Map backend AuthResponse → frontend { user, tokens } */
+const adaptAuthResponse = (apiData) => {
+    const expiresIn = Math.max(
+        0,
+        Math.floor((new Date(apiData.expiresAt).getTime() - Date.now()) / 1000),
+    );
+    return {
+        user: adaptBackendUser(apiData.user),
+        tokens: {
+            accessToken: apiData.accessToken,
+            refreshToken: apiData.refreshToken,
+            expiresIn,
+        },
+    };
+};
+
+/* ═══════════════════════════════════════════════════════
+   MOCK HELPERS  (kept intact for offline development)
+   ═══════════════════════════════════════════════════════ */
+
 const createMockJWT = (payload, expiresInMinutes = 15) => {
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
     const now = Math.floor(Date.now() / 1000);
@@ -31,7 +110,6 @@ const createMockJWT = (payload, expiresInMinutes = 15) => {
     return `${header}.${body}.${signature}`;
 };
 
-/* ─── Stored mock users database ─── */
 const getMockUsers = () => {
     try {
         return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
@@ -194,13 +272,10 @@ const DEMO_SESSIONS = [
 ];
 
 /* ═══════════════════════════════════════════════════════
-   AUTH SERVICE API
+   MOCK AUTH IMPLEMENTATIONS (used as fallback)
    ═══════════════════════════════════════════════════════ */
 
-const authService = {
-    /**
-     * Register a new user
-     */
+const mockAuth = {
     async register({ firstName, lastName, email, password, dateOfBirth, gender }) {
         await delay();
         const users = getMockUsers();
@@ -255,9 +330,6 @@ const authService = {
         };
     },
 
-    /**
-     * Login with email + password
-     */
     async login({ email, password, rememberMe = false }) {
         await delay();
 
@@ -291,9 +363,6 @@ const authService = {
         };
     },
 
-    /**
-     * Logout
-     */
     async logout() {
         await delay(300);
         localStorage.removeItem(STORAGE_KEYS.ACCESS);
@@ -301,24 +370,10 @@ const authService = {
         localStorage.removeItem(STORAGE_KEYS.REMEMBER);
     },
 
-    /**
-     * Logout from all devices
-     */
-    async logoutAllDevices() {
-        await delay();
-        localStorage.removeItem(STORAGE_KEYS.ACCESS);
-        localStorage.removeItem(STORAGE_KEYS.REFRESH);
-        localStorage.removeItem(STORAGE_KEYS.REMEMBER);
-        return { message: 'Logged out from all devices' };
-    },
-
-    /**
-     * Refresh access token
-     */
-    async refreshToken(refreshToken) {
+    async refreshToken(token) {
         await delay(200);
         try {
-            const decoded = JSON.parse(atob(refreshToken.split('.')[1]));
+            const decoded = JSON.parse(atob(token.split('.')[1]));
             if (decoded.exp < Date.now() / 1000) {
                 throw new Error('Refresh token expired');
             }
@@ -330,9 +385,6 @@ const authService = {
         }
     },
 
-    /**
-     * Get current user profile
-     */
     async getProfile() {
         await delay(400);
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
@@ -355,10 +407,125 @@ const authService = {
         }
     },
 
-    /**
-     * Update profile
-     */
+    async changePassword() {
+        await delay();
+        return { message: 'Password changed successfully' };
+    },
+
+    async forgotPassword() {
+        await delay();
+        return { message: 'If an account exists with that email, a password reset link has been sent.' };
+    },
+
+    async resetPassword(token) {
+        await delay();
+        if (!token) throw { response: { status: 400, data: { message: 'Invalid or expired reset token' } } };
+        return { message: 'Password has been reset successfully' };
+    },
+};
+
+/* ═══════════════════════════════════════════════════════
+   AUTH SERVICE  (real backend → mock fallback)
+   ═══════════════════════════════════════════════════════ */
+
+const authService = {
+    /* ─── Core auth (backend-connected with fallback) ─── */
+
+    async register({ firstName, lastName, email, password, dateOfBirth, gender }) {
+        if (useMock) return mockAuth.register({ firstName, lastName, email, password, dateOfBirth, gender });
+
+        try {
+            const { data: res } = await api.post('/v1/auth/register', {
+                email,
+                password,
+                confirmPassword: password,
+                firstName,
+                lastName,
+            });
+            return adaptAuthResponse(res.data);
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.register({ firstName, lastName, email, password, dateOfBirth, gender });
+            throw err;
+        }
+    },
+
+    async login({ email, password, rememberMe = false }) {
+        if (useMock) return mockAuth.login({ email, password, rememberMe });
+
+        try {
+            const { data: res } = await api.post('/v1/auth/login', { email, password });
+            const result = adaptAuthResponse(res.data);
+            if (rememberMe) {
+                localStorage.setItem(STORAGE_KEYS.REMEMBER, 'true');
+            }
+            return result;
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.login({ email, password, rememberMe });
+            throw err;
+        }
+    },
+
+    async logout() {
+        if (useMock) return mockAuth.logout();
+
+        try {
+            await api.post('/v1/auth/logout');
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            // Logout locally even if the backend call fails
+        }
+        localStorage.removeItem(STORAGE_KEYS.ACCESS);
+        localStorage.removeItem(STORAGE_KEYS.REFRESH);
+        localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+    },
+
+    async logoutAllDevices() {
+        // No dedicated backend endpoint yet — delegate to regular logout
+        await authService.logout();
+        return { message: 'Logged out from all devices' };
+    },
+
+    async refreshToken(refreshTokenValue) {
+        if (useMock) return mockAuth.refreshToken(refreshTokenValue);
+
+        try {
+            const { data: res } = await api.post('/v1/auth/refresh', {
+                refreshToken: refreshTokenValue,
+            });
+            const apiData = res.data;
+            const expiresIn = Math.max(
+                0,
+                Math.floor((new Date(apiData.expiresAt).getTime() - Date.now()) / 1000),
+            );
+            return {
+                accessToken: apiData.accessToken,
+                refreshToken: apiData.refreshToken,
+                expiresIn,
+            };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.refreshToken(refreshTokenValue);
+            throw err;
+        }
+    },
+
+    async getProfile() {
+        if (useMock) return mockAuth.getProfile();
+
+        try {
+            const { data: res } = await api.get('/v1/auth/me');
+            return adaptBackendUser(res.data);
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.getProfile();
+            throw err;
+        }
+    },
+
     async updateProfile(updates) {
+        // No backend endpoint yet — always mock
         await delay();
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
         if (!token) throw { response: { status: 401 } };
@@ -377,57 +544,75 @@ const authService = {
         return rest;
     },
 
-    /**
-     * Upload avatar (mock — returns same URL)
-     */
     async uploadAvatar(file) {
         await delay(1200);
         const url = URL.createObjectURL(file);
         return { avatar: url };
     },
 
-    /**
-     * Forgot password — send reset email
-     */
+    async changePassword(currentPassword, newPassword) {
+        if (useMock) return mockAuth.changePassword();
+
+        try {
+            const { data: res } = await api.post('/v1/auth/change-password', {
+                currentPassword,
+                newPassword,
+                confirmNewPassword: newPassword,
+            });
+            return { message: res.message || 'Password changed successfully' };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.changePassword();
+            throw err;
+        }
+    },
+
     async forgotPassword(email) {
-        await delay();
-        // Always return success to prevent email enumeration
-        return { message: 'If an account exists with that email, a password reset link has been sent.' };
+        if (useMock) return mockAuth.forgotPassword();
+
+        try {
+            const { data: res } = await api.post('/v1/auth/forgot-password', { email });
+            return { message: res.message || 'If an account exists with that email, a password reset link has been sent.' };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.forgotPassword();
+            throw err;
+        }
     },
 
-    /**
-     * Reset password with token
-     */
     async resetPassword(token, newPassword) {
-        await delay();
-        // Mock: always succeeds if token is present
-        if (!token) throw { response: { status: 400, data: { message: 'Invalid or expired reset token' } } };
-        return { message: 'Password has been reset successfully' };
+        if (useMock) return mockAuth.resetPassword(token);
+
+        try {
+            const { data: res } = await api.post('/v1/auth/reset-password', {
+                email: '',
+                token,
+                newPassword,
+                confirmNewPassword: newPassword,
+            });
+            return { message: res.message || 'Password has been reset successfully' };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.resetPassword(token);
+            throw err;
+        }
     },
 
-    /**
-     * Verify email with token
-     */
     async verifyEmail(token) {
+        // No backend endpoint yet
         await delay();
         if (!token) throw { response: { status: 400, data: { message: 'Invalid verification token' } } };
         return { message: 'Email verified successfully', verified: true };
     },
 
-    /**
-     * Resend verification email
-     */
     async resendVerification(email) {
         await delay();
         return { message: 'Verification email sent' };
     },
 
-    /**
-     * Social login (Google/Apple)
-     */
     async socialLogin(provider) {
+        // No backend endpoint yet — always mock
         await delay(1200);
-        // Mock: simulate successful social auth → creates/returns demo user
         const user = {
             ...DEMO_USER,
             id: 'usr_social_' + provider,
@@ -441,9 +626,17 @@ const authService = {
         return { user, tokens: { accessToken, refreshToken, expiresIn: 900 } };
     },
 
-    /* ─── Account data endpoints ─── */
+    /* ─── Account data endpoints (real backend with mock fallback) ─── */
 
     async getOrders() {
+        if (!useMock) {
+            try {
+                const { data } = await api.get('/v1/orders');
+                return data.data ?? [];
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(600);
         return DEMO_ORDERS;
     },
@@ -504,30 +697,59 @@ const authService = {
     },
 
     async updateAddresses(addresses) {
+        if (!useMock) {
+            try {
+                const { data } = await api.put('/v1/auth/profile/addresses', { addresses });
+                return data.data ?? addresses;
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay();
         return addresses;
     },
 
     async updatePreferences(preferences) {
+        if (!useMock) {
+            try {
+                const { data } = await api.put('/v1/auth/profile/preferences', preferences);
+                return data.data ?? preferences;
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay();
         return preferences;
     },
 
-    /* ─── Server Cart & Wishlist (mock — returns demo data for authenticated users) ─── */
+    /* ─── Server Cart & Wishlist (real backend with mock fallback) ─── */
 
-    /**
-     * Get the user's server-side cart.
-     * When backend exists, this fetches cart items stored on the server.
-     * For now returns demo items for the demo user, empty for new users.
-     */
     async getServerCart() {
+        if (!useMock) {
+            try {
+                const { data } = await api.get('/v1/cart');
+                const items = data.data?.items ?? [];
+                return items.map(item => ({
+                    id: item.productId ?? item.id,
+                    name: item.productName ?? item.name,
+                    price: item.unitPrice ?? item.price,
+                    image: item.imageUrl ?? item.image,
+                    size: item.size ?? '',
+                    color: item.color ?? '',
+                    quantity: item.quantity ?? 1,
+                }));
+            } catch (err) {
+                activateMockOnNetworkError(err);
+                if (!isNetworkError(err)) return [];
+            }
+        }
+        // Mock fallback
         await delay(300);
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
         if (!token) return [];
 
         try {
             const decoded = JSON.parse(atob(token.split('.')[1]));
-            // Demo user has a pre-populated server cart
             if (decoded.email === DEMO_USER.email || decoded.sub === DEMO_USER.id) {
                 return [
                     {
@@ -550,19 +772,41 @@ const authService = {
         }
     },
 
-    /**
-     * Sync local cart to server.
-     * When backend exists, this sends the merged cart to be persisted.
-     */
     async syncCart(items) {
+        if (!useMock) {
+            try {
+                await api.post('/v1/cart/merge', {
+                    items: items.map(item => ({
+                        productId: item.id,
+                        quantity: item.quantity,
+                    })),
+                });
+                return { success: true, itemCount: items.length };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(200);
         return { success: true, itemCount: items.length };
     },
 
-    /**
-     * Get the user's server-side wishlist.
-     */
     async getServerWishlist() {
+        if (!useMock) {
+            try {
+                const { data } = await api.get('/v1/wishlist');
+                return (data.data ?? []).map(item => ({
+                    id: item.productId ?? item.id,
+                    name: item.productName ?? item.name,
+                    price: item.price,
+                    image: item.imageUrl ?? item.image,
+                    inStock: item.inStock ?? true,
+                }));
+            } catch (err) {
+                activateMockOnNetworkError(err);
+                if (!isNetworkError(err)) return [];
+            }
+        }
+        // Mock fallback
         await delay(300);
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
         if (!token) return [];
@@ -600,10 +844,17 @@ const authService = {
         }
     },
 
-    /**
-     * Sync local wishlist to server.
-     */
     async syncWishlist(items) {
+        if (!useMock) {
+            try {
+                await api.post('/v1/wishlist/sync', {
+                    productIds: items.map(item => item.id),
+                });
+                return { success: true, itemCount: items.length };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(200);
         return { success: true, itemCount: items.length };
     },

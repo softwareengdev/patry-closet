@@ -4,15 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import QuickViewModal from './QuickViewModal';
-import { mockProducts } from '../data/products';
+import { useFeaturedProducts } from '../hooks/useProducts';
 
 const FeaturedProducts = () => {
     const { t } = useTranslation();
     const [quickViewProduct, setQuickViewProduct] = useState(null);
-
-    const featured = mockProducts
-        .filter(p => p.badge === 'bestSeller' || p.badge === 'new')
-        .slice(0, 8);
+    const { data: featured = [], isLoading } = useFeaturedProducts(8);
 
     return (
         <section className="py-20 sm:py-28 bg-warm-100 dark:bg-gray-950 w-full">
@@ -38,13 +35,22 @@ const FeaturedProducts = () => {
 
                 {/* Product grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10">
-                    {featured.map(product => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onQuickView={setQuickViewProduct}
-                        />
-                    ))}
+                    {isLoading
+                        ? Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="aspect-[3/4] bg-warm-300 dark:bg-gray-800 rounded-lg mb-3" />
+                                <div className="h-3 bg-warm-300 dark:bg-gray-800 rounded w-2/3 mb-2" />
+                                <div className="h-3 bg-warm-300 dark:bg-gray-800 rounded w-1/3" />
+                            </div>
+                        ))
+                        : featured.map(product => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onQuickView={setQuickViewProduct}
+                            />
+                        ))
+                    }
                 </div>
             </div>
 

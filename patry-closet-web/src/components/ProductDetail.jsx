@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useTranslation } from 'react-i18next';
-import { mockProducts, COLOR_MAP } from '../data/products';
+import { COLOR_MAP } from '../data/products';
+import { useProduct, useRelatedProducts } from '../hooks/useProducts';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import SizeGuideModal from './SizeGuideModal';
@@ -38,7 +39,8 @@ const getProductImages = (product) => {
 };
 
 const getStockForSize = (productId, size) => {
-  const hash = (productId * 7 + size.charCodeAt(0) * 13) % 20;
+  const idNum = typeof productId === 'number' ? productId : [...String(productId)].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const hash = (idNum * 7 + size.charCodeAt(0) * 13) % 20;
   return hash < 3 ? 0 : hash < 6 ? 2 : 10;
 };
 
@@ -122,7 +124,8 @@ function StockDot({ stock }) {
 const ProductDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
-  const product = mockProducts.find((p) => p.id === parseInt(id));
+  const { data: product, isLoading } = useProduct(id);
+  const { data: relatedProducts = [] } = useRelatedProducts(product?.id, 8);
 
   const { addToCart, triggerFlyToCart } = useContext(CartContext);
   const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
@@ -152,6 +155,16 @@ const ProductDetail = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-gray-600 dark:text-gray-400">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mb-4" />
+        <p className="text-lg">{t('loading', 'Loading…')}</p>
+      </div>
+    );
+  }
+
   // Not-found guard (hooks above, JSX below)
   if (!product) {
     return (
@@ -168,10 +181,6 @@ const ProductDetail = () => {
   const currentStock = selectedSize ? getStockForSize(product.id, selectedSize) : 10;
   const isOutOfStock = currentStock === 0;
   const maxQty = Math.min(currentStock, 10);
-
-  const relatedProducts = mockProducts
-    .filter((p) => (p.subcategory === product.subcategory || p.category === product.category) && p.id !== product.id)
-    .slice(0, 8);
 
   const categoryForSizeGuide =
     product.category === 'Hombres' ? 'Hombres' : product.category === 'Accesorios' ? 'Accesorios' : 'women';

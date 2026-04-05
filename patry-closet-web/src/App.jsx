@@ -13,6 +13,7 @@ import Cart from './components/Cart';
 import WishlistPage from './components/WishlistPage';
 import Checkout from './components/Checkout';
 import CookieConsent from './components/CookieConsent';
+import ErrorBoundary from './components/ErrorBoundary';
 import SEOHead, { getOrganizationSchema, getWebSiteSchema, getLocalBusinessSchema, getBrandSchema, getPersonSchema } from './components/SEOHead';
 
 import LoginPage from './pages/LoginPage';
@@ -104,19 +105,19 @@ function AppContent() {
                             </motion.div>
                         } />
                         <Route path="/products" element={
-                            <motion.div {...pageTransition}><ProductsPage /></motion.div>
+                            <motion.div {...pageTransition}><ErrorBoundary><ProductsPage /></ErrorBoundary></motion.div>
                         } />
                         <Route path="/products/:id" element={
-                            <motion.div {...pageTransition}><ProductDetail /></motion.div>
+                            <motion.div {...pageTransition}><ErrorBoundary><ProductDetail /></ErrorBoundary></motion.div>
                         } />
                         <Route path="/cart" element={
-                            <motion.div {...pageTransition}><Cart /></motion.div>
+                            <motion.div {...pageTransition}><ErrorBoundary><Cart /></ErrorBoundary></motion.div>
                         } />
                         <Route path="/wishlist" element={
-                            <motion.div {...pageTransition}><WishlistPage /></motion.div>
+                            <motion.div {...pageTransition}><ErrorBoundary><WishlistPage /></ErrorBoundary></motion.div>
                         } />
                         <Route path="/checkout" element={
-                            <motion.div {...pageTransition}><Checkout /></motion.div>
+                            <motion.div {...pageTransition}><ErrorBoundary><Checkout /></ErrorBoundary></motion.div>
                         } />
                         <Route path="/blog" element={
                             <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><BlogPage /></Suspense></motion.div>
