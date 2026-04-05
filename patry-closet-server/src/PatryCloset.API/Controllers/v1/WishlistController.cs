@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Wishlist.Commands;
@@ -18,6 +19,7 @@ namespace PatryCloset.API.Controllers.v1;
 [Route("api/v{version:apiVersion}/wishlist")]
 [Authorize]
 [Produces("application/json")]
+[EnableRateLimiting("write")]
 public sealed class WishlistController(ISender mediator, IRepository<CustomerProfile> profileRepo) : ControllerBase
 {
     /// <summary>Get user's wishlist.</summary>

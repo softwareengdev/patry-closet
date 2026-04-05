@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Products.Commands;
 using PatryCloset.Application.Features.Products.DTOs;
@@ -13,6 +14,7 @@ namespace PatryCloset.API.Controllers.v1;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/products")]
 [Produces("application/json")]
+[EnableRateLimiting("catalog")]
 public sealed class ProductsController(ISender mediator) : ControllerBase
 {
     /// <summary>Get products with filtering, sorting, and pagination.</summary>

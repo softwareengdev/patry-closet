@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Categories.DTOs;
 using PatryCloset.Application.Features.Categories.Queries;
@@ -11,6 +12,7 @@ namespace PatryCloset.API.Controllers.v1;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/categories")]
 [Produces("application/json")]
+[EnableRateLimiting("catalog")]
 public sealed class CategoriesController(ISender mediator) : ControllerBase
 {
     /// <summary>Get category tree with subcategories and product counts.</summary>

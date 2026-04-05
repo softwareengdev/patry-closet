@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PatryCloset.Domain.Entities;
 using PatryCloset.Domain.Interfaces;
 using PatryCloset.Infrastructure.Payments;
@@ -13,6 +14,7 @@ namespace PatryCloset.API.Controllers;
 [ApiController]
 [Route("api/webhooks/stripe")]
 [ApiExplorerSettings(GroupName = "webhooks")]
+[EnableRateLimiting("webhook")]
 public sealed class StripeWebhookController(
     StripeWebhookHandler webhookHandler,
     IRepository<Payment> paymentRepo,

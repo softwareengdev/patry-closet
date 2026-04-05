@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Addresses.Commands;
@@ -18,6 +19,7 @@ namespace PatryCloset.API.Controllers.v1;
 [Route("api/v{version:apiVersion}/addresses")]
 [Authorize]
 [Produces("application/json")]
+[EnableRateLimiting("write")]
 public sealed class AddressesController(ISender mediator, IRepository<CustomerProfile> profileRepo) : ControllerBase
 {
     /// <summary>Get all addresses for current user.</summary>

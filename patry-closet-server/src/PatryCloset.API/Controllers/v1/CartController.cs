@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Cart.Commands;
@@ -17,6 +18,7 @@ namespace PatryCloset.API.Controllers.v1;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/cart")]
 [Produces("application/json")]
+[EnableRateLimiting("write")]
 public sealed class CartController(ISender mediator, IRepository<CustomerProfile> profileRepo) : ControllerBase
 {
     private const string SessionCookieName = "PatryCloset-Session";

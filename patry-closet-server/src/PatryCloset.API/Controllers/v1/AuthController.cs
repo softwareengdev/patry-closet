@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Auth.Commands;
 using PatryCloset.Application.Features.Auth.DTOs;
@@ -14,6 +15,7 @@ namespace PatryCloset.API.Controllers.v1;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/auth")]
 [Produces("application/json")]
+[EnableRateLimiting("auth")]
 public sealed class AuthController(ISender mediator) : ControllerBase
 {
     /// <summary>Register a new customer account.</summary>
