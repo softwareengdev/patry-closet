@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { loginSchema } from '../../lib/validationSchemas';
 import SocialButtons from './SocialButtons';
@@ -63,14 +63,13 @@ const LoginForm = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center mb-8"
             >
-                <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                    <Sparkles className="w-6 h-6 text-pink-500" />
-                    <span className="font-serif text-2xl tracking-wide">PATRY CLOSET</span>
+                <Link to="/" className="inline-block mb-6">
+                    <span className="text-2xl lg:text-3xl font-bold tracking-tighter">PATRY<span className="text-rose">♡</span>CLOSET</span>
                 </Link>
-                <h1 className="text-3xl font-bold tracking-tight mb-2">
+                <h1 className="text-3xl sm:text-4xl font-serif font-light tracking-tight mb-2">
                     {t('auth.welcomeBack', 'Welcome Back')}
                 </h1>
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-light">
                     {t('auth.loginSubtitle', 'Sign in to access your account, orders and wishlist')}
                 </p>
             </motion.div>
@@ -82,7 +81,7 @@ const LoginForm = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 flex items-start gap-3"
+                        className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border-l-2 border-red-500 flex items-start gap-3"
                         role="alert"
                     >
                         <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -120,10 +119,10 @@ const LoginForm = () => {
                             autoComplete="email"
                             placeholder="you@example.com"
                             {...register('email')}
-                            className={`w-full pl-11 pr-4 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                            className={`w-full pl-11 pr-4 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                 errors.email
                                     ? 'border-red-400 focus:border-red-500'
-                                    : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                    : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                             }`}
                             aria-invalid={!!errors.email}
                             aria-describedby={errors.email ? 'login-email-error' : undefined}
@@ -158,10 +157,10 @@ const LoginForm = () => {
                             autoComplete="current-password"
                             placeholder="••••••••"
                             {...register('password')}
-                            className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                            className={`w-full pl-11 pr-12 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                 errors.password
                                     ? 'border-red-400 focus:border-red-500'
-                                    : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                    : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                             }`}
                             aria-invalid={!!errors.password}
                             aria-describedby={errors.password ? 'login-password-error' : undefined}
@@ -189,7 +188,7 @@ const LoginForm = () => {
                         id="remember-me"
                         type="checkbox"
                         {...register('rememberMe')}
-                        className="w-4 h-4 rounded border-warm-500 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white accent-black dark:accent-white"
+                        className="w-4 h-4 border-warm-500 dark:border-gray-600 text-black dark:text-white focus:ring-black dark:focus:ring-white accent-black dark:accent-white"
                     />
                     <label htmlFor="remember-me" className="text-sm text-gray-600 dark:text-gray-400">
                         {t('auth.rememberMe', 'Remember me for 30 days')}
@@ -202,7 +201,7 @@ const LoginForm = () => {
                     disabled={isSubmitting}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? (
                         <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
@@ -226,12 +225,23 @@ const LoginForm = () => {
                 </Link>
             </p>
 
+            {/* Back to Store */}
+            <div className="text-center mt-6">
+                <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    {t('auth.backToStore', 'Back to Store')}
+                </Link>
+            </div>
+
             {/* Demo Hint */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-6 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800"
+                className="mt-6 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800"
             >
                 <p className="text-xs text-amber-700 dark:text-amber-300 text-center">
                     <strong>Demo:</strong> demo@patrycloset.com / Demo1234!

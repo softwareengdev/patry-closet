@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock, AlertCircle, ArrowLeft, ArrowRight, Check, Sparkles, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ArrowLeft, ArrowRight, Check, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { forgotPasswordSchema, resetPasswordSchema, getPasswordStrength } from '../../lib/validationSchemas';
 
@@ -66,9 +66,8 @@ const ForgotPassword = () => {
         <div className="w-full max-w-md mx-auto">
             {/* Header */}
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-                <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                    <Sparkles className="w-6 h-6 text-pink-500" />
-                    <span className="font-serif text-2xl tracking-wide">PATRY CLOSET</span>
+                <Link to="/" className="inline-block mb-6">
+                    <span className="text-2xl lg:text-3xl font-bold tracking-tighter">PATRY<span className="text-rose">♡</span>CLOSET</span>
                 </Link>
             </motion.div>
 
@@ -82,17 +81,17 @@ const ForgotPassword = () => {
                         exit={{ opacity: 0, x: -20 }}
                     >
                         <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
                                 <Lock className="w-8 h-8 text-gray-600 dark:text-gray-300" />
                             </div>
-                            <h1 className="text-2xl font-bold mb-2">{t('auth.forgotPasswordTitle', 'Forgot your password?')}</h1>
+                            <h1 className="text-2xl font-serif font-light tracking-tight mb-2">{t('auth.forgotPasswordTitle', 'Forgot your password?')}</h1>
                             <p className="text-gray-500 dark:text-gray-400 text-sm">
                                 {t('auth.forgotPasswordDesc', "No worries! Enter your email and we'll send you a reset link.")}
                             </p>
                         </div>
 
                         {error && (
-                            <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 flex items-center gap-2" role="alert">
+                            <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border-l-2 border-red-500 flex items-center gap-2" role="alert">
                                 <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                                 <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                             </div>
@@ -111,10 +110,10 @@ const ForgotPassword = () => {
                                         autoComplete="email"
                                         placeholder="you@example.com"
                                         {...requestForm.register('email')}
-                                        className={`w-full pl-11 pr-4 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                                        className={`w-full pl-11 pr-4 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                             requestForm.formState.errors.email
                                                 ? 'border-red-400 focus:border-red-500'
-                                                : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                                : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                                         }`}
                                     />
                                 </div>
@@ -131,7 +130,7 @@ const ForgotPassword = () => {
                                 disabled={isSubmitting}
                                 whileHover={{ scale: 1.01 }}
                                 whileTap={{ scale: 0.99 }}
-                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
                                     <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
@@ -148,6 +147,16 @@ const ForgotPassword = () => {
                             <ArrowLeft className="w-4 h-4" />
                             {t('auth.backToLogin', 'Back to Sign In')}
                         </Link>
+
+                        <div className="text-center mt-4">
+                            <Link
+                                to="/"
+                                className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5" />
+                                {t('auth.backToStore', 'Back to Store')}
+                            </Link>
+                        </div>
                     </motion.div>
                 )}
 
@@ -159,7 +168,7 @@ const ForgotPassword = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center"
                     >
-                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
@@ -168,7 +177,7 @@ const ForgotPassword = () => {
                                 <Mail className="w-10 h-10 text-green-600 dark:text-green-400" />
                             </motion.div>
                         </div>
-                        <h2 className="text-2xl font-bold mb-2">{t('auth.checkYourEmail', 'Check Your Email')}</h2>
+                        <h2 className="text-2xl font-serif font-light tracking-tight mb-2">{t('auth.checkYourEmail', 'Check Your Email')}</h2>
                         <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed">
                             {t('auth.resetEmailSent', "We've sent a password reset link to your email. The link expires in 15 minutes.")}
                         </p>
@@ -181,7 +190,7 @@ const ForgotPassword = () => {
                             </button>
                             <Link
                                 to="/login"
-                                className="w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm text-center"
+                                className="w-full py-3 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider text-center"
                             >
                                 {t('auth.backToLogin', 'Back to Sign In')}
                             </Link>
@@ -198,17 +207,17 @@ const ForgotPassword = () => {
                         exit={{ opacity: 0, x: 20 }}
                     >
                         <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
                                 <ShieldCheck className="w-8 h-8 text-gray-600 dark:text-gray-300" />
                             </div>
-                            <h1 className="text-2xl font-bold mb-2">{t('auth.setNewPassword', 'Set New Password')}</h1>
+                            <h1 className="text-2xl font-serif font-light tracking-tight mb-2">{t('auth.setNewPassword', 'Set New Password')}</h1>
                             <p className="text-gray-500 dark:text-gray-400 text-sm">
                                 {t('auth.setNewPasswordDesc', 'Your new password must be different from previously used passwords.')}
                             </p>
                         </div>
 
                         {error && (
-                            <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 flex items-center gap-2" role="alert">
+                            <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 border-l-2 border-red-500 flex items-center gap-2" role="alert">
                                 <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                                 <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                             </div>
@@ -225,8 +234,8 @@ const ForgotPassword = () => {
                                         autoComplete="new-password"
                                         placeholder="••••••••"
                                         {...resetForm.register('password')}
-                                        className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
-                                            resetForm.formState.errors.password ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                        className={`w-full pl-11 pr-12 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                                            resetForm.formState.errors.password ? 'border-red-400' : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                                         }`}
                                     />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -257,8 +266,8 @@ const ForgotPassword = () => {
                                         autoComplete="new-password"
                                         placeholder="••••••••"
                                         {...resetForm.register('confirmPassword')}
-                                        className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
-                                            resetForm.formState.errors.confirmPassword ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                        className={`w-full pl-11 pr-12 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                                            resetForm.formState.errors.confirmPassword ? 'border-red-400' : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                                         }`}
                                     />
                                     <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -277,7 +286,7 @@ const ForgotPassword = () => {
                                 disabled={isSubmitting}
                                 whileHover={{ scale: 1.01 }}
                                 whileTap={{ scale: 0.99 }}
-                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {isSubmitting ? (
                                     <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
@@ -297,18 +306,18 @@ const ForgotPassword = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center"
                     >
-                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
                             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
                                 <Check className="w-10 h-10 text-green-600 dark:text-green-400" />
                             </motion.div>
                         </div>
-                        <h2 className="text-2xl font-bold mb-2">{t('auth.passwordReset', 'Password Reset!')}</h2>
+                        <h2 className="text-2xl font-serif font-light tracking-tight mb-2">{t('auth.passwordReset', 'Password Reset!')}</h2>
                         <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
                             {t('auth.passwordResetSuccess', 'Your password has been updated successfully. You can now sign in.')}
                         </p>
                         <Link
                             to="/login"
-                            className="inline-flex items-center gap-2 px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm"
+                            className="inline-flex items-center gap-2 px-8 py-3 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider"
                         >
                             {t('auth.signIn', 'Sign In')}
                             <ArrowRight className="w-4 h-4" />

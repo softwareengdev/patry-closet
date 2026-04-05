@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import {
     Eye, EyeOff, Mail, Lock, User, Calendar, AlertCircle, ArrowRight,
-    Check, Sparkles, ShieldCheck,
+    Check, ShieldCheck, ArrowLeft,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { registerSchema, getPasswordStrength } from '../../lib/validationSchemas';
@@ -93,10 +93,10 @@ const RegisterForm = () => {
                     autoComplete={autoComplete}
                     placeholder={placeholder}
                     {...register(name)}
-                    className={`w-full ${Icon ? 'pl-11' : 'pl-4'} pr-4 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                    className={`w-full ${Icon ? 'pl-11' : 'pl-4'} pr-4 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                         error
                             ? 'border-red-400 focus:border-red-500'
-                            : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                            : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                     }`}
                     aria-invalid={!!error}
                     aria-describedby={error ? `${id}-error` : undefined}
@@ -116,14 +116,13 @@ const RegisterForm = () => {
         <div className="w-full max-w-md mx-auto">
             {/* Header */}
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-                <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                    <Sparkles className="w-6 h-6 text-pink-500" />
-                    <span className="font-serif text-2xl tracking-wide">PATRY CLOSET</span>
+                <Link to="/" className="inline-block mb-6">
+                    <span className="text-2xl lg:text-3xl font-bold tracking-tighter">PATRY<span className="text-rose">♡</span>CLOSET</span>
                 </Link>
-                <h1 className="text-3xl font-bold tracking-tight mb-2">
+                <h1 className="text-3xl sm:text-4xl font-serif font-light tracking-tight mb-2">
                     {t('auth.createAccountTitle', 'Create Your Account')}
                 </h1>
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-light">
                     {t('auth.registerSubtitle', 'Join the Patry Closet community')}
                 </p>
             </motion.div>
@@ -132,7 +131,7 @@ const RegisterForm = () => {
             <div className="flex items-center gap-2 mb-6">
                 {[1, 2].map((s) => (
                     <div key={s} className="flex items-center gap-2 flex-1">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+                        <div className={`w-8 h-8 flex items-center justify-center text-xs font-bold transition-colors ${
                             step >= s ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-warm-400 dark:bg-gray-700 text-gray-500'
                         }`}>
                             {step > s ? <Check className="w-4 h-4" /> : s}
@@ -149,7 +148,7 @@ const RegisterForm = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 flex items-start gap-3"
+                        className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border-l-2 border-red-500 flex items-start gap-3"
                         role="alert"
                     >
                         <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -198,7 +197,7 @@ const RegisterForm = () => {
                                 onClick={handleNextStep}
                                 whileHover={{ scale: 1.01 }}
                                 whileTap={{ scale: 0.99 }}
-                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors mt-2"
+                                className="w-full py-3.5 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors mt-2"
                             >
                                 {t('auth.continue', 'Continue')}
                                 <ArrowRight className="w-4 h-4" />
@@ -227,10 +226,10 @@ const RegisterForm = () => {
                                         autoComplete="new-password"
                                         placeholder="••••••••"
                                         {...register('password')}
-                                        className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                                        className={`w-full pl-11 pr-12 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                             errors.password
                                                 ? 'border-red-400 focus:border-red-500'
-                                                : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                                : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                                         }`}
                                         aria-invalid={!!errors.password}
                                     />
@@ -280,10 +279,10 @@ const RegisterForm = () => {
                                         autoComplete="new-password"
                                         placeholder="••••••••"
                                         {...register('confirmPassword')}
-                                        className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 ${
+                                        className={`w-full pl-11 pr-12 py-3.5 border transition-colors bg-transparent focus:outline-none focus:ring-0 ${
                                             errors.confirmPassword
                                                 ? 'border-red-400 focus:border-red-500'
-                                                : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
+                                                : 'border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white'
                                         }`}
                                         aria-invalid={!!errors.confirmPassword}
                                     />
@@ -317,7 +316,7 @@ const RegisterForm = () => {
                                             id="reg-dob"
                                             type="date"
                                             {...register('dateOfBirth')}
-                                            className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0"
+                                            className="w-full pl-11 pr-4 py-3.5 border border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0"
                                         />
                                     </div>
                                 </div>
@@ -329,7 +328,7 @@ const RegisterForm = () => {
                                     <select
                                         id="reg-gender"
                                         {...register('gender')}
-                                        className="w-full px-4 py-3.5 rounded-xl border-2 border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0 appearance-none"
+                                        className="w-full px-4 py-3.5 border border-warm-300 dark:border-gray-800 focus:border-black dark:focus:border-white transition-colors bg-transparent focus:outline-none focus:ring-0 appearance-none"
                                     >
                                         <option value="">{t('auth.selectGender', 'Select...')}</option>
                                         {GENDER_OPTIONS.map((o) => (
@@ -345,7 +344,7 @@ const RegisterForm = () => {
                                     id="accept-terms"
                                     type="checkbox"
                                     {...register('acceptTerms')}
-                                    className="mt-1 w-4 h-4 rounded border-warm-500 dark:border-gray-600 accent-black dark:accent-white"
+                                    className="mt-1 w-4 h-4 border-warm-500 dark:border-gray-600 accent-black dark:accent-white"
                                 />
                                 <label htmlFor="accept-terms" className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                                     {t('auth.acceptTermsPrefix', 'I agree to the')}{' '}
@@ -370,7 +369,7 @@ const RegisterForm = () => {
                                 <button
                                     type="button"
                                     onClick={() => setStep(1)}
-                                    className="px-6 py-3.5 rounded-xl border-2 border-warm-400 dark:border-gray-700 text-sm font-medium hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
+                                    className="px-6 py-3.5 border border-warm-300 dark:border-gray-800 text-sm font-medium hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     {t('auth.back', 'Back')}
                                 </button>
@@ -379,7 +378,7 @@ const RegisterForm = () => {
                                     disabled={isSubmitting}
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="flex-1 py-3.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+                                    className="flex-1 py-3.5 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
                                 >
                                     {isSubmitting ? (
                                         <div className="w-5 h-5 border-2 border-warm-500 border-t-white dark:border-t-black rounded-full animate-spin" />
@@ -404,6 +403,17 @@ const RegisterForm = () => {
                 </Link>
             </p>
 
+            {/* Back to Store */}
+            <div className="text-center mt-6">
+                <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    {t('auth.backToStore', 'Back to Store')}
+                </Link>
+            </div>
+
             {/* Terms Modal */}
             <AnimatePresence>
                 {(showTermsModal || showPrivacyModal) && (
@@ -419,7 +429,7 @@ const RegisterForm = () => {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-warm-50 dark:bg-gray-900 rounded-2xl max-w-lg w-full max-h-[70vh] overflow-y-auto p-6 shadow-2xl"
+                            className="bg-warm-50 dark:bg-gray-900 max-w-lg w-full max-h-[70vh] overflow-y-auto p-6 shadow-2xl"
                         >
                             <h2 className="text-xl font-bold mb-4">
                                 {showTermsModal ? t('auth.termsOfService', 'Terms of Service') : t('auth.privacyPolicy', 'Privacy Policy')}
@@ -451,7 +461,7 @@ const RegisterForm = () => {
                             </div>
                             <button
                                 onClick={() => { setShowTermsModal(false); setShowPrivacyModal(false); }}
-                                className="mt-6 w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium text-sm"
+                                className="mt-6 w-full py-3 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider"
                             >
                                 {t('close', 'Close')}
                             </button>

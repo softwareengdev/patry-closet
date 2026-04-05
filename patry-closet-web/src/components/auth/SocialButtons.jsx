@@ -49,7 +49,7 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
                 whileTap={{ scale: 0.99 }}
                 onClick={() => handleSocialLogin('google')}
                 disabled={!!loadingProvider}
-                className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl border-2 border-warm-400 dark:border-gray-700 bg-warm-50 dark:bg-gray-800 hover:bg-warm-200 dark:hover:bg-gray-750 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-800 hover:bg-warm-200 dark:hover:bg-gray-750 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label={`${actionText} Google`}
             >
                 {loadingProvider === 'google' ? (
@@ -66,7 +66,7 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
                 whileTap={{ scale: 0.99 }}
                 onClick={() => handleSocialLogin('apple')}
                 disabled={!!loadingProvider}
-                className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl border-2 border-warm-400 dark:border-gray-700 bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label={`${actionText} Apple`}
             >
                 {loadingProvider === 'apple' ? (
@@ -79,11 +79,11 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
 
             {/* Divider */}
             <div className="relative flex items-center my-2">
-                <div className="flex-1 border-t border-warm-400 dark:border-gray-700" />
+                <div className="flex-1 h-px bg-warm-300 dark:bg-gray-800" />
                 <span className="px-4 text-xs text-gray-400 uppercase tracking-wider">
                     {t('auth.orContinueWithEmail', 'or continue with email')}
                 </span>
-                <div className="flex-1 border-t border-warm-400 dark:border-gray-700" />
+                <div className="flex-1 h-px bg-warm-300 dark:bg-gray-800" />
             </div>
         </div>
     );
