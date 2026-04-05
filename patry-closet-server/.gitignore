@@ -1,0 +1,32 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.vs/
+.vs/
+
+## IDE
+.idea/
+*.swp
+*.sln.docstates
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Logs
+logs/
+*.log
+
+## Packages
+packages/
+node_modules/
+
+## User secrets
+secrets.json
+
+## Docker volumes
+postgres-data/
+redis-data/
