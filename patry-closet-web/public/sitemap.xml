@@ -1,39 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Homepage -->
   <url>
     <loc>https://patrycloset.com/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://patrycloset.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://patrycloset.com/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://patrycloset.com/" />
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://patrycloset.com/og-image.jpg</image:loc>
+      <image:title>PATRY♡CLOSET — Tienda de Moda Online Premium</image:title>
+      <image:caption>Colecciones exclusivas de ropa de mujer, vestidos, bolsos y accesorios</image:caption>
+    </image:image>
   </url>
+
+  <!-- Products / Catálogo -->
   <url>
     <loc>https://patrycloset.com/products</loc>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
   </url>
+
+  <!-- Categorías principales -->
+  <url>
+    <loc>https://patrycloset.com/products?category=vestidos</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=tops</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=pantalones</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=faldas</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=abrigos</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=zapatos</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=bolsos</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=accesorios</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://patrycloset.com/products?category=joyeria</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Wishlist -->
+  <url>
+    <loc>https://patrycloset.com/wishlist</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.60</priority>
+  </url>
+
+  <!-- Blog -->
   <url>
     <loc>https://patrycloset.com/blog</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
+
+  <!-- FAQ -->
   <url>
     <loc>https://patrycloset.com/faq</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.70</priority>
   </url>
+
+  <!-- Legal -->
   <url>
     <loc>https://patrycloset.com/terms</loc>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.30</priority>
   </url>
   <url>
     <loc>https://patrycloset.com/privacy</loc>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.30</priority>
   </url>
   <url>
     <loc>https://patrycloset.com/cookies</loc>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.30</priority>
   </url>
 </urlset>

@@ -2,12 +2,12 @@ import { useState, useContext, useRef, useCallback, useEffect, useMemo } from 'r
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Helmet } from 'react-helmet-async';
 import { BookOpen, ChevronLeft, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import { ThemeContext } from '../context/ThemeContext';
 import BlogCard from '../components/blog/BlogCard';
 import BlogFilters from '../components/blog/BlogFilters';
 import BlogSidebar from '../components/blog/BlogSidebar';
+import SEOHead, { getBreadcrumbSchema } from '../components/SEOHead';
 import { useInfiniteBlogPosts, useFeaturedPosts } from '../hooks/useBlog';
 
 const BlogPage = () => {
@@ -85,29 +85,32 @@ const BlogPage = () => {
   return (
     <div className="min-h-screen bg-warm-200 dark:bg-gray-950 transition-colors">
       {/* ─── SEO META ─── */}
-      <Helmet>
-        <title>{t('blog.heroTitle', 'Style, Trends & Stories')} — Patry Closet</title>
-        <meta name="description" content={t('blog.heroSubtitle', 'Discover the latest in fashion, sustainability, and the art of dressing well.')} />
-        <link rel="canonical" href="https://patrycloset.com/blog" />
-        <meta property="og:title" content={`${t('blog.heroTitle', 'Style, Trends & Stories')} — Patry Closet`} />
-        <meta property="og:description" content={t('blog.heroSubtitle', 'Discover the latest in fashion, sustainability, and the art of dressing well.')} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://patrycloset.com/blog" />
-        {heroPost && <meta property="og:image" content={heroPost.coverImage} />}
-        <meta name="twitter:card" content="summary_large_image" />
-        <script type="application/ld+json">{JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Blog',
-          name: 'Patry Closet Journal',
-          description: t('blog.heroSubtitle', 'Discover the latest in fashion, sustainability, and the art of dressing well.'),
-          url: 'https://patrycloset.com/blog',
-          publisher: {
-            '@type': 'Organization',
-            name: 'Patry Closet',
-            url: 'https://patrycloset.com',
+      <SEOHead
+        title="Blog de Moda — Tendencias, Estilo y Consejos"
+        description="Descubre las últimas tendencias de moda, consejos de estilo, sostenibilidad y el arte de vestir bien en el blog de PATRY♡CLOSET. Inspiración de moda para mujer."
+        canonical="/blog"
+        image={heroPost?.coverImage}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Blog',
+            name: 'Patry Closet Journal',
+            description: 'Blog de moda con las últimas tendencias, consejos de estilo, sostenibilidad y el arte de vestir bien.',
+            url: 'https://patrycloset.com/blog',
+            publisher: {
+              '@type': 'Organization',
+              name: 'Patry Closet',
+              url: 'https://patrycloset.com',
+            },
+            author: {
+              '@type': 'Person',
+              name: 'Patricia',
+              url: 'https://www.instagram.com/patriiiii93/',
+            },
           },
-        })}</script>
-      </Helmet>
+          getBreadcrumbSchema([{ name: 'Inicio', url: '/' }, { name: 'Blog' }]),
+        ]}
+      />
 
       {/* ─── HERO SECTION ─── */}
       <section

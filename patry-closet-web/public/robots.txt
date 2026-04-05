@@ -1,16 +1,53 @@
+# Patry Closet — robots.txt
 # https://www.robotstxt.org/robotstxt.html
+
+# Allow all search engine bots
 User-agent: *
 Allow: /
+Allow: /products
+Allow: /blog
+Allow: /faq
 
-# Block auth & account pages from indexing
+# Block auth, account & checkout pages from indexing
 Disallow: /login
 Disallow: /register
 Disallow: /forgot-password
+Disallow: /verify-email
+Disallow: /account
+Disallow: /checkout
+
+# Block internal assets from crawling
+Disallow: /assets/
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Googlebot-specific: allow all crawlable content
+User-agent: Googlebot
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /verify-email
+Disallow: /account
+Disallow: /checkout
+
+# Googlebot Image: allow all product images
+User-agent: Googlebot-Image
+Allow: /
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /login
+Disallow: /register
 Disallow: /account
 Disallow: /checkout
 
 # Sitemap location
 Sitemap: https://patrycloset.com/sitemap.xml
 
-# Crawl-delay (polite crawling)
+# Crawl-delay (polite crawling for bots that support it)
 Crawl-delay: 1
+
+# Host directive (Yandex)
+Host: https://patrycloset.com

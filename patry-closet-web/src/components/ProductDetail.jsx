@@ -23,6 +23,7 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import SizeGuideModal from './SizeGuideModal';
 import ProductCard from './ProductCard';
+import SEOHead, { getProductSchema, getBreadcrumbSchema } from './SEOHead';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -213,6 +214,21 @@ const ProductDetail = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      <SEOHead
+        title={`${product.name} — ${product.category}`}
+        description={`Comprar ${product.name} en PATRY♡CLOSET. ${product.description?.slice(0, 120) || 'Moda premium online'}. Envío gratuito en pedidos +50€.`}
+        canonical={`/products/${product.id}`}
+        image={product.images?.[0] || product.image}
+        type="product"
+        jsonLd={[
+          getProductSchema(product),
+          getBreadcrumbSchema([
+            { name: 'Inicio', url: '/' },
+            { name: product.category, url: `/products?category=${product.category}` },
+            { name: product.name },
+          ]),
+        ]}
+      />
       {/* ── Breadcrumbs ─────────────────────────────────────────────── */}
       <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4">
         <ol className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 flex-wrap">

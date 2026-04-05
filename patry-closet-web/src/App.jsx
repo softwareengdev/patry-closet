@@ -13,7 +13,7 @@ import Cart from './components/Cart';
 import WishlistPage from './components/WishlistPage';
 import Checkout from './components/Checkout';
 import CookieConsent from './components/CookieConsent';
-import SEOHead, { getOrganizationSchema, getWebSiteSchema } from './components/SEOHead';
+import SEOHead, { getOrganizationSchema, getWebSiteSchema, getLocalBusinessSchema, getBrandSchema, getPersonSchema } from './components/SEOHead';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -77,7 +77,7 @@ function AppContent() {
 
     usePageTracking();
 
-    const homeJsonLd = [getOrganizationSchema(), getWebSiteSchema()];
+    const homeJsonLd = [getOrganizationSchema(), getWebSiteSchema(), getLocalBusinessSchema(), getBrandSchema(), getPersonSchema()];
 
     return (
         <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-warm-100 text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
@@ -91,8 +91,8 @@ function AppContent() {
                         <Route path="/" element={
                             <motion.div {...pageTransition}>
                                 <SEOHead
-                                    title="Moda Online — Colecciones Exclusivas"
-                                    description="PATRY♡CLOSET — Tienda de moda online con colecciones exclusivas para mujer, hombre y accesorios. Envío gratuito en pedidos +50€. Descubre las últimas tendencias."
+                                    title="Tienda de Moda Online Premium — Ropa Mujer, Vestidos, Accesorios"
+                                    description="PATRY♡CLOSET — Tu tienda de moda online premium en España. Colecciones exclusivas de ropa de mujer: vestidos, tops, pantalones, bolsos, zapatos y accesorios de las últimas tendencias. Envío gratuito en pedidos +50€. Descubre tu estilo con Patricia."
                                     canonical="/"
                                     jsonLd={homeJsonLd}
                                 />

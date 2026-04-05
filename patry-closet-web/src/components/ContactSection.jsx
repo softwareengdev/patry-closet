@@ -775,7 +775,7 @@ const ContactSection = () => {
                         {/* Social Links */}
                         <motion.div variants={fadeUp} className="flex items-center justify-center gap-3 pt-2">
                             {[
-                                { icon: FaInstagram, href: 'https://instagram.com/patrycloset', label: 'Instagram' },
+                                { icon: FaInstagram, href: 'https://www.instagram.com/patriiiii93/', label: 'Instagram' },
                                 { icon: FaFacebook, href: 'https://facebook.com/patrycloset', label: 'Facebook' },
                                 { icon: FaTiktok, href: 'https://tiktok.com/@patrycloset', label: 'TikTok' },
                             ].map(social => (

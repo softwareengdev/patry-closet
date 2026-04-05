@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ProductCard from './ProductCard';
 import QuickViewModal from './QuickViewModal';
+import SEOHead, { getCollectionPageSchema, getBreadcrumbSchema } from './SEOHead';
 import { mockProducts, COLOR_MAP } from '../data/products';
 
 /* ─── Derive available facet values from product data ─── */
@@ -535,6 +536,15 @@ const ProductsPage = () => {
 
     return (
         <section className="bg-warm-200 dark:bg-gray-950 min-h-screen" aria-label={t('productCatalog')}>
+            <SEOHead
+                title="Catálogo de Moda — Ropa Mujer, Vestidos, Accesorios"
+                description="Explora el catálogo completo de PATRY♡CLOSET: vestidos, tops, pantalones, faldas, bolsos, zapatos y accesorios de las últimas tendencias. Moda online premium con envío gratuito en pedidos +50€."
+                canonical="/products"
+                jsonLd={[
+                    getCollectionPageSchema('Catálogo de Moda Patry Closet', 'Colección completa de ropa de mujer y accesorios de moda premium', filteredProducts),
+                    getBreadcrumbSchema([{ name: 'Inicio', url: '/' }, { name: 'Catálogo' }]),
+                ]}
+            />
             {/* SR-only live region for results */}
             <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{srAnnouncement}</div>
 

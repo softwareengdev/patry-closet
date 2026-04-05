@@ -37,7 +37,7 @@ const BLOG_POSTS = [
 ];
 
 const SOCIAL_LINKS = [
-    { icon: FaInstagram, href: 'https://instagram.com/patrycloset', label: 'Instagram' },
+    { icon: FaInstagram, href: 'https://www.instagram.com/patriiiii93/', label: 'Instagram' },
     { icon: FaFacebook, href: 'https://facebook.com/patrycloset', label: 'Facebook' },
     { icon: FaTiktok, href: 'https://tiktok.com/@patrycloset', label: 'TikTok' },
 ];
