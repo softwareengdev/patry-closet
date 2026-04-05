@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Products.Commands;
@@ -19,6 +20,7 @@ public sealed class ProductsController(ISender mediator) : ControllerBase
 {
     /// <summary>Get products with filtering, sorting, and pagination.</summary>
     [HttpGet]
+    [OutputCache(PolicyName = "CatalogCache")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedList<ProductListDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProducts(
         [FromQuery] string? search,
@@ -80,6 +82,7 @@ public sealed class ProductsController(ISender mediator) : ControllerBase
 
     /// <summary>Get featured products for homepage.</summary>
     [HttpGet("featured")]
+    [OutputCache(PolicyName = "CatalogCache")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ProductListDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetFeaturedProducts(
         [FromQuery] int count = 12, CancellationToken ct = default)
@@ -93,6 +96,7 @@ public sealed class ProductsController(ISender mediator) : ControllerBase
 
     /// <summary>Get product detail by slug or ID.</summary>
     [HttpGet("{slug}")]
+    [OutputCache(PolicyName = "CatalogCache")]
     [ProducesResponseType(typeof(ApiResponse<ProductDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProductBySlug(string slug, CancellationToken ct)

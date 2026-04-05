@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using Hangfire;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -211,6 +212,17 @@ builder.Services.AddCors(options =>
 // ─── Rate Limiting (built-in .NET 7+) ───
 builder.Services.AddRateLimitingPolicies();
 
+// ─── Response Caching & Output Caching ───
+builder.Services.AddResponseCaching();
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(30)));
+    options.AddPolicy("CatalogCache", builder =>
+        builder.Expire(TimeSpan.FromMinutes(5)).Tag("catalog"));
+    options.AddPolicy("StaticCache", builder =>
+        builder.Expire(TimeSpan.FromMinutes(30)).Tag("static"));
+});
+
 // ─── HSTS (production only) ───
 if (!builder.Environment.IsDevelopment())
 {
@@ -331,10 +343,23 @@ app.UseCors("AllowFrontend");
 // 6. Rate limiting — after CORS (so preflight isn't throttled)
 app.UseRateLimiter();
 
+// 7. Response caching & output caching
+app.UseResponseCaching();
+app.UseOutputCache();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Hangfire Dashboard (admin only)
+app.MapHangfireDashboard("/hangfire", new Hangfire.DashboardOptions
+{
+    Authorization = new[] { new PatryCloset.API.Middleware.HangfireDashboardAuthFilter() },
+    DashboardTitle = "PATRY♡CLOSET — Background Jobs",
+    StatsPollingInterval = 5000
+});
+
 // Health check endpoints
 app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 {
@@ -368,6 +393,27 @@ app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthC
 {
     Predicate = _ => false
 });
+
+// ─── Register Recurring Background Jobs ───
+RecurringJob.AddOrUpdate<PatryCloset.Infrastructure.BackgroundJobs.Jobs.OrderCleanupJob>(
+    "order-cleanup",
+    job => job.CleanupAbandonedOrdersAsync(),
+    Cron.Hourly);
+
+RecurringJob.AddOrUpdate<PatryCloset.Infrastructure.BackgroundJobs.Jobs.StaleCartCleanupJob>(
+    "stale-cart-cleanup",
+    job => job.CleanupStaleCartsAsync(),
+    Cron.Daily(3)); // 3 AM UTC
+
+RecurringJob.AddOrUpdate<PatryCloset.Infrastructure.BackgroundJobs.Jobs.StockAlertJob>(
+    "stock-alert",
+    job => job.CheckLowStockAsync(),
+    "0 */4 * * *"); // Every 4 hours
+
+RecurringJob.AddOrUpdate<PatryCloset.Infrastructure.BackgroundJobs.Jobs.CacheWarmupJob>(
+    "cache-warmup",
+    job => job.WarmupCacheAsync(),
+    Cron.Daily(5)); // 5 AM UTC
 
 // ─── Startup log ───
 Log.Information("🚀 Patry Closet API starting on {Environment}", app.Environment.EnvironmentName);

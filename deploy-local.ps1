@@ -1,465 +1,805 @@
 #!/usr/bin/env pwsh
+#Requires -Version 7.0
+
 <#
 .SYNOPSIS
-    PATRY♡CLOSET — Full-Stack Local Deployment Script
+    PATRY♡CLOSET — Interactive Local Deployment Console
 .DESCRIPTION
-    Launches the complete development environment in 3 separate PowerShell 7 windows:
-      1. 🗄️  PostgreSQL 17 — Database monitor (psql live session)
-      2. 🚀  ASP.NET Core API — Backend server (http://localhost:5200)
-      3. 🌐  Vite + React — Frontend dev server (http://localhost:3000)
-
-    Each console shows live logs and can be used interactively.
-    The script validates prerequisites, runs health checks, and reports status.
-
-.PARAMETER SkipDbCheck
-    Skip PostgreSQL service verification (if using remote DB).
-.PARAMETER NoBrowser
-    Don't auto-open browser after deployment.
-.PARAMETER BackendOnly
-    Only start the backend (API + DB).
-.PARAMETER FrontendOnly
-    Only start the frontend.
-
+    Advanced deployment and management script for the Patry Closet e-commerce platform.
+    Manages PostgreSQL, Redis, Backend API, and Frontend services with interactive menu.
+    Features admin authentication, advanced logging, service management, and health monitoring.
+.PARAMETER SkipAuth
+    Bypass the authentication prompt (for scripted/CI usage).
+.PARAMETER LogDir
+    Directory for log files. Defaults to .\logs under the script root.
+.NOTES
+    Credentials: Admin / Admin
 .EXAMPLE
     .\deploy-local.ps1
-    .\deploy-local.ps1 -NoBrowser
-    .\deploy-local.ps1 -BackendOnly
+    .\deploy-local.ps1 -SkipAuth
 #>
 
-[CmdletBinding()]
 param(
-    [switch]$SkipDbCheck,
-    [switch]$NoBrowser,
-    [switch]$BackendOnly,
-    [switch]$FrontendOnly
+    [switch]$SkipAuth,
+    [string]$LogDir = "$PSScriptRoot\logs"
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = "Continue"
 
-# ─────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════
 # Configuration
-# ─────────────────────────────────────────────────────────────────
-$ROOT_DIR       = $PSScriptRoot
-$SERVER_DIR     = Join-Path $ROOT_DIR 'patry-closet-server'
-$API_DIR        = Join-Path $SERVER_DIR 'src\PatryCloset.API'
-$WEB_DIR        = Join-Path $ROOT_DIR 'patry-closet-web'
-$API_URL        = 'http://localhost:5200'
-$WEB_PORT       = 3000
-$DB_HOST        = 'localhost'
-$DB_PORT        = 5432
-$DB_NAME        = 'patrycloset_dev'
-$DB_USER        = 'postgres'
-$PG_SERVICE     = 'postgresql-x64-17'
-$PWSH_EXE       = 'pwsh'
+# ═══════════════════════════════════════════════════════════════
+$script:Config = @{
+    ProjectRoot    = $PSScriptRoot
+    ServerDir      = Join-Path $PSScriptRoot "patry-closet-server"
+    WebDir         = Join-Path $PSScriptRoot "patry-closet-web"
+    ApiUrl         = "http://localhost:5200"
+    FrontendUrl    = "http://localhost:5173"
+    PgHost         = "localhost"
+    PgPort         = 5432
+    PgUser         = "postgres"
+    PgPassword     = "postgres"
+    PgDatabase     = "patrycloset_dev"
+    PgService      = "postgresql-x64-17"
+    RedisHost      = "localhost"
+    RedisPort      = 6379
+    LogDir         = $LogDir
+    AdminUser      = "Admin"
+    AdminPass      = "Admin"
+}
 
-# Colors
-$C_RESET  = "`e[0m"
-$C_GREEN  = "`e[32m"
-$C_YELLOW = "`e[33m"
-$C_RED    = "`e[31m"
-$C_CYAN   = "`e[36m"
-$C_BOLD   = "`e[1m"
-$C_DIM    = "`e[2m"
+# Process tracking
+$script:Processes = @{
+    PostgreSQL = $null
+    Redis      = $null
+    Backend    = $null
+    Frontend   = $null
+}
 
-# ─────────────────────────────────────────────────────────────────
-# Helper Functions
-# ─────────────────────────────────────────────────────────────────
+$script:LogFile = $null
+
+# ═══════════════════════════════════════════════════════════════
+# UI Helpers
+# ═══════════════════════════════════════════════════════════════
 function Write-Banner {
-    Write-Host ''
-    Write-Host "${C_BOLD}${C_CYAN}╔══════════════════════════════════════════════════════════╗${C_RESET}"
-    Write-Host "${C_BOLD}${C_CYAN}║            PATRY♡CLOSET — Local Deployment               ║${C_RESET}"
-    Write-Host "${C_BOLD}${C_CYAN}╚══════════════════════════════════════════════════════════╝${C_RESET}"
-    Write-Host "${C_DIM}  $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  |  PowerShell $($PSVersionTable.PSVersion)${C_RESET}"
-    Write-Host ''
+    Clear-Host
+    $banner = @"
+
+  `e[1m`e[35m╔═══════════════════════════════════════════════════════════╗`e[0m
+  `e[1m`e[35m║                                                           ║`e[0m
+  `e[1m`e[35m║            P A T R Y ♡ C L O S E T                        ║`e[0m
+  `e[1m`e[35m║                                                           ║`e[0m
+  `e[1m`e[35m║          Infrastructure Management Console                ║`e[0m
+  `e[1m`e[35m║                                                           ║`e[0m
+  `e[1m`e[35m╚═══════════════════════════════════════════════════════════╝`e[0m
+
+"@
+    Write-Host $banner
+    Write-Host "  `e[2m$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  |  PowerShell $($PSVersionTable.PSVersion)`e[0m"
+    Write-Host ""
 }
 
-function Write-Step([string]$Icon, [string]$Message) {
-    Write-Host "  ${C_CYAN}${Icon}${C_RESET}  ${Message}"
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss.fff"
+    $entry = "[$ts] [$Level] $Message"
+
+    switch ($Level) {
+        "ERROR"   { Write-Host "  `e[31m❌ $Message`e[0m" }
+        "WARN"    { Write-Host "  `e[33m⚠  $Message`e[0m" }
+        "SUCCESS" { Write-Host "  `e[32m✅ $Message`e[0m" }
+        "STEP"    { Write-Host "  `e[36m🔧 $Message`e[0m" }
+        default   { Write-Host "  `e[2mℹ  $Message`e[0m" }
+    }
+
+    if ($script:LogFile) {
+        $entry | Out-File -FilePath $script:LogFile -Append -Encoding utf8
+    }
 }
 
-function Write-Ok([string]$Message) {
-    Write-Host "  ${C_GREEN}✔${C_RESET}  ${Message}"
+function Write-Section {
+    param([string]$Title)
+    Write-Host ""
+    Write-Host "  `e[2m─────────────────────────────────────────────────`e[0m"
+    Write-Host "  `e[1m$Title`e[0m"
+    Write-Host "  `e[2m─────────────────────────────────────────────────`e[0m"
 }
 
-function Write-Warn([string]$Message) {
-    Write-Host "  ${C_YELLOW}⚠${C_RESET}  ${Message}"
+function Write-StatusLine {
+    param([string]$Service, [string]$Status, [string]$Details = "")
+    $color = switch ($Status) {
+        "Running"  { "32" }
+        "Stopped"  { "31" }
+        "Starting" { "33" }
+        "Error"    { "31" }
+        default    { "2" }
+    }
+    $icon = switch ($Status) {
+        "Running"  { "●" }
+        "Stopped"  { "○" }
+        "Starting" { "◌" }
+        "Error"    { "✗" }
+        default    { "?" }
+    }
+    $line = "  `e[${color}m$icon $($Service.PadRight(15)) [$Status]`e[0m"
+    if ($Details) { $line += "  `e[2m$Details`e[0m" }
+    Write-Host $line
 }
 
-function Write-Fail([string]$Message) {
-    Write-Host "  ${C_RED}✖${C_RESET}  ${Message}"
+# ═══════════════════════════════════════════════════════════════
+# Authentication
+# ═══════════════════════════════════════════════════════════════
+function Invoke-Authentication {
+    Write-Banner
+    Write-Host "  `e[33m🔐 Authentication Required`e[0m"
+    Write-Host ""
+
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        $user = Read-Host "  Username"
+        $pass = Read-Host "  Password" -MaskInput
+
+        if ($user -eq $script:Config.AdminUser -and $pass -eq $script:Config.AdminPass) {
+            Write-Host ""
+            Write-Log "Authentication successful — Welcome, $user" "SUCCESS"
+            Start-Sleep -Seconds 1
+            return $true
+        }
+
+        $remaining = 3 - $attempt
+        if ($remaining -gt 0) {
+            Write-Log "Invalid credentials. $remaining attempt(s) remaining." "ERROR"
+        }
+    }
+
+    Write-Log "Authentication failed — access denied." "ERROR"
+    Start-Sleep -Seconds 2
+    return $false
 }
 
-function Test-CommandExists([string]$Cmd) {
-    $null -ne (Get-Command $Cmd -ErrorAction SilentlyContinue)
-}
-
+# ═══════════════════════════════════════════════════════════════
+# Port & Process Utilities
+# ═══════════════════════════════════════════════════════════════
 function Test-PortInUse([int]$Port) {
     $null -ne (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
 }
 
-function Stop-ProcessOnPort([int]$Port) {
-    $conns = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-    if ($conns) {
-        foreach ($conn in $conns) {
-            $proc = Get-Process -Id $conn.OwningProcess -ErrorAction SilentlyContinue
-            if ($proc -and $proc.ProcessName -ne 'System') {
-                Write-Warn "Killing PID $($proc.Id) ($($proc.ProcessName)) on port $Port"
-                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
-                Start-Sleep -Milliseconds 500
-            }
-        }
-    }
-}
-
-function Wait-ForEndpoint([string]$Url, [int]$TimeoutSec = 30) {
-    $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    while ($sw.Elapsed.TotalSeconds -lt $TimeoutSec) {
-        try {
-            $resp = Invoke-WebRequest -Uri $Url -Method GET -TimeoutSec 3 -ErrorAction Stop
-            if ($resp.StatusCode -eq 200) { return $true }
-        } catch { }
-        Start-Sleep -Milliseconds 800
-    }
-    return $false
-}
-
-# ─────────────────────────────────────────────────────────────────
-# Prerequisites Check
-# ─────────────────────────────────────────────────────────────────
-function Test-Prerequisites {
-    Write-Host "${C_BOLD}  Prerequisites Check${C_RESET}"
-    Write-Host "${C_DIM}  ────────────────────${C_RESET}"
-    $ok = $true
-
-    # PowerShell 7+
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
-        Write-Ok "PowerShell $($PSVersionTable.PSVersion)"
-    } else {
-        Write-Fail "PowerShell 7+ required (found $($PSVersionTable.PSVersion))"
-        $ok = $false
-    }
-
-    # .NET SDK
-    if (Test-CommandExists 'dotnet') {
-        $dotnetVersion = (dotnet --version 2>$null)
-        Write-Ok ".NET SDK $dotnetVersion"
-    } else {
-        Write-Fail '.NET SDK not found'
-        $ok = $false
-    }
-
-    # Node.js
-    if (Test-CommandExists 'node') {
-        $nodeVersion = (node --version 2>$null)
-        Write-Ok "Node.js $nodeVersion"
-    } else {
-        Write-Fail 'Node.js not found'
-        $ok = $false
-    }
-
-    # npm
-    if (Test-CommandExists 'npm') {
-        $npmVersion = (npm --version 2>$null)
-        Write-Ok "npm $npmVersion"
-    } else {
-        Write-Fail 'npm not found'
-        $ok = $false
-    }
-
-    # PostgreSQL
-    if (-not $SkipDbCheck) {
-        $pgSvc = Get-Service -Name $PG_SERVICE -ErrorAction SilentlyContinue
-        if ($pgSvc -and $pgSvc.Status -eq 'Running') {
-            Write-Ok "PostgreSQL ($PG_SERVICE) running"
-        } elseif ($pgSvc) {
-            Write-Warn "PostgreSQL service found but not running — starting..."
-            Start-Service -Name $PG_SERVICE -ErrorAction SilentlyContinue
-            Start-Sleep -Seconds 2
-            $pgSvc = Get-Service -Name $PG_SERVICE
+# ═══════════════════════════════════════════════════════════════
+# Service Management
+# ═══════════════════════════════════════════════════════════════
+function Start-PostgreSQL {
+    Write-Log "Starting PostgreSQL..." "STEP"
+    try {
+        # Try native Windows service first
+        $pgSvc = Get-Service -Name $script:Config.PgService -ErrorAction SilentlyContinue
+        if ($pgSvc) {
             if ($pgSvc.Status -eq 'Running') {
-                Write-Ok "PostgreSQL started successfully"
+                $script:Processes.PostgreSQL = "service:$($script:Config.PgService)"
+                Write-Log "PostgreSQL already running (Windows service)" "SUCCESS"
+                return
+            }
+            Start-Service -Name $script:Config.PgService -ErrorAction Stop
+            $script:Processes.PostgreSQL = "service:$($script:Config.PgService)"
+            Write-Log "PostgreSQL started via Windows service on port $($script:Config.PgPort)" "SUCCESS"
+            return
+        }
+
+        # Fallback to Docker
+        $dockerAvailable = Get-Command docker -ErrorAction SilentlyContinue
+        if ($dockerAvailable) {
+            $existing = docker ps -a --filter "name=patrycloset-postgres" --format "{{.Names}}" 2>$null
+            if ($existing) {
+                docker start patrycloset-postgres 2>$null | Out-Null
             } else {
-                Write-Fail "Could not start PostgreSQL"
-                $ok = $false
+                docker run -d --name patrycloset-postgres `
+                    -e POSTGRES_DB=$($script:Config.PgDatabase) `
+                    -e POSTGRES_USER=$($script:Config.PgUser) `
+                    -e POSTGRES_PASSWORD=$($script:Config.PgPassword) `
+                    -p "$($script:Config.PgPort):5432" `
+                    postgres:17-alpine 2>$null | Out-Null
             }
-        } else {
-            Write-Fail "PostgreSQL service '$PG_SERVICE' not found"
-            $ok = $false
+            $script:Processes.PostgreSQL = "docker:patrycloset-postgres"
+            Write-Log "PostgreSQL started via Docker on port $($script:Config.PgPort)" "SUCCESS"
+            return
         }
+
+        Write-Log "No PostgreSQL service or Docker found — cannot start PostgreSQL" "ERROR"
     }
-
-    # psql
-    if (Test-CommandExists 'psql') {
-        Write-Ok "psql CLI available"
-    } else {
-        # Try adding PostgreSQL bin to PATH
-        $pgBin = 'C:\Program Files\PostgreSQL\17\bin'
-        if (Test-Path $pgBin) {
-            $env:PATH = "$pgBin;$env:PATH"
-            Write-Warn "Added PostgreSQL bin to PATH"
-        } else {
-            Write-Warn "psql not found — database console may not work"
-        }
+    catch {
+        Write-Log "Failed to start PostgreSQL: $_" "ERROR"
     }
-
-    # Project directories
-    if (Test-Path $API_DIR) { Write-Ok "Backend project found" }
-    else { Write-Fail "Backend not found at $API_DIR"; $ok = $false }
-
-    if (Test-Path $WEB_DIR) { Write-Ok "Frontend project found" }
-    else { Write-Fail "Frontend not found at $WEB_DIR"; $ok = $false }
-
-    # node_modules
-    if (-not (Test-Path (Join-Path $WEB_DIR 'node_modules'))) {
-        Write-Warn 'node_modules missing — installing dependencies...'
-        Push-Location $WEB_DIR
-        npm install --legacy-peer-deps 2>&1 | Out-Null
-        Pop-Location
-        Write-Ok 'Dependencies installed'
-    }
-
-    Write-Host ''
-    return $ok
 }
 
-# ─────────────────────────────────────────────────────────────────
-# Free ports if occupied
-# ─────────────────────────────────────────────────────────────────
-function Clear-Ports {
-    Write-Host "${C_BOLD}  Port Cleanup${C_RESET}"
-    Write-Host "${C_DIM}  ────────────${C_RESET}"
-
-    if (-not $FrontendOnly) {
-        if (Test-PortInUse 5200) {
-            Stop-ProcessOnPort 5200
-            Write-Ok "Port 5200 freed"
-        } else {
-            Write-Ok "Port 5200 available"
+function Start-Redis {
+    Write-Log "Starting Redis..." "STEP"
+    try {
+        $dockerAvailable = Get-Command docker -ErrorAction SilentlyContinue
+        if (-not $dockerAvailable) {
+            Write-Log "Docker not available — cannot start Redis" "WARN"
+            return
         }
+
+        $existing = docker ps -a --filter "name=patrycloset-redis" --format "{{.Names}}" 2>$null
+        if ($existing) {
+            docker start patrycloset-redis 2>$null | Out-Null
+        } else {
+            docker run -d --name patrycloset-redis `
+                -p "$($script:Config.RedisPort):6379" `
+                redis:7-alpine redis-server --appendonly yes 2>$null | Out-Null
+        }
+        $script:Processes.Redis = "docker:patrycloset-redis"
+        Write-Log "Redis started on port $($script:Config.RedisPort)" "SUCCESS"
+    }
+    catch {
+        Write-Log "Failed to start Redis: $_" "ERROR"
+    }
+}
+
+function Start-Backend {
+    Write-Log "Starting Backend API..." "STEP"
+    try {
+        $apiDir = Join-Path $script:Config.ServerDir "src\PatryCloset.API"
+        if (-not (Test-Path $apiDir)) {
+            Write-Log "Backend project not found at $apiDir" "ERROR"
+            return
+        }
+
+        $logPath = Join-Path $script:Config.LogDir "backend.log"
+        $errorLogPath = Join-Path $script:Config.LogDir "backend-error.log"
+
+        $proc = Start-Process -FilePath "dotnet" `
+            -ArgumentList "run", "--project", $apiDir, "--urls", $script:Config.ApiUrl `
+            -WorkingDirectory $script:Config.ServerDir `
+            -RedirectStandardOutput $logPath `
+            -RedirectStandardError $errorLogPath `
+            -PassThru -NoNewWindow
+
+        $script:Processes.Backend = $proc
+        Write-Log "Backend API starting on $($script:Config.ApiUrl) (PID: $($proc.Id))" "SUCCESS"
+    }
+    catch {
+        Write-Log "Failed to start Backend: $_" "ERROR"
+    }
+}
+
+function Start-Frontend {
+    Write-Log "Starting Frontend dev server..." "STEP"
+    try {
+        $webDir = $script:Config.WebDir
+        if (-not (Test-Path $webDir)) {
+            Write-Log "Frontend project not found at $webDir" "ERROR"
+            return
+        }
+
+        # Ensure node_modules exist
+        if (-not (Test-Path (Join-Path $webDir "node_modules"))) {
+            Write-Log "Installing frontend dependencies..." "STEP"
+            Push-Location $webDir
+            npm install --legacy-peer-deps 2>&1 | Out-Null
+            Pop-Location
+        }
+
+        $logPath = Join-Path $script:Config.LogDir "frontend.log"
+        $errorLogPath = Join-Path $script:Config.LogDir "frontend-error.log"
+
+        $proc = Start-Process -FilePath "npm" `
+            -ArgumentList "run", "dev" `
+            -WorkingDirectory $webDir `
+            -RedirectStandardOutput $logPath `
+            -RedirectStandardError $errorLogPath `
+            -PassThru -NoNewWindow
+
+        $script:Processes.Frontend = $proc
+        Write-Log "Frontend starting on $($script:Config.FrontendUrl) (PID: $($proc.Id))" "SUCCESS"
+    }
+    catch {
+        Write-Log "Failed to start Frontend: $_" "ERROR"
+    }
+}
+
+function Stop-ServiceByName {
+    param([string]$ServiceName)
+    Write-Log "Stopping $ServiceName..." "STEP"
+
+    $proc = $script:Processes[$ServiceName]
+    if ($null -eq $proc) {
+        Write-Log "$ServiceName is not tracked as running" "WARN"
+        return
     }
 
-    if (-not $BackendOnly) {
-        if (Test-PortInUse $WEB_PORT) {
-            Stop-ProcessOnPort $WEB_PORT
-            Write-Ok "Port $WEB_PORT freed"
-        } else {
-            Write-Ok "Port $WEB_PORT available"
+    try {
+        if ($proc -is [string] -and $proc.StartsWith("docker:")) {
+            $containerName = $proc.Replace("docker:", "")
+            docker stop $containerName 2>$null | Out-Null
+            Write-Log "$ServiceName stopped (Docker container: $containerName)" "SUCCESS"
         }
-    }
-
-    Write-Host ''
-}
-
-# ─────────────────────────────────────────────────────────────────
-# Launch Console Windows
-# ─────────────────────────────────────────────────────────────────
-function Start-DatabaseConsole {
-    $dbScript = @"
-`$Host.UI.RawUI.WindowTitle = '🗄️  PATRY CLOSET — PostgreSQL'
-`$env:PGPASSWORD = 'postgres'
-Write-Host ''
-Write-Host '`e[1m`e[36m╔══════════════════════════════════════════════╗`e[0m'
-Write-Host '`e[1m`e[36m║     🗄️  PostgreSQL 17 — Database Console     ║`e[0m'
-Write-Host '`e[1m`e[36m╚══════════════════════════════════════════════╝`e[0m'
-Write-Host ''
-Write-Host '`e[2m  Database : $DB_NAME'
-Write-Host '  Host     : ${DB_HOST}:${DB_PORT}'
-Write-Host '  User     : $DB_USER'
-Write-Host '  Schema   : patrycloset`e[0m'
-Write-Host ''
-Write-Host '`e[33m  Useful commands:`e[0m'
-Write-Host '`e[2m    \dt patrycloset.*       — List all tables'
-Write-Host '    \d+ patrycloset.\"Products\" — Describe Products table'
-Write-Host '    SELECT count(*) FROM patrycloset.\"Products\";'
-Write-Host '    SELECT count(*) FROM patrycloset.\"Orders\";'
-Write-Host '    SELECT count(*) FROM patrycloset.\"Payments\";'
-Write-Host '    \x                        — Toggle expanded display'
-Write-Host '    \q                        — Quit`e[0m'
-Write-Host ''
-& psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME
-"@
-    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($dbScript))
-    Start-Process $PWSH_EXE -ArgumentList "-NoExit", "-EncodedCommand", $encoded
-    Write-Ok "Database console launched (psql → $DB_NAME)"
-}
-
-function Start-BackendConsole {
-    $apiScript = @"
-`$Host.UI.RawUI.WindowTitle = '🚀 PATRY CLOSET — API Server'
-Write-Host ''
-Write-Host '`e[1m`e[36m╔══════════════════════════════════════════════╗`e[0m'
-Write-Host '`e[1m`e[36m║   🚀 ASP.NET Core API — Backend Server       ║`e[0m'
-Write-Host '`e[1m`e[36m╚══════════════════════════════════════════════╝`e[0m'
-Write-Host ''
-Write-Host '`e[2m  URL      : $API_URL'
-Write-Host '  Swagger  : $API_URL/swagger'
-Write-Host '  Health   : $API_URL/api/v1/health'
-Write-Host '  Env      : Development'
-Write-Host '  DB       : ${DB_HOST}:${DB_PORT}/${DB_NAME}`e[0m'
-Write-Host ''
-Write-Host '`e[33m  Press Ctrl+C to stop the server.`e[0m'
-Write-Host '`e[2m  ────────────────────────────────────────────`e[0m'
-Write-Host ''
-Set-Location '$API_DIR'
-`$env:ASPNETCORE_ENVIRONMENT = 'Development'
-`$env:ASPNETCORE_URLS = '$API_URL'
-dotnet run --no-launch-profile
-"@
-    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($apiScript))
-    Start-Process $PWSH_EXE -ArgumentList "-NoExit", "-EncodedCommand", $encoded
-    Write-Ok "Backend console launched (dotnet run → $API_URL)"
-}
-
-function Start-FrontendConsole {
-    $webScript = @"
-`$Host.UI.RawUI.WindowTitle = '🌐 PATRY CLOSET — Frontend'
-Write-Host ''
-Write-Host '`e[1m`e[36m╔══════════════════════════════════════════════╗`e[0m'
-Write-Host '`e[1m`e[36m║    🌐 Vite + React — Frontend Dev Server     ║`e[0m'
-Write-Host '`e[1m`e[36m╚══════════════════════════════════════════════╝`e[0m'
-Write-Host ''
-Write-Host '`e[2m  Local    : http://localhost:${WEB_PORT}'
-Write-Host '  API      : $API_URL'
-Write-Host '  Mode     : Development (HMR enabled)`e[0m'
-Write-Host ''
-Write-Host '`e[33m  Press Ctrl+C to stop the dev server.`e[0m'
-Write-Host '`e[2m  ────────────────────────────────────────────`e[0m'
-Write-Host ''
-Set-Location '$WEB_DIR'
-npx vite --host
-"@
-    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($webScript))
-    Start-Process $PWSH_EXE -ArgumentList "-NoExit", "-EncodedCommand", $encoded
-    Write-Ok "Frontend console launched (vite → http://localhost:${WEB_PORT})"
-}
-
-# ─────────────────────────────────────────────────────────────────
-# Health Checks
-# ─────────────────────────────────────────────────────────────────
-function Invoke-HealthChecks {
-    Write-Host "${C_BOLD}  Health Checks${C_RESET}"
-    Write-Host "${C_DIM}  ─────────────${C_RESET}"
-
-    if (-not $FrontendOnly) {
-        Write-Step '⏳' "Waiting for API at ${API_URL}..."
-        if (Wait-ForEndpoint "${API_URL}/api/v1/health" -TimeoutSec 40) {
-            try {
-                $health = Invoke-RestMethod -Uri "${API_URL}/api/v1/health" -TimeoutSec 5
-                Write-Ok "API: $($health.status) (v$($health.version))"
-            } catch {
-                Write-Ok "API responding at ${API_URL}"
-            }
-
-            # Endpoint count
-            try {
-                $swagger = Invoke-RestMethod -Uri "${API_URL}/swagger/v1/swagger.json" -TimeoutSec 5
-                $epCount = $swagger.paths.PSObject.Properties.Name.Count
-                Write-Ok "Swagger: $epCount endpoints documented"
-            } catch {
-                Write-Warn "Swagger not reachable"
-            }
-        } else {
-            Write-Warn "API did not respond in 40s — check backend console for errors"
+        elseif ($proc -is [string] -and $proc.StartsWith("service:")) {
+            $svcName = $proc.Replace("service:", "")
+            Stop-Service -Name $svcName -Force -ErrorAction SilentlyContinue
+            Write-Log "$ServiceName stopped (Windows service: $svcName)" "SUCCESS"
         }
-    }
-
-    if (-not $BackendOnly) {
-        Write-Step '⏳' "Waiting for Frontend..."
-        if (Wait-ForEndpoint "http://localhost:${WEB_PORT}" -TimeoutSec 25) {
-            Write-Ok "Frontend serving at http://localhost:${WEB_PORT}"
-        } else {
-            # Vite may pick next port
-            if (Wait-ForEndpoint "http://localhost:3001" -TimeoutSec 5) {
-                Write-Ok "Frontend serving at http://localhost:3001 (port 3000 was busy)"
+        elseif ($proc -is [System.Diagnostics.Process]) {
+            if (-not $proc.HasExited) {
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                Write-Log "$ServiceName stopped (PID: $($proc.Id))" "SUCCESS"
             } else {
-                Write-Warn "Frontend did not respond — check frontend console"
+                Write-Log "$ServiceName had already exited" "WARN"
+            }
+        }
+        $script:Processes[$ServiceName] = $null
+    }
+    catch {
+        Write-Log "Error stopping ${ServiceName}: $_" "ERROR"
+    }
+}
+
+function Get-ServiceStatus {
+    param([string]$ServiceName)
+
+    $proc = $script:Processes[$ServiceName]
+
+    if ($null -eq $proc) {
+        # Check if running externally (port-based detection)
+        $port = switch ($ServiceName) {
+            "PostgreSQL" { $script:Config.PgPort }
+            "Redis"      { $script:Config.RedisPort }
+            "Backend"    { 5200 }
+            "Frontend"   { 5173 }
+            default      { 0 }
+        }
+        if ($port -gt 0 -and (Test-PortInUse $port)) {
+            return "Running"
+        }
+        return "Stopped"
+    }
+
+    if ($proc -is [string] -and $proc.StartsWith("docker:")) {
+        $containerName = $proc.Replace("docker:", "")
+        $running = docker ps --filter "name=$containerName" --filter "status=running" --format "{{.Names}}" 2>$null
+        if ($running) { return "Running" } else { return "Stopped" }
+    }
+
+    if ($proc -is [string] -and $proc.StartsWith("service:")) {
+        $svcName = $proc.Replace("service:", "")
+        $svc = Get-Service -Name $svcName -ErrorAction SilentlyContinue
+        if ($svc -and $svc.Status -eq 'Running') { return "Running" } else { return "Stopped" }
+    }
+
+    if ($proc -is [System.Diagnostics.Process]) {
+        if ($proc.HasExited) { return "Stopped" } else { return "Running" }
+    }
+
+    return "Unknown"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Health & Diagnostics
+# ═══════════════════════════════════════════════════════════════
+function Test-ApiHealth {
+    Write-Section "API Health Check"
+    Write-Host ""
+    try {
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
+        $response = Invoke-RestMethod -Uri "$($script:Config.ApiUrl)/health" -TimeoutSec 5 -ErrorAction Stop
+        $sw.Stop()
+        $elapsed = $sw.ElapsedMilliseconds
+
+        Write-Log "API responded in ${elapsed}ms" "SUCCESS"
+
+        if ($response.status) {
+            $level = if ($response.status -eq "Healthy") { "SUCCESS" } else { "WARN" }
+            Write-Log "Status: $($response.status)" $level
+        }
+
+        if ($response.checks) {
+            foreach ($check in $response.checks) {
+                $level = if ($check.status -eq "Healthy") { "SUCCESS" }
+                         elseif ($check.status -eq "Degraded") { "WARN" }
+                         else { "ERROR" }
+                Write-Log "  $($check.name): $($check.status)" $level
             }
         }
     }
-
-    if (-not $SkipDbCheck -and -not $FrontendOnly) {
+    catch [System.Net.Http.HttpRequestException] {
+        Write-Log "API is not reachable at $($script:Config.ApiUrl)" "ERROR"
+    }
+    catch {
+        # Try a basic web request as fallback
         try {
-            $env:PGPASSWORD = 'postgres'
-            $tables = & psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='patrycloset'" 2>$null
-            $count = ($tables -replace '\s','')
-            Write-Ok "Database: $count tables in schema 'patrycloset'"
-        } catch {
-            Write-Warn "Could not query database"
+            $basicResponse = Invoke-WebRequest -Uri "$($script:Config.ApiUrl)/health" -TimeoutSec 5 -ErrorAction Stop
+            Write-Log "API responded with status code $($basicResponse.StatusCode)" "SUCCESS"
+        }
+        catch {
+            Write-Log "API is not responding: $($_.Exception.Message)" "ERROR"
         }
     }
-
-    Write-Host ''
 }
 
-# ─────────────────────────────────────────────────────────────────
-# Summary
-# ─────────────────────────────────────────────────────────────────
-function Write-Summary {
-    Write-Host "${C_BOLD}${C_GREEN}╔══════════════════════════════════════════════════════════╗${C_RESET}"
-    Write-Host "${C_BOLD}${C_GREEN}║              ✅ Deployment Complete!                     ║${C_RESET}"
-    Write-Host "${C_BOLD}${C_GREEN}╚══════════════════════════════════════════════════════════╝${C_RESET}"
-    Write-Host ''
-    if (-not $FrontendOnly) {
-        Write-Host "  ${C_CYAN}🗄️  Database${C_RESET}   psql → ${DB_HOST}:${DB_PORT}/${DB_NAME}"
-        Write-Host "  ${C_CYAN}🚀 Backend${C_RESET}    ${API_URL}  |  Swagger: ${API_URL}/swagger"
+function Test-DatabaseConnection {
+    Write-Section "Database Connection Test"
+    Write-Host ""
+    try {
+        # Try Docker exec first
+        $dockerContainer = docker ps --filter "name=patrycloset-postgres" --filter "status=running" --format "{{.Names}}" 2>$null
+        if ($dockerContainer) {
+            $result = docker exec patrycloset-postgres pg_isready -U $($script:Config.PgUser) 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Log "PostgreSQL is accepting connections (Docker)" "SUCCESS"
+                return
+            }
+        }
+
+        # Try native psql
+        $psql = Get-Command psql -ErrorAction SilentlyContinue
+        if ($psql) {
+            $env:PGPASSWORD = $script:Config.PgPassword
+            $null = & psql -h $script:Config.PgHost -p $script:Config.PgPort `
+                -U $script:Config.PgUser -d $script:Config.PgDatabase `
+                -c "SELECT 1;" 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Log "PostgreSQL is accepting connections (native)" "SUCCESS"
+
+                # Get table count
+                $tables = & psql -h $script:Config.PgHost -p $script:Config.PgPort `
+                    -U $script:Config.PgUser -d $script:Config.PgDatabase `
+                    -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='patrycloset'" 2>$null
+                $count = ($tables -replace '\s','')
+                if ($count) {
+                    Write-Log "Found $count tables in schema 'patrycloset'" "INFO"
+                }
+                return
+            }
+        }
+
+        # Port-based check as last resort
+        if (Test-PortInUse $script:Config.PgPort) {
+            Write-Log "Port $($script:Config.PgPort) is active — PostgreSQL may be running" "WARN"
+        } else {
+            Write-Log "PostgreSQL connection failed — no service detected on port $($script:Config.PgPort)" "ERROR"
+        }
     }
-    if (-not $BackendOnly) {
-        Write-Host "  ${C_CYAN}🌐 Frontend${C_RESET}   http://localhost:${WEB_PORT}"
+    catch {
+        Write-Log "Database test failed: $_" "ERROR"
     }
-    Write-Host ''
-    Write-Host "${C_DIM}  Each console window shows live logs.${C_RESET}"
-    Write-Host "${C_DIM}  Press Ctrl+C in any console to stop that service.${C_RESET}"
-    Write-Host ''
 }
 
-# ─────────────────────────────────────────────────────────────────
-# Main
-# ─────────────────────────────────────────────────────────────────
-function Main {
+function Test-RedisConnection {
+    Write-Section "Redis Connection Test"
+    Write-Host ""
+    try {
+        $dockerContainer = docker ps --filter "name=patrycloset-redis" --filter "status=running" --format "{{.Names}}" 2>$null
+        if ($dockerContainer) {
+            $result = docker exec patrycloset-redis redis-cli ping 2>$null
+            if ($result -eq "PONG") {
+                Write-Log "Redis is responding (PONG)" "SUCCESS"
+                $info = docker exec patrycloset-redis redis-cli info memory 2>$null | Select-String "used_memory_human"
+                if ($info) {
+                    Write-Log "Memory: $($info -replace '.*:','')" "INFO"
+                }
+                return
+            }
+        }
+
+        if (Test-PortInUse $script:Config.RedisPort) {
+            Write-Log "Port $($script:Config.RedisPort) is active — Redis may be running" "WARN"
+        } else {
+            Write-Log "Redis not detected on port $($script:Config.RedisPort)" "ERROR"
+        }
+    }
+    catch {
+        Write-Log "Redis test failed: $_" "ERROR"
+    }
+}
+
+function Show-RecentLogs {
+    param([string]$ServiceName, [int]$Lines = 30)
+    Write-Section "$ServiceName — Recent Logs (last $Lines lines)"
+
+    $logMap = @{
+        "Backend"    = "backend.log"
+        "Frontend"   = "frontend.log"
+        "PostgreSQL" = "postgresql.log"
+    }
+
+    if (-not $logMap.ContainsKey($ServiceName)) {
+        Write-Log "No log mapping for $ServiceName" "WARN"
+        return
+    }
+
+    $logFile = Join-Path $script:Config.LogDir $logMap[$ServiceName]
+    if (Test-Path $logFile) {
+        Write-Host ""
+        $content = Get-Content $logFile -Tail $Lines -ErrorAction SilentlyContinue
+        if ($content) {
+            foreach ($line in $content) {
+                $color = if ($line -match "error|fail|exception") { "`e[31m" }
+                         elseif ($line -match "warn") { "`e[33m" }
+                         elseif ($line -match "info|started|success|ready") { "`e[32m" }
+                         else { "`e[2m" }
+                Write-Host "    ${color}${line}`e[0m"
+            }
+        } else {
+            Write-Log "Log file exists but is empty" "WARN"
+        }
+    }
+    else {
+        Write-Log "No log file found at $logFile" "WARN"
+    }
+}
+
+function Invoke-DatabaseMigration {
+    Write-Section "Database Migration"
+    Write-Log "Running EF Core migrations..." "STEP"
+    try {
+        $apiDir = Join-Path $script:Config.ServerDir "src\PatryCloset.API"
+        if (-not (Test-Path $apiDir)) {
+            Write-Log "API project not found at $apiDir" "ERROR"
+            return
+        }
+        $result = & dotnet ef database update --project $apiDir --startup-project $apiDir 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "Database migration completed successfully" "SUCCESS"
+        } else {
+            Write-Log "Migration failed" "ERROR"
+            $result | ForEach-Object { Write-Host "    `e[31m$_`e[0m" }
+        }
+    }
+    catch {
+        Write-Log "Migration error: $_" "ERROR"
+    }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Menu System
+# ═══════════════════════════════════════════════════════════════
+function Show-Dashboard {
     Write-Banner
+    Write-Section "Service Status"
+    Write-Host ""
 
-    # 1. Prerequisites
-    if (-not (Test-Prerequisites)) {
-        Write-Fail "Prerequisites check failed. Fix errors above and retry."
-        exit 1
+    foreach ($svc in @("PostgreSQL", "Redis", "Backend", "Frontend")) {
+        $status = Get-ServiceStatus $svc
+        $details = switch ($svc) {
+            "PostgreSQL" { "port $($script:Config.PgPort)" }
+            "Redis"      { "port $($script:Config.RedisPort)" }
+            "Backend"    { $script:Config.ApiUrl }
+            "Frontend"   { $script:Config.FrontendUrl }
+        }
+        Write-StatusLine $svc $status $details
     }
 
-    # 2. Free ports
-    Clear-Ports
+    Write-Host ""
+    Write-Section "Operations Menu"
+    Write-Host ""
+    Write-Host "  `e[1m[1]`e[0m  🚀 Start All Services          `e[1m[6]`e[0m  📊 API Health Check"
+    Write-Host "  `e[1m[2]`e[0m  🛑 Stop All Services            `e[1m[7]`e[0m  🗄  Database Connection Test"
+    Write-Host "  `e[1m[3]`e[0m  🔄 Restart All Services         `e[1m[8]`e[0m  📡 Redis Connection Test"
+    Write-Host "  `e[1m[4]`e[0m  ▶  Start Individual Service     `e[1m[9]`e[0m  📋 View Backend Logs"
+    Write-Host "  `e[1m[5]`e[0m  ⏹  Stop Individual Service      `e[1m[10]`e[0m 📋 View Frontend Logs"
+    Write-Host ""
+    Write-Host "  `e[1m[11]`e[0m 🏗  Build Backend               `e[1m[12]`e[0m 🧪 Run Tests"
+    Write-Host "  `e[1m[13]`e[0m 🌐 Open Swagger UI              `e[1m[14]`e[0m 🌐 Open Frontend"
+    Write-Host "  `e[1m[15]`e[0m 🔀 Run DB Migrations"
+    Write-Host ""
+    Write-Host "  `e[31m[0]  ❌ Exit (Stop All & Quit)`e[0m"
+    Write-Host ""
+}
 
-    # 3. Launch consoles
-    Write-Host "${C_BOLD}  Launching Services${C_RESET}"
-    Write-Host "${C_DIM}  ──────────────────${C_RESET}"
-
-    if (-not $FrontendOnly) {
-        Start-DatabaseConsole
-        Start-Sleep -Seconds 1
-        Start-BackendConsole
-        Start-Sleep -Seconds 1
-    }
-
-    if (-not $BackendOnly) {
-        Start-FrontendConsole
-        Start-Sleep -Seconds 1
-    }
-
-    Write-Host ''
-
-    # 4. Health checks
-    Invoke-HealthChecks
-
-    # 5. Summary
-    Write-Summary
-
-    # 6. Open browser
-    if (-not $NoBrowser) {
-        if (-not $BackendOnly) {
-            Start-Process "http://localhost:${WEB_PORT}"
-        } elseif (-not $FrontendOnly) {
-            Start-Process "${API_URL}/swagger"
+function Select-IndividualService {
+    param([string]$Action)
+    Write-Host ""
+    Write-Host "  `e[36mSelect service to ${Action}:`e[0m"
+    Write-Host "  `e[1m[1]`e[0m PostgreSQL   `e[1m[2]`e[0m Redis   `e[1m[3]`e[0m Backend   `e[1m[4]`e[0m Frontend"
+    Write-Host ""
+    $choice = Read-Host "  Selection"
+    switch ($choice) {
+        "1" { return "PostgreSQL" }
+        "2" { return "Redis" }
+        "3" { return "Backend" }
+        "4" { return "Frontend" }
+        default {
+            Write-Log "Invalid selection" "WARN"
+            return $null
         }
     }
 }
 
+function Start-IndividualService {
+    param([string]$ServiceName)
+    switch ($ServiceName) {
+        "PostgreSQL" { Start-PostgreSQL }
+        "Redis"      { Start-Redis }
+        "Backend"    { Start-Backend }
+        "Frontend"   { Start-Frontend }
+    }
+}
+
+function Start-AllServices {
+    Write-Section "Starting All Services"
+    Start-PostgreSQL
+    Start-Sleep -Seconds 2
+    Start-Redis
+    Start-Sleep -Seconds 1
+    Start-Backend
+    Start-Sleep -Seconds 2
+    Start-Frontend
+    Write-Host ""
+    Write-Log "All services started" "SUCCESS"
+}
+
+function Stop-AllServices {
+    Write-Section "Stopping All Services"
+    Stop-ServiceByName "Frontend"
+    Stop-ServiceByName "Backend"
+    Stop-ServiceByName "Redis"
+    Stop-ServiceByName "PostgreSQL"
+    Write-Host ""
+    Write-Log "All services stopped" "SUCCESS"
+}
+
+function Invoke-BuildBackend {
+    Write-Section "Building Backend"
+    Write-Log "Running dotnet build..." "STEP"
+
+    $slnPath = Join-Path $script:Config.ServerDir "PatryCloset.sln"
+    if (-not (Test-Path $slnPath)) {
+        # Try finding any .sln file
+        $slnFile = Get-ChildItem -Path $script:Config.ServerDir -Filter "*.sln" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($slnFile) { $slnPath = $slnFile.FullName }
+        else {
+            Write-Log "No solution file found in $($script:Config.ServerDir)" "ERROR"
+            return
+        }
+    }
+
+    $result = & dotnet build $slnPath -c Release 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Log "Build succeeded" "SUCCESS"
+    } else {
+        Write-Log "Build failed" "ERROR"
+        $result | Where-Object { $_ -match "error" } | ForEach-Object {
+            Write-Host "    `e[31m$_`e[0m"
+        }
+    }
+}
+
+function Invoke-RunTests {
+    Write-Section "Running Tests"
+    Write-Log "Running dotnet test..." "STEP"
+
+    $slnPath = Join-Path $script:Config.ServerDir "PatryCloset.sln"
+    if (-not (Test-Path $slnPath)) {
+        $slnFile = Get-ChildItem -Path $script:Config.ServerDir -Filter "*.sln" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($slnFile) { $slnPath = $slnFile.FullName }
+        else {
+            Write-Log "No solution file found" "ERROR"
+            return
+        }
+    }
+
+    $result = & dotnet test $slnPath 2>&1
+    $result | ForEach-Object {
+        $color = if ($_ -match "Passed|passed|Correctas") { "`e[32m" }
+                 elseif ($_ -match "error|fail|Error|Failed") { "`e[31m" }
+                 else { "`e[2m" }
+        Write-Host "    ${color}$_`e[0m"
+    }
+}
+
+function Open-InBrowser {
+    param([string]$Url)
+    try {
+        Start-Process $Url
+        Write-Log "Opened $Url in browser" "SUCCESS"
+    }
+    catch {
+        Write-Log "Could not open browser: $_" "WARN"
+    }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Main Entry Point
+# ═══════════════════════════════════════════════════════════════
+function Main {
+    # Setup logging directory
+    if (-not (Test-Path $script:Config.LogDir)) {
+        New-Item -ItemType Directory -Path $script:Config.LogDir -Force | Out-Null
+    }
+    $script:LogFile = Join-Path $script:Config.LogDir "deploy-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+
+    # Authenticate
+    if (-not $SkipAuth) {
+        $authenticated = Invoke-Authentication
+        if (-not $authenticated) {
+            exit 1
+        }
+    }
+
+    Write-Log "Session started — Log: $($script:LogFile)" "INFO"
+
+    # Main loop
+    $running = $true
+    while ($running) {
+        Show-Dashboard
+        $choice = Read-Host "  Select option"
+
+        switch ($choice) {
+            "1" {
+                Start-AllServices
+                Read-Host "  Press Enter to continue"
+            }
+            "2" {
+                Stop-AllServices
+                Read-Host "  Press Enter to continue"
+            }
+            "3" {
+                Stop-AllServices
+                Start-Sleep -Seconds 2
+                Start-AllServices
+                Read-Host "  Press Enter to continue"
+            }
+            "4" {
+                $svc = Select-IndividualService "start"
+                if ($svc) { Start-IndividualService $svc }
+                Read-Host "  Press Enter to continue"
+            }
+            "5" {
+                $svc = Select-IndividualService "stop"
+                if ($svc) { Stop-ServiceByName $svc }
+                Read-Host "  Press Enter to continue"
+            }
+            "6" {
+                Test-ApiHealth
+                Read-Host "  Press Enter to continue"
+            }
+            "7" {
+                Test-DatabaseConnection
+                Read-Host "  Press Enter to continue"
+            }
+            "8" {
+                Test-RedisConnection
+                Read-Host "  Press Enter to continue"
+            }
+            "9" {
+                Show-RecentLogs "Backend"
+                Read-Host "  Press Enter to continue"
+            }
+            "10" {
+                Show-RecentLogs "Frontend"
+                Read-Host "  Press Enter to continue"
+            }
+            "11" {
+                Invoke-BuildBackend
+                Read-Host "  Press Enter to continue"
+            }
+            "12" {
+                Invoke-RunTests
+                Read-Host "  Press Enter to continue"
+            }
+            "13" {
+                Open-InBrowser "$($script:Config.ApiUrl)/swagger"
+            }
+            "14" {
+                Open-InBrowser $script:Config.FrontendUrl
+            }
+            "15" {
+                Invoke-DatabaseMigration
+                Read-Host "  Press Enter to continue"
+            }
+            "0" {
+                Write-Host ""
+                Write-Log "Shutting down all services..." "STEP"
+                Stop-AllServices
+                Write-Log "Session ended. Goodbye! 👋" "SUCCESS"
+                $running = $false
+            }
+            default {
+                Write-Host "  `e[33mInvalid option. Please try again.`e[0m"
+                Start-Sleep -Seconds 1
+            }
+        }
+    }
+}
+
+# Run
 Main

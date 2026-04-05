@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +67,7 @@ public static class DependencyInjection
         // Auth & Token Services
         services.AddSingleton<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
 
         // Services
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
@@ -91,6 +94,29 @@ public static class DependencyInjection
         services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
         services.AddScoped<IPaymentService, StripePaymentService>();
         services.AddScoped<StripeWebhookHandler>();
+
+        // Email
+        services.AddScoped<IEmailService, Email.SmtpEmailService>();
+
+        // Background Jobs (Hangfire)
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(opts => opts.UseNpgsqlConnection(connectionString)));
+        services.AddHangfireServer(options =>
+        {
+            options.WorkerCount = Environment.ProcessorCount;
+            options.Queues = new[] { "critical", "default", "low" };
+        });
+        services.AddScoped<IBackgroundJobService, BackgroundJobs.HangfireJobService>();
+
+        // Register job workers for DI
+        services.AddScoped<BackgroundJobs.Jobs.OrderCleanupJob>();
+        services.AddScoped<BackgroundJobs.Jobs.StaleCartCleanupJob>();
+        services.AddScoped<BackgroundJobs.Jobs.StockAlertJob>();
+        services.AddScoped<BackgroundJobs.Jobs.CacheWarmupJob>();
 
         return services;
     }
