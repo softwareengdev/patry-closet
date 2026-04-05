@@ -37,11 +37,11 @@ const AccountPage = () => {
     // Derive active tab from URL path
     const pathParts = location.pathname.split('/').filter(Boolean);
     const urlTab = pathParts.length > 1 ? pathParts[1] : null;
-    const [activeTab, setActiveTab] = useState(urlTab && TAB_MAP[urlTab] ? urlTab : null);
+    const [activeTab, setActiveTab] = useState(urlTab && TAB_MAP[urlTab] ? urlTab : 'profile');
 
     useEffect(() => {
-        const tab = pathParts.length > 1 ? pathParts[1] : null;
-        setActiveTab(tab && TAB_MAP[tab] ? tab : null);
+        const tab = pathParts.length > 1 ? pathParts[1] : 'profile';
+        setActiveTab(TAB_MAP[tab] ? tab : 'profile');
     }, [location.pathname]);
 
     const handleTabClick = (tabKey) => {
@@ -118,7 +118,7 @@ const AccountPage = () => {
 
             <div className="flex gap-6 sm:gap-8">
                 {/* ─── Sidebar (desktop) ─── */}
-                <aside className={`hidden sm:block w-56 shrink-0 ${activeTab ? '' : 'sm:w-full sm:max-w-none'}`}>
+                <aside className="hidden sm:block w-56 shrink-0">
                     <nav className="space-y-1 sticky top-24">
                         {TABS.map(tab => {
                             const config = TAB_MAP[tab.key];
@@ -217,12 +217,7 @@ const AccountPage = () => {
                     </motion.div>
                 )}
 
-                {/* Desktop: show profile by default */}
-                {!activeTab && (
-                    <div className="hidden sm:block flex-1">
-                        <ProfileTab />
-                    </div>
-                )}
+
             </div>
         </div>
     );

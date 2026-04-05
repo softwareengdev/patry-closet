@@ -215,7 +215,7 @@ const Navbar = ({ isTransparent = false }) => {
     }, [userMenuOpen]);
 
     const showSolid = !isTransparent || scrolled || isMobileMenuOpen || activeMega;
-    const solidBg = isDark ? 'rgba(3,7,18,0.97)' : 'rgba(254,253,251,0.97)';
+    const solidBg = isDark ? 'rgba(3,7,18,1)' : 'rgba(254,253,251,1)';
     const navTextClass = showSolid
         ? `${isHighContrast ? 'text-hc-fg' : 'text-gray-800 dark:text-gray-200'}`
         : 'text-white/90';

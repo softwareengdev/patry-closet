@@ -1,4 +1,4 @@
-import { useContext, lazy, Suspense } from 'react';
+import { useContext, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
@@ -49,6 +49,15 @@ const PageLoader = () => (
     </div>
 );
 
+/* ─── Scroll to top on route change ─── */
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
+}
+
 /* ─── Skip to content link (A11Y) ─── */
 const SkipToContent = () => (
     <a
@@ -72,6 +81,7 @@ function AppContent() {
 
     return (
         <div className={`w-full min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-gray-950 text-white' : 'bg-warm-100 text-gray-900'} ${isHighContrast ? 'high-contrast' : ''}`}>
+            <ScrollToTop />
             <SkipToContent />
             <CookieConsent />
             {showNavbar && <Navbar isTransparent={isHome} />}
