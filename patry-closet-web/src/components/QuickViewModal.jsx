@@ -8,6 +8,8 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { useTranslation } from 'react-i18next';
 import { COLOR_MAP } from '../data/products';
+import OptimizedImage from './ui/OptimizedImage';
+import { SIZES, buildImageUrl } from '../lib/imageUtils';
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
     const { t } = useTranslation();
@@ -105,7 +107,7 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                     <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
                                         <motion.img
                                             key={selectedImage}
-                                            src={productImages[selectedImage]}
+                                            src={buildImageUrl(productImages[selectedImage], { quality: 80 })}
                                             alt={product.name}
                                             className="w-full h-full object-cover"
                                             initial={{ opacity: 0 }}
@@ -143,7 +145,13 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                                     : 'border-transparent opacity-60 hover:opacity-100'
                                             }`}
                                         >
-                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                            <OptimizedImage
+                                                src={img}
+                                                alt=""
+                                                sizes={SIZES.thumbnail}
+                                                quality={60}
+                                                className="w-full h-full"
+                                            />
                                         </button>
                                     ))}
                                 </div>

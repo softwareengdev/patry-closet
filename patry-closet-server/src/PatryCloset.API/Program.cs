@@ -38,7 +38,7 @@ builder.Host.UseSerilog((context, loggerConfig) =>
 
 // ─── Application & Infrastructure layers ───
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
 // ─── Current User Service ───
 builder.Services.AddHttpContextAccessor();
@@ -338,6 +338,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 
 // 6. Rate limiting — after CORS (so preflight isn't throttled)

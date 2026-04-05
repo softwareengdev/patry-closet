@@ -3,9 +3,11 @@ using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PatryCloset.Application.Common.Interfaces;
 using PatryCloset.Domain.Interfaces;
 using PatryCloset.Infrastructure.Caching;
+using PatryCloset.Infrastructure.Configuration;
 using PatryCloset.Infrastructure.Identity;
 using PatryCloset.Infrastructure.Payments;
 using PatryCloset.Infrastructure.Persistence;
@@ -21,7 +23,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHostEnvironment? environment = null)
     {
         // Interceptors
         services.AddScoped<AuditableEntityInterceptor>();
@@ -97,6 +100,17 @@ public static class DependencyInjection
 
         // Email
         services.AddScoped<IEmailService, Email.SmtpEmailService>();
+
+        // File Storage
+        services.Configure<CloudinarySettings>(configuration.GetSection(CloudinarySettings.SectionName));
+        if (environment?.IsDevelopment() == true)
+        {
+            services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        }
+        else
+        {
+            services.AddScoped<IFileStorageService, CloudinaryStorageService>();
+        }
 
         // Background Jobs (Hangfire)
         var connectionString = configuration.GetConnectionString("DefaultConnection");

@@ -5,6 +5,8 @@ import { Trash2, ShoppingBag, Plus, Minus, ArrowRight, ChevronRight, Tag, X, Tru
 import { CartContext } from '../context/CartContext';
 import { useTranslation } from 'react-i18next';
 import { COLOR_MAP } from '../data/products';
+import OptimizedImage from './ui/OptimizedImage';
+import { SIZES } from '../lib/imageUtils';
 
 const Cart = () => {
     const { t } = useTranslation();
@@ -77,7 +79,14 @@ const Cart = () => {
                                 >
                                     <div className="flex gap-5">
                                         <Link to={`/products/${item.id}`} className="flex-shrink-0 w-24 h-32 sm:w-28 sm:h-36 overflow-hidden bg-warm-200 dark:bg-gray-900">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
+                                            <OptimizedImage
+                                                src={item.image}
+                                                alt={item.name}
+                                                sizes={SIZES.cartItem}
+                                                quality={60}
+                                                className="w-full h-full"
+                                                imgClassName="hover:scale-105 transition-transform duration-500"
+                                            />
                                         </Link>
                                         <div className="flex-1 min-w-0 flex flex-col">
                                             <div className="flex items-start justify-between gap-2">

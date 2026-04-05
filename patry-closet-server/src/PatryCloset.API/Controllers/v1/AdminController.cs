@@ -3,10 +3,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using PatryCloset.Application.Common.Interfaces;
 using PatryCloset.Application.Common.Models;
 using PatryCloset.Application.Features.Admin.Commands;
 using PatryCloset.Application.Features.Admin.DTOs;
 using PatryCloset.Application.Features.Admin.Queries;
+using PatryCloset.Domain.Entities;
+using PatryCloset.Domain.Interfaces;
 
 namespace PatryCloset.API.Controllers.v1;
 
@@ -16,7 +19,12 @@ namespace PatryCloset.API.Controllers.v1;
 [Authorize(Policy = "ManagerOrAdmin")]
 [Produces("application/json")]
 [EnableRateLimiting("admin")]
-public sealed class AdminController(ISender mediator) : ControllerBase
+public sealed class AdminController(
+    ISender mediator,
+    IFileStorageService fileStorageService,
+    IRepository<Product> productRepository,
+    IRepository<ProductImage> productImageRepository,
+    IUnitOfWork unitOfWork) : ControllerBase
 {
     /// <summary>Get admin dashboard statistics.</summary>
     [HttpGet("dashboard")]
@@ -125,4 +133,71 @@ public sealed class AdminController(ISender mediator) : ControllerBase
             ? Ok(ApiResponse<object>.Ok(null!, $"Order status updated to {request.Status}"))
             : BadRequest(ApiResponse<object>.Fail(result.Error!));
     }
+
+    /// <summary>Upload an image for a product.</summary>
+    [HttpPost("products/{productId:guid}/images")]
+    [Authorize(Policy = "AdminOnly")]
+    [ProducesResponseType(typeof(ApiResponse<ProductImageDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    public async Task<IActionResult> UploadProductImage(
+        Guid productId, IFormFile file, [FromQuery] int? sortOrder = null, CancellationToken ct = default)
+    {
+        if (file is null || file.Length == 0)
+            return BadRequest(ApiResponse<object>.Fail("No file provided."));
+
+        var product = await productRepository.GetByIdAsync(productId, ct);
+        if (product is null)
+            return NotFound(ApiResponse<object>.Fail($"Product {productId} not found."));
+
+        string url;
+        try
+        {
+            using var stream = file.OpenReadStream();
+            url = await fileStorageService.UploadAsync(stream, file.FileName, file.ContentType, "products", ct);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResponse<object>.Fail(ex.Message));
+        }
+
+        var imageCount = await productImageRepository.CountAsync(i => i.ProductId == productId, ct);
+
+        var image = new ProductImage
+        {
+            ProductId = productId,
+            Url = url,
+            AltText = product.Name,
+            SortOrder = sortOrder ?? imageCount,
+        };
+
+        await productImageRepository.AddAsync(image, ct);
+        await unitOfWork.SaveChangesAsync(ct);
+
+        var dto = new ProductImageDto(image.Id, image.Url, image.AltText, image.SortOrder, image.IsHover);
+        return StatusCode(StatusCodes.Status201Created, ApiResponse<ProductImageDto>.Ok(dto, "Image uploaded successfully."));
+    }
+
+    /// <summary>Delete a product image.</summary>
+    [HttpDelete("products/{productId:guid}/images/{imageId:guid}")]
+    [Authorize(Policy = "AdminOnly")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteProductImage(
+        Guid productId, Guid imageId, CancellationToken ct = default)
+    {
+        var image = await productImageRepository.GetByIdAsync(imageId, ct);
+        if (image is null || image.ProductId != productId)
+            return NotFound(ApiResponse<object>.Fail("Image not found."));
+
+        await fileStorageService.DeleteAsync(image.Url, ct);
+        await productImageRepository.DeleteAsync(image, ct);
+        await unitOfWork.SaveChangesAsync(ct);
+
+        return Ok(ApiResponse<object>.Ok(null!, "Image deleted successfully."));
+    }
 }
+
+/// <summary>DTO returned after image upload.</summary>
+public sealed record ProductImageDto(Guid Id, string Url, string? AltText, int SortOrder, bool IsHover);

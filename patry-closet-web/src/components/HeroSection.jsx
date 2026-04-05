@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Pagination, Navigation, Parallax } from 'swiper/modules';
 import { ArrowRight, ChevronDown } from 'lucide-react';
+import OptimizedImage from './ui/OptimizedImage';
+import { SIZES } from '../lib/imageUtils';
 
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -126,12 +128,14 @@ const HeroSection = () => {
                     <SwiperSlide key={slide.id}>
                         {/* Background image with Ken Burns */}
                         <div className="absolute inset-0 w-full h-full">
-                            <img
+                            <OptimizedImage
                                 src={slide.image}
                                 alt=""
-                                className="hero-slide-image w-full h-full object-cover"
-                                loading={slide.id === 1 ? 'eager' : 'lazy'}
-                                draggable="false"
+                                fill
+                                sizes={SIZES.hero}
+                                priority={slide.id === 1}
+                                imgClassName="hero-slide-image"
+                                className="w-full h-full"
                             />
                         </div>
 

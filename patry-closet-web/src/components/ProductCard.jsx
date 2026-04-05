@@ -1,4 +1,4 @@
-import { useState, useContext, useRef, useCallback, useEffect } from 'react';
+import { useState, useContext, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Eye, ShoppingCart, Star, Check } from 'lucide-react';
@@ -6,63 +6,8 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { useTranslation } from 'react-i18next';
 import { COLOR_MAP } from '../data/products';
-
-/* ─── Shimmer placeholder ─── */
-const ShimmerPlaceholder = () => (
-    <div className="absolute inset-0 bg-warm-300 dark:bg-gray-800 animate-pulse">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/10 to-transparent shimmer-wave" />
-    </div>
-);
-
-/* ─── Lazy image with shimmer ─── */
-const LazyImage = ({ src, alt, className, onLoad: externalOnLoad, ...props }) => {
-    const [loaded, setLoaded] = useState(false);
-    const [error, setError] = useState(false);
-    const imgRef = useRef(null);
-    const observerRef = useRef(null);
-    const [inView, setInView] = useState(false);
-
-    useEffect(() => {
-        if (!imgRef.current) return;
-        observerRef.current = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setInView(true);
-                    observerRef.current?.disconnect();
-                }
-            },
-            { rootMargin: '200px' }
-        );
-        observerRef.current.observe(imgRef.current);
-        return () => observerRef.current?.disconnect();
-    }, []);
-
-    const handleLoad = useCallback(() => {
-        setLoaded(true);
-        externalOnLoad?.();
-    }, [externalOnLoad]);
-
-    return (
-        <div ref={imgRef} className="relative w-full h-full">
-            {!loaded && !error && <ShimmerPlaceholder />}
-            {inView && (
-                <img
-                    src={src}
-                    alt={alt}
-                    className={`${className} transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-                    onLoad={handleLoad}
-                    onError={() => setError(true)}
-                    {...props}
-                />
-            )}
-            {error && (
-                <div className="absolute inset-0 bg-warm-400 dark:bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
-                    Image unavailable
-                </div>
-            )}
-        </div>
-    );
-};
+import OptimizedImage from './ui/OptimizedImage';
+import { SIZES } from '../lib/imageUtils';
 
 /* ─── Badge component ─── */
 const ProductBadge = ({ badge, discount }) => {
@@ -224,21 +169,17 @@ const ProductCard = ({ product, onQuickView }) => {
                 {/* Badge */}
                 <ProductBadge badge={product.badge} discount={product.discount || 0} />
 
-                {/* Main image */}
-                <LazyImage
+                {/* Product image with hover */}
+                <OptimizedImage
                     src={product.image}
+                    hoverSrc={product.hoverImage}
                     alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    aspectRatio="3/4"
+                    sizes={SIZES.productCard}
+                    quality={80}
+                    className="w-full"
+                    imgClassName="object-cover"
                 />
-
-                {/* Hover image (crossfade) */}
-                {product.hoverImage && (
-                    <LazyImage
-                        src={product.hoverImage}
-                        alt={`${product.name} - hover`}
-                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-                    />
-                )}
 
                 {/* Wishlist button */}
                 <button
