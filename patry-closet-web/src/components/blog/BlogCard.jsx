@@ -43,7 +43,7 @@ const BlogCard = ({ post, index = 0, variant = 'default' }) => {
       initial={{ opacity: 0, y: 24 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className={`group relative bg-warm-50 dark:bg-gray-900 rounded-xl overflow-hidden border transition-all duration-300
+      className={`group relative bg-warm-50 dark:bg-gray-900 overflow-hidden border transition-all duration-300
         ${isDark
           ? 'border-gray-800 hover:border-gray-700 hover:shadow-xl hover:shadow-black/20'
           : 'border-warm-300 hover:border-warm-400 hover:shadow-xl hover:shadow-gray-200/60'
@@ -76,14 +76,14 @@ const BlogCard = ({ post, index = 0, variant = 'default' }) => {
 
         {/* Read More overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <span className="bg-warm-50/95 dark:bg-gray-900/95 text-gray-900 dark:text-white text-xs font-semibold uppercase tracking-widest px-5 py-2.5 rounded-full backdrop-blur-sm">
+          <span className="bg-warm-50/95 dark:bg-gray-900/95 text-gray-900 dark:text-white text-xs font-semibold uppercase tracking-widest px-5 py-2.5 backdrop-blur-sm">
             {t('readMore', 'Read More')}
           </span>
         </div>
 
         {/* Badge */}
         {badge && (
-          <span className={`absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${badge.className}`}>
+          <span className={`absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${badge.className}`}>
             <BadgeIcon className="w-3 h-3" />
             {t(badge.labelKey, badge.fallback)}
           </span>

@@ -22,19 +22,19 @@ const AddressCard = ({ address, isDefault, onEdit, onDelete, onSetDefault, isDar
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`relative p-5 rounded-xl border-2 transition-all ${
+            className={`relative p-5 border-2 transition-all ${
                 isDefault
                     ? isDark ? 'border-white/30 bg-gray-800/50' : 'border-black/20 bg-warm-200'
                     : isDark ? 'border-gray-800 hover:border-gray-700' : 'border-warm-400 hover:border-warm-500'
             }`}
         >
             {isDefault && (
-                <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-black dark:bg-white text-white dark:text-black rounded-full">
+                <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-black dark:bg-white text-white dark:text-black">
                     <Star className="w-3 h-3" /> {t('account.default', 'Default')}
                 </span>
             )}
             <div className="flex items-start gap-3 mb-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isDark ? 'bg-gray-700' : 'bg-warm-300'}`}>
+                <div className={`w-10 h-10 flex items-center justify-center shrink-0 ${isDark ? 'bg-gray-700' : 'bg-warm-300'}`}>
                     <MapPin className="w-5 h-5 text-green-500" />
                 </div>
                 <div className="min-w-0">
@@ -128,7 +128,7 @@ const AddressesTab = () => {
     };
 
     const inputClass = (error) =>
-        `w-full px-3 py-2.5 rounded-lg border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 text-sm ${
+        `w-full px-3 py-2.5 border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 text-sm ${
             error ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
         }`;
 
@@ -136,12 +136,12 @@ const AddressesTab = () => {
         <div className="max-w-2xl">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-bold mb-1">{t('account.addresses', 'My Addresses')}</h2>
+                    <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.addresses', 'My Addresses')}</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{addresses.length}/5 {t('account.addressesUsed', 'addresses saved')}</p>
                 </div>
                 {addresses.length < 5 && !showForm && (
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={openAdd}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-medium">
+                        className="flex items-center gap-2 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider">
                         <Plus className="w-4 h-4" /> {t('account.addAddress', 'Add Address')}
                     </motion.button>
                 )}
@@ -157,7 +157,7 @@ const AddressesTab = () => {
                         className="mb-6 overflow-hidden"
                     >
                         <form onSubmit={handleSubmit(onSubmit)} noValidate
-                            className={`p-5 rounded-xl border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+                            className={`p-5 border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold">{editingAddress ? t('account.editAddress', 'Edit Address') : t('account.newAddress', 'New Address')}</h3>
                                 <button type="button" onClick={() => { setShowForm(false); setEditingAddress(null); reset(); }}>
@@ -220,7 +220,7 @@ const AddressesTab = () => {
                                 </div>
                                 <div className="flex items-end">
                                     <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                        <input type="checkbox" {...register('isDefault')} className="w-4 h-4 rounded accent-black dark:accent-white" />
+                                        <input type="checkbox" {...register('isDefault')} className="w-4 h-4 accent-black dark:accent-white" />
                                         {t('account.setAsDefault', 'Set as default shipping address')}
                                     </label>
                                 </div>
@@ -228,12 +228,12 @@ const AddressesTab = () => {
 
                             <div className="flex gap-3">
                                 <motion.button type="submit" disabled={saving} whileTap={{ scale: 0.98 }}
-                                    className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50">
+                                    className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider flex items-center gap-2 disabled:opacity-50">
                                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                                     {t('account.saveAddress', 'Save Address')}
                                 </motion.button>
                                 <button type="button" onClick={() => { setShowForm(false); setEditingAddress(null); reset(); }}
-                                    className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 rounded-lg text-sm">
+                                    className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 text-sm">
                                     {t('account.cancel', 'Cancel')}
                                 </button>
                             </div>
@@ -256,7 +256,7 @@ const AddressesTab = () => {
                 <div className="text-center py-12">
                     <MapPin className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                     <p className="text-gray-500 dark:text-gray-400 mb-4">{t('account.noAddresses', 'No addresses saved yet')}</p>
-                    <button onClick={openAdd} className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-medium">
+                    <button onClick={openAdd} className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider">
                         {t('account.addFirst', 'Add your first address')}
                     </button>
                 </div>

@@ -67,7 +67,7 @@ const PaymentsTab = () => {
         return (
             <div className="space-y-4 max-w-2xl">
                 {[1, 2].map(i => (
-                    <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`} />
+                    <div key={i} className={`h-20 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`} />
                 ))}
             </div>
         );
@@ -77,12 +77,12 @@ const PaymentsTab = () => {
         <div className="max-w-2xl">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-bold mb-1">{t('account.paymentMethods', 'Payment Methods')}</h2>
+                    <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.paymentMethods', 'Payment Methods')}</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('account.paymentDesc', 'Manage your saved cards')}</p>
                 </div>
                 {!showAddForm && (
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setShowAddForm(true)}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-medium">
+                        className="flex items-center gap-2 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider">
                         <Plus className="w-4 h-4" /> {t('account.addCard', 'Add Card')}
                     </motion.button>
                 )}
@@ -97,7 +97,7 @@ const PaymentsTab = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="mb-6 overflow-hidden"
                     >
-                        <div className={`p-5 rounded-xl border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+                        <div className={`p-5 border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                             <div className="flex items-center gap-2 mb-4">
                                 <ShieldCheck className="w-5 h-5 text-green-500" />
                                 <span className="text-sm font-medium">{t('account.securePayment', 'Secure payment via Stripe')}</span>
@@ -105,18 +105,18 @@ const PaymentsTab = () => {
                             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                                 {t('account.stripeNote', 'Card details are securely processed by Stripe. We never store your full card number.')}
                             </p>
-                            <div className={`p-4 rounded-lg border mb-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-warm-500 bg-warm-50'}`}>
+                            <div className={`p-4 border mb-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-warm-500 bg-warm-50'}`}>
                                 <div className="h-10 flex items-center text-sm text-gray-400">
                                     {t('account.stripeElementPlaceholder', 'Stripe CardElement would render here with real backend')}
                                 </div>
                             </div>
                             <div className="flex gap-3">
                                 <motion.button onClick={handleAdd} disabled={adding} whileTap={{ scale: 0.98 }}
-                                    className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50">
+                                    className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider flex items-center gap-2 disabled:opacity-50">
                                     {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                                     {t('account.addCard', 'Add Card')}
                                 </motion.button>
-                                <button onClick={() => setShowAddForm(false)} className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 rounded-lg text-sm">
+                                <button onClick={() => setShowAddForm(false)} className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 text-sm">
                                     {t('account.cancel', 'Cancel')}
                                 </button>
                             </div>
@@ -135,7 +135,7 @@ const PaymentsTab = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                            className={`flex items-center gap-4 p-4 border-2 transition-all ${
                                 pm.isDefault
                                     ? isDark ? 'border-white/30 bg-gray-800/50' : 'border-black/20 bg-warm-200'
                                     : isDark ? 'border-gray-800' : 'border-warm-400'
@@ -149,7 +149,7 @@ const PaymentsTab = () => {
                                     <span className="text-sm font-medium capitalize">{pm.brand}</span>
                                     <span className="text-sm text-gray-500">•••• {pm.last4}</span>
                                     {pm.isDefault && (
-                                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-black dark:bg-white text-white dark:text-black rounded-full">
+                                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-black dark:bg-white text-white dark:text-black">
                                             {t('account.default', 'Default')}
                                         </span>
                                     )}
@@ -175,7 +175,7 @@ const PaymentsTab = () => {
                 <div className="text-center py-12">
                     <CreditCard className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                     <p className="text-gray-500 dark:text-gray-400 mb-4">{t('account.noPaymentMethods', 'No payment methods saved')}</p>
-                    <button onClick={() => setShowAddForm(true)} className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-medium">
+                    <button onClick={() => setShowAddForm(true)} className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider">
                         {t('account.addFirst', 'Add your first card')}
                     </button>
                 </div>

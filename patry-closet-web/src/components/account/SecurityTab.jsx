@@ -74,14 +74,14 @@ const SecurityTab = () => {
 
     return (
         <div className="max-w-2xl">
-            <h2 className="text-xl font-bold mb-1">{t('account.security', 'Security & Sessions')}</h2>
+            <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.security', 'Security & Sessions')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">{t('account.securityDesc', 'Manage your password, 2FA, and active sessions')}</p>
 
             {/* ─── Change Password ─── */}
-            <div className={`p-5 rounded-xl border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+            <div className={`p-5 border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                        <div className={`w-10 h-10 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Lock className="w-5 h-5 text-blue-500" />
                         </div>
                         <div>
@@ -100,7 +100,7 @@ const SecurityTab = () => {
                 <AnimatePresence>
                     {passwordChanged && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                            className="mt-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-sm text-green-700 dark:text-green-400 flex items-center gap-2">
+                            className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 text-sm text-green-700 dark:text-green-400 flex items-center gap-2">
                             <Check className="w-4 h-4" /> {t('account.passwordUpdated', 'Password updated successfully!')}
                         </motion.div>
                     )}
@@ -120,7 +120,7 @@ const SecurityTab = () => {
                                 <label className="block text-xs font-medium mb-1">{t('auth.newPassword', 'New Password')}</label>
                                 <div className="relative">
                                     <input type={showPassword ? 'text' : 'password'} {...register('password')} autoComplete="new-password"
-                                        className={`w-full px-3 pr-10 py-2.5 rounded-lg border-2 bg-transparent focus:outline-none text-sm ${
+                                        className={`w-full px-3 pr-10 py-2.5 border-2 bg-transparent focus:outline-none text-sm ${
                                             errors.password ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`} />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -130,7 +130,7 @@ const SecurityTab = () => {
                                 {passwordValue && (
                                     <div className="mt-1.5 flex gap-1">
                                         {[1, 2, 3, 4, 5].map(l => (
-                                            <div key={l} className={`h-1 flex-1 rounded-full ${l <= strength.score ? strength.color : 'bg-warm-400 dark:bg-gray-700'}`} />
+                                            <div key={l} className={`h-1 flex-1 ${l <= strength.score ? strength.color : 'bg-warm-400 dark:bg-gray-700'}`} />
                                         ))}
                                     </div>
                                 )}
@@ -141,7 +141,7 @@ const SecurityTab = () => {
                                 <label className="block text-xs font-medium mb-1">{t('auth.confirmNewPassword', 'Confirm New Password')}</label>
                                 <div className="relative">
                                     <input type={showConfirm ? 'text' : 'password'} {...register('confirmPassword')} autoComplete="new-password"
-                                        className={`w-full px-3 pr-10 py-2.5 rounded-lg border-2 bg-transparent focus:outline-none text-sm ${
+                                        className={`w-full px-3 pr-10 py-2.5 border-2 bg-transparent focus:outline-none text-sm ${
                                             errors.confirmPassword ? 'border-red-400' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
                                         }`} />
                                     <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -153,12 +153,12 @@ const SecurityTab = () => {
 
                             <div className="flex gap-2 pt-1">
                                 <motion.button type="submit" disabled={changingPassword} whileTap={{ scale: 0.98 }}
-                                    className="px-5 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50">
+                                    className="px-5 py-2 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider flex items-center gap-2 disabled:opacity-50">
                                     {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                                     {t('account.updatePassword', 'Update Password')}
                                 </motion.button>
                                 <button type="button" onClick={() => { setShowPasswordForm(false); reset(); }}
-                                    className="px-4 py-2 border border-warm-400 dark:border-gray-700 rounded-lg text-sm">
+                                    className="px-4 py-2 border border-warm-400 dark:border-gray-700 text-sm">
                                     {t('account.cancel', 'Cancel')}
                                 </button>
                             </div>
@@ -168,10 +168,10 @@ const SecurityTab = () => {
             </div>
 
             {/* ─── Two-Factor Authentication ─── */}
-            <div className={`p-5 rounded-xl border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+            <div className={`p-5 border mb-6 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                        <div className={`w-10 h-10 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Key className="w-5 h-5 text-amber-500" />
                         </div>
                         <div>
@@ -201,10 +201,10 @@ const SecurityTab = () => {
             </div>
 
             {/* ─── Active Sessions ─── */}
-            <div className={`p-5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+            <div className={`p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                        <div className={`w-10 h-10 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Shield className="w-5 h-5 text-gray-500" />
                         </div>
                         <div>
@@ -220,7 +220,7 @@ const SecurityTab = () => {
 
                 {loadingSessions ? (
                     <div className="space-y-3">
-                        {[1, 2].map(i => <div key={i} className={`h-14 rounded-lg animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-400'}`} />)}
+                        {[1, 2].map(i => <div key={i} className={`h-14 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-400'}`} />)}
                     </div>
                 ) : (
                     <div className="space-y-2">
@@ -234,7 +234,7 @@ const SecurityTab = () => {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0, x: -20 }}
-                                        className={`flex items-center gap-3 p-3 rounded-lg ${
+                                        className={`flex items-center gap-3 p-3 ${
                                             session.isCurrent
                                                 ? isDark ? 'bg-green-900/20 border border-green-800' : 'bg-green-50 border border-green-200'
                                                 : isDark ? 'bg-gray-800/50' : 'bg-warm-50 border border-warm-300'
@@ -245,7 +245,7 @@ const SecurityTab = () => {
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm font-medium">{session.device}</span>
                                                 {session.isCurrent && (
-                                                    <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-green-500 text-white rounded-full">
+                                                    <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-green-500 text-white">
                                                         {t('account.currentSession', 'Current')}
                                                     </span>
                                                 )}

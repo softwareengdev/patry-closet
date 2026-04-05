@@ -89,7 +89,7 @@ const FooterSection = () => {
                 >
                     <motion.div variants={fadeUp} className="flex items-center justify-between mb-8">
                         <div>
-                            <h3 className="text-xl sm:text-2xl font-bold">{t('ourBlog', 'Our Blog')}</h3>
+                            <h3 className="text-xl sm:text-2xl font-serif font-light tracking-tight">{t('ourBlog', 'Our Blog')}</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {t('footer.blogSubtitle', 'Style tips, trends and behind the scenes')}
                             </p>
@@ -110,7 +110,7 @@ const FooterSection = () => {
                             <motion.article
                                 key={post.id}
                                 variants={fadeUp}
-                                className={`group rounded-xl overflow-hidden border transition-all hover:shadow-lg ${
+                                className={`group overflow-hidden border transition-all hover:shadow-lg ${
                                     isDark
                                         ? 'bg-gray-900 border-gray-800 hover:border-gray-700'
                                         : 'bg-warm-50 border-warm-400 hover:border-warm-500'
@@ -156,7 +156,7 @@ const FooterSection = () => {
                     }`}
                 >
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                        <div className={`w-10 h-10 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                             <Mail className="w-5 h-5 text-pink-500" />
                         </div>
                         <div>
@@ -170,14 +170,14 @@ const FooterSection = () => {
                         <input
                             type="email"
                             placeholder={t('footer.emailPlaceholder', 'Your email')}
-                            className={`flex-1 sm:w-56 px-4 py-2.5 rounded-lg border text-sm bg-transparent focus:outline-none ${
+                            className={`flex-1 sm:w-56 px-4 py-2.5 border text-sm bg-transparent focus:outline-none ${
                                 isDark
                                     ? 'border-gray-700 focus:border-white placeholder-gray-600'
                                     : 'border-warm-500 focus:border-black placeholder-gray-400'
                             }`}
                             aria-label={t('footer.emailPlaceholder', 'Your email')}
                         />
-                        <button className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        <button className={`px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors ${
                             isDark
                                 ? 'bg-warm-50 text-black hover:bg-warm-300'
                                 : 'bg-black text-white hover:bg-gray-900'
@@ -212,7 +212,7 @@ const FooterSection = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={s.label}
-                                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                                    className={`w-9 h-9 flex items-center justify-center transition-colors ${
                                         isDark
                                             ? 'bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white'
                                             : 'bg-warm-300 hover:bg-warm-400 text-gray-500 hover:text-gray-900'

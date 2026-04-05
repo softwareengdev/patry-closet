@@ -42,12 +42,12 @@ const OrdersTab = () => {
         return (
             <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                    <div key={i} className={`rounded-xl p-5 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                    <div key={i} className={`p-5 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                         <div className="flex gap-4">
-                            <div className={`w-16 h-16 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
+                            <div className={`w-16 h-16 ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
                             <div className="flex-1 space-y-2">
-                                <div className={`h-4 w-32 rounded ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
-                                <div className={`h-3 w-48 rounded ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
+                                <div className={`h-4 w-32 ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
+                                <div className={`h-3 w-48 ${isDark ? 'bg-gray-700' : 'bg-warm-400'}`} />
                             </div>
                         </div>
                     </div>
@@ -58,14 +58,14 @@ const OrdersTab = () => {
 
     return (
         <div className="max-w-3xl">
-            <h2 className="text-xl font-bold mb-1">{t('account.orders', 'My Orders')}</h2>
+            <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.orders', 'My Orders')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{t('account.ordersDesc', 'Track and manage your orders')}</p>
 
             {/* Filter tabs */}
             <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
                 {['all', 'processing', 'shipped', 'delivered', 'cancelled'].map(f => (
                     <button key={f} onClick={() => setFilter(f)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                        className={`px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors ${
                             filter === f
                                 ? 'bg-black dark:bg-white text-white dark:text-black'
                                 : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-warm-300 text-gray-600 hover:bg-warm-400'
@@ -90,19 +90,19 @@ const OrdersTab = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className={`rounded-xl border overflow-hidden ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-50'}`}
+                                className={`border overflow-hidden ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-50'}`}
                             >
                                 {/* Header */}
                                 <button onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
                                     className="w-full p-4 sm:p-5 flex items-center gap-4 text-left hover:bg-warm-200/50 dark:hover:bg-gray-800/50 transition-colors">
                                     {/* First item image */}
-                                    <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-warm-300 dark:bg-gray-800">
+                                    <div className="w-14 h-14 overflow-hidden shrink-0 bg-warm-300 dark:bg-gray-800">
                                         <img src={order.items[0]?.image} alt="" className="w-full h-full object-cover" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-semibold text-sm">{order.orderNumber}</span>
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${status.color}`}>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold ${status.color}`}>
                                                 <StatusIcon className="w-3 h-3" /> {status.label}
                                             </span>
                                         </div>
@@ -126,7 +126,7 @@ const OrdersTab = () => {
                                             <div className={`px-5 pb-5 border-t ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                 {/* Tracking */}
                                                 {order.trackingNumber && (
-                                                    <div className={`mt-4 p-3 rounded-lg flex items-center justify-between ${isDark ? 'bg-gray-800' : 'bg-warm-200'}`}>
+                                                    <div className={`mt-4 p-3 flex items-center justify-between ${isDark ? 'bg-gray-800' : 'bg-warm-200'}`}>
                                                         <div className="flex items-center gap-2">
                                                             <Truck className="w-4 h-4 text-purple-500" />
                                                             <span className="text-xs font-medium">{t('account.tracking', 'Tracking')}: {order.trackingNumber}</span>
@@ -142,7 +142,7 @@ const OrdersTab = () => {
                                                 <div className="mt-4 space-y-3">
                                                     {order.items.map((item, i) => (
                                                         <div key={i} className="flex items-center gap-3">
-                                                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-warm-300 dark:bg-gray-800 shrink-0">
+                                                            <div className="w-12 h-12 overflow-hidden bg-warm-300 dark:bg-gray-800 shrink-0">
                                                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                                             </div>
                                                             <div className="flex-1 min-w-0">

@@ -57,7 +57,7 @@ const CookiesPage = () => {
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight text-gray-900 dark:text-white mb-3">
                                 Política de Cookies
                             </h1>
-                            <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-warm-200 text-gray-500'}`}>
+                            <span className={`inline-block text-xs font-medium px-3 py-1 ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-warm-200 text-gray-500'}`}>
                                 Última actualización: 1 de abril de 2026
                             </span>
                         </div>
@@ -65,7 +65,7 @@ const CookiesPage = () => {
                         {/* Content */}
                         <div className="space-y-5">
                             {/* Section 1 */}
-                            <div className={`rounded-xl border p-6 sm:p-8 ${cardClass}`}>
+                            <div className={`border p-6 sm:p-8 ${cardClass}`}>
                                 <h2 className="text-lg sm:text-xl font-serif font-medium mb-4 tracking-tight">1. ¿Qué son las Cookies?</h2>
                                 <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                     Las cookies son pequeños archivos de texto que se almacenan en su dispositivo (ordenador, tablet o móvil) cuando visita un sitio web. Se utilizan para que el sitio funcione correctamente, para mejorar la experiencia de usuario y para recopilar información estadística sobre su uso.
@@ -73,7 +73,7 @@ const CookiesPage = () => {
                             </div>
 
                             {/* Section 2 */}
-                            <div className={`rounded-xl border p-6 sm:p-8 ${cardClass}`}>
+                            <div className={`border p-6 sm:p-8 ${cardClass}`}>
                                 <h2 className="text-lg sm:text-xl font-serif font-medium mb-4 tracking-tight">2. Marco Legal</h2>
                                 <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                     Esta Política de Cookies cumple con la <strong>Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE)</strong>, el <strong>Reglamento (UE) 2016/679 (RGPD)</strong> y las directrices de la <strong>Agencia Española de Protección de Datos (AEPD)</strong> sobre cookies.
@@ -81,7 +81,7 @@ const CookiesPage = () => {
                             </div>
 
                             {/* Section 3 — Cookie Tables */}
-                            <div className={`rounded-xl border p-6 sm:p-8 ${cardClass}`}>
+                            <div className={`border p-6 sm:p-8 ${cardClass}`}>
                                 <h2 className="text-lg sm:text-xl font-serif font-medium mb-6 tracking-tight">3. Tipos de Cookies que Utilizamos</h2>
 
                                 {/* Essential Cookies */}
@@ -90,7 +90,7 @@ const CookiesPage = () => {
                                         <span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Cookies Estrictamente Necesarias
                                     </h3>
                                     <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Son esenciales para el funcionamiento del sitio web. No requieren consentimiento.</p>
-                                    <div className={`overflow-x-auto rounded-xl border ${tableBorderClass}`}>
+                                    <div className={`overflow-x-auto border ${tableBorderClass}`}>
                                         <table className="w-full text-sm">
                                             <thead className={tableHeadClass}>
                                                 <tr>
@@ -121,10 +121,10 @@ const CookiesPage = () => {
                                 {/* Analytics Cookies */}
                                 <div>
                                     <h3 className={`text-base font-medium mb-3 flex items-center gap-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-                                        <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Cookies de Análisis
+                                        <span className="w-2 h-2 rounded-full bg-rose inline-block" /> Cookies de Análisis
                                     </h3>
                                     <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Nos ayudan a entender cómo interactúan los visitantes con el sitio. Requieren su consentimiento.</p>
-                                    <div className={`overflow-x-auto rounded-xl border ${tableBorderClass}`}>
+                                    <div className={`overflow-x-auto border ${tableBorderClass}`}>
                                         <table className="w-full text-sm">
                                             <thead className={tableHeadClass}>
                                                 <tr>
@@ -154,7 +154,7 @@ const CookiesPage = () => {
                             </div>
 
                             {/* Section 4 */}
-                            <div className={`rounded-xl border p-6 sm:p-8 ${cardClass}`}>
+                            <div className={`border p-6 sm:p-8 ${cardClass}`}>
                                 <h2 className="text-lg sm:text-xl font-serif font-medium mb-4 tracking-tight">4. Gestión de Cookies</h2>
                                 <div className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                     <p className="mb-3">Puede gestionar sus preferencias de cookies en cualquier momento:</p>
@@ -172,7 +172,7 @@ const CookiesPage = () => {
                             </div>
 
                             {/* Section 5 */}
-                            <div className={`rounded-xl border p-6 sm:p-8 ${cardClass}`}>
+                            <div className={`border p-6 sm:p-8 ${cardClass}`}>
                                 <h2 className="text-lg sm:text-xl font-serif font-medium mb-4 tracking-tight">5. Más Información</h2>
                                 <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                     Para más información sobre cómo tratamos sus datos personales, consulte nuestra{' '}

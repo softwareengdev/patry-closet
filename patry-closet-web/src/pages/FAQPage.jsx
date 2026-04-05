@@ -140,8 +140,8 @@ const FAQPage = () => {
         : FAQ_SECTIONS;
 
     const cardClass = isDark
-        ? 'bg-gray-900 border-gray-800'
-        : 'bg-warm-50 border-warm-400';
+        ? 'bg-gray-900 border-gray-800 hover:border-gray-700 transition-all'
+        : 'bg-warm-50 border-warm-400 hover:border-warm-500 transition-all';
 
     return (
         <>
@@ -174,7 +174,7 @@ const FAQPage = () => {
                             <span className="text-[11px] font-medium uppercase tracking-ultra-wide text-gray-400 mb-3 block">
                                 Centro de Ayuda
                             </span>
-                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight mb-3">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight text-gray-900 dark:text-white mb-3">
                                 Preguntas Frecuentes
                             </h1>
                             <p className={`leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -191,7 +191,7 @@ const FAQPage = () => {
                                 placeholder="Buscar en las preguntas frecuentes..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className={`w-full pl-12 pr-4 py-3.5 rounded-xl border transition-colors text-sm ${
+                                className={`w-full pl-12 pr-4 py-3.5 border transition-colors text-sm ${
                                     isDark
                                         ? 'bg-gray-900 border-gray-800 focus:border-rose placeholder-gray-500 text-gray-200'
                                         : 'bg-warm-50 border-warm-400 focus:border-accent-900 placeholder-gray-400 text-gray-800'
@@ -200,7 +200,7 @@ const FAQPage = () => {
                         </div>
 
                         {filteredSections.length === 0 && (
-                            <div className={`text-center py-12 rounded-xl border ${cardClass}`}>
+                            <div className={`text-center py-12 border ${cardClass}`}>
                                 <p className={isDark ? 'text-gray-500' : 'text-gray-400'}>
                                     No se encontraron resultados para "{searchQuery}".
                                 </p>
@@ -220,7 +220,7 @@ const FAQPage = () => {
                                         return (
                                             <div
                                                 key={key}
-                                                className={`rounded-xl border overflow-hidden transition-all ${
+                                                className={`border overflow-hidden transition-all ${
                                                     isOpen
                                                         ? isDark ? 'border-gray-700 bg-gray-900' : 'border-warm-500 bg-warm-50'
                                                         : isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-50'
@@ -252,14 +252,14 @@ const FAQPage = () => {
                         ))}
 
                         {/* CTA */}
-                        <div className={`mt-12 p-8 sm:p-10 rounded-2xl text-center border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'}`}>
+                        <div className={`mt-12 p-8 sm:p-10 text-center border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'}`}>
                             <h3 className="text-xl font-serif font-medium mb-2">¿No encuentras tu respuesta?</h3>
                             <p className={`mb-6 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                 Nuestro equipo está listo para ayudarte.
                             </p>
                             <Link
                                 to="/#contact"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-accent-900 text-white rounded-full hover:bg-accent-800 transition-colors font-medium text-sm"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-accent-900 text-white uppercase tracking-wider hover:bg-accent-800 transition-colors font-medium text-sm"
                             >
                                 Contactar Soporte
                             </Link>

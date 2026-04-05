@@ -378,7 +378,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 8, scale: 0.96 }}
                                             transition={{ duration: 0.15 }}
-                                            className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-50 overflow-hidden border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'}`}
+                                            className={`absolute right-0 mt-2 w-56 shadow-xl z-50 overflow-hidden border border-warm-300 dark:border-gray-800 ${isDark ? 'bg-gray-900' : 'bg-warm-50'}`}
                                         >
                                             <div className={`px-4 py-3 border-b ${isDark ? 'border-gray-800' : 'border-warm-300'}`}>
                                                 <p className="text-sm font-semibold truncate">{user?.firstName} {user?.lastName}</p>
@@ -395,7 +395,7 @@ const Navbar = ({ isTransparent = false }) => {
                                                         key={item.to}
                                                         to={item.to}
                                                         onClick={() => setUserMenuOpen(false)}
-                                                        className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
+                                                        className={`flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
                                                     >
                                                         <item.icon className="w-4 h-4 text-gray-400" />
                                                         {item.label}
@@ -409,7 +409,7 @@ const Navbar = ({ isTransparent = false }) => {
                                                         await logout();
                                                         navigate('/');
                                                     }}
-                                                    className={`w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm rounded-lg text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
+                                                    className={`w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-red-500 transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
                                                 >
                                                     <LogOut className="w-4 h-4" />
                                                     {t('account.logout', 'Sign Out')}
@@ -439,7 +439,7 @@ const Navbar = ({ isTransparent = false }) => {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 8, scale: 0.96 }}
                                             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                                            className={`absolute right-0 mt-3 w-48 overflow-hidden z-50 ${isHighContrast ? 'bg-hc-bg border-2 border-hc-border' : 'bg-warm-50 dark:bg-gray-900 shadow-xl border border-warm-300 dark:border-gray-800 rounded-xl'}`}
+                                            className={`absolute right-0 mt-3 w-48 overflow-hidden z-50 ${isHighContrast ? 'bg-hc-bg border-2 border-hc-border' : 'bg-warm-50 dark:bg-gray-900 shadow-xl border border-warm-300 dark:border-gray-800'}`}
                                         >
                                             <div className="p-1.5">
                                                 {Object.entries(themeIcons).map(([key, Icon]) => (
@@ -448,7 +448,7 @@ const Navbar = ({ isTransparent = false }) => {
                                                         whileHover={{ x: 2 }}
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={() => { setMode(key); setThemePickerOpen(false); }}
-                                                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg ${mode === key
+                                                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${mode === key
                                                             ? (isHighContrast ? 'bg-hc-accent text-black font-bold' : 'bg-warm-300 dark:bg-gray-800 font-medium')
                                                             : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                                         }`}

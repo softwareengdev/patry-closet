@@ -75,7 +75,7 @@ const NotificationsTab = () => {
         <div className="max-w-2xl">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-bold mb-1">{t('account.notifications', 'Notifications')}</h2>
+                    <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.notifications', 'Notifications')}</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         {unreadCount > 0 ? `${unreadCount} ${t('account.unread', 'unread')}` : t('account.allRead', 'All caught up!')}
                     </p>
@@ -87,7 +87,7 @@ const NotificationsTab = () => {
                         </button>
                     )}
                     <button onClick={() => setShowPrefs(!showPrefs)}
-                        className={`p-2 rounded-lg transition-colors ${showPrefs ? 'bg-black dark:bg-white text-white dark:text-black' : isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                        className={`p-2 transition-colors ${showPrefs ? 'bg-black dark:bg-white text-white dark:text-black' : isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                         <Settings className="w-4 h-4" />
                     </button>
                 </div>
@@ -102,7 +102,7 @@ const NotificationsTab = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="mb-6 overflow-hidden"
                     >
-                        <div className={`p-5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+                        <div className={`p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
                             <h3 className="font-semibold text-sm mb-4">{t('account.notifPreferences', 'Notification Preferences')}</h3>
                             <div className="space-y-3">
                                 {PREF_ITEMS.map(item => (
@@ -121,11 +121,11 @@ const NotificationsTab = () => {
                             </div>
                             <div className="mt-4 pt-4 border-t border-warm-400 dark:border-gray-800 flex gap-4">
                                 <label className="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" checked={prefs.pushEnabled} onChange={() => togglePref('pushEnabled')} className="w-4 h-4 rounded accent-black dark:accent-white" />
+                                    <input type="checkbox" checked={prefs.pushEnabled} onChange={() => togglePref('pushEnabled')} className="w-4 h-4 accent-black dark:accent-white" />
                                     {t('account.pushNotif', 'Push notifications')}
                                 </label>
                                 <label className="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" checked={prefs.emailEnabled} onChange={() => togglePref('emailEnabled')} className="w-4 h-4 rounded accent-black dark:accent-white" />
+                                    <input type="checkbox" checked={prefs.emailEnabled} onChange={() => togglePref('emailEnabled')} className="w-4 h-4 accent-black dark:accent-white" />
                                     {t('account.emailNotif', 'Email notifications')}
                                 </label>
                             </div>
@@ -138,7 +138,7 @@ const NotificationsTab = () => {
             {loading ? (
                 <div className="space-y-3">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`} />
+                        <div key={i} className={`h-16 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`} />
                     ))}
                 </div>
             ) : (
@@ -153,16 +153,16 @@ const NotificationsTab = () => {
                                     layout
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className={`flex items-start gap-3 p-4 rounded-xl transition-colors cursor-pointer ${
+                                    className={`flex items-start gap-3 p-4 transition-colors cursor-pointer ${
                                         !notif.read
                                             ? isDark ? 'bg-gray-800/80' : 'bg-blue-50/50'
                                             : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                     }`}
                                     onClick={() => markRead(notif.id)}
                                 >
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${config.bg}`}>
+                                    <div className={`w-10 h-10 flex items-center justify-center shrink-0 ${config.bg}`}>
                                         {notif.image ? (
-                                            <img src={notif.image} alt="" className="w-full h-full object-cover rounded-xl" />
+                                            <img src={notif.image} alt="" className="w-full h-full object-cover" />
                                         ) : (
                                             <Icon className={`w-5 h-5 ${config.color}`} />
                                         )}

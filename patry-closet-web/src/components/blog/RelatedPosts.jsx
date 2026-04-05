@@ -33,7 +33,7 @@ const RelatedPosts = ({ posts }) => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1, duration: 0.4 }}
-            className={`group rounded-xl overflow-hidden border transition-all hover:shadow-lg
+            className={`group overflow-hidden border transition-all hover:shadow-lg
               ${isDark
                 ? 'bg-gray-900 border-gray-800 hover:border-gray-700 hover:shadow-black/20'
                 : 'bg-warm-50 border-warm-300 hover:border-warm-400 hover:shadow-gray-200/60'

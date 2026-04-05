@@ -142,7 +142,7 @@ const ContactMethod = ({ icon: Icon, label, value, href, accent, isDark }) => (
         href={href}
         target={href.startsWith('http') ? '_blank' : undefined}
         rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-        className={`flex items-center gap-4 p-4 rounded-xl border transition-all group ${
+        className={`flex items-center gap-4 p-4 border transition-all group ${
             isDark
                 ? 'border-gray-800 hover:border-gray-700 bg-gray-900/50 hover:bg-gray-900'
                 : 'border-warm-400 hover:border-warm-500 bg-warm-50 hover:bg-warm-200'
@@ -150,7 +150,7 @@ const ContactMethod = ({ icon: Icon, label, value, href, accent, isDark }) => (
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
     >
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent}`}>
+        <div className={`w-11 h-11 flex items-center justify-center shrink-0 ${accent}`}>
             <Icon className="w-5 h-5 text-white" />
         </div>
         <div className="min-w-0 flex-1">
@@ -175,7 +175,7 @@ const ImagePreview = ({ file, onRemove, index }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="relative group w-20 h-20 rounded-lg overflow-hidden"
+            className="relative group w-20 h-20 overflow-hidden"
         >
             {preview && <img src={preview} alt={`Attachment ${index + 1}`} className="w-full h-full object-cover" />}
             <button
@@ -319,7 +319,7 @@ const ContactSection = () => {
     )}`;
 
     /* ─── Input classes ─── */
-    const inputBase = `w-full px-4 py-3 rounded-xl border-2 transition-all bg-transparent focus:outline-none focus:ring-0 text-sm ${
+    const inputBase = `w-full px-4 py-3 border-2 transition-all bg-transparent focus:outline-none focus:ring-0 text-sm ${
         isDark
             ? 'border-gray-800 focus:border-white placeholder-gray-600'
             : 'border-warm-400 focus:border-black placeholder-gray-400'
@@ -353,7 +353,7 @@ const ContactSection = () => {
                     variants={stagger}
                     className="text-center mb-12 sm:mb-16"
                 >
-                    <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-4 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
+                    <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium mb-4 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
                         <Sparkles className="w-3 h-3" />
                         {t('contact.badge', 'We\'re here to help')}
                     </motion.div>
@@ -385,7 +385,7 @@ const ContactSection = () => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className={`p-8 sm:p-12 rounded-2xl border text-center ${
+                                    className={`p-8 sm:p-12 border text-center ${
                                         isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'
                                     }`}
                                 >
@@ -410,7 +410,7 @@ const ContactSection = () => {
                                     )}
                                     <button
                                         onClick={handleNewMessage}
-                                        className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                                        className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold uppercase tracking-wider transition-colors ${
                                             isDark
                                                 ? 'bg-warm-50 text-black hover:bg-warm-300'
                                                 : 'bg-black text-white hover:bg-gray-900'
@@ -429,7 +429,7 @@ const ContactSection = () => {
                                     exit={{ opacity: 0 }}
                                     onSubmit={handleSubmit(onSubmit)}
                                     noValidate
-                                    className={`p-6 sm:p-8 rounded-2xl border ${
+                                    className={`p-6 sm:p-8 border ${
                                         isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'
                                     }`}
                                 >
@@ -440,7 +440,7 @@ const ContactSection = () => {
                                                 initial={{ opacity: 0, height: 0 }}
                                                 animate={{ opacity: 1, height: 'auto' }}
                                                 exit={{ opacity: 0, height: 0 }}
-                                                className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 flex items-start gap-3"
+                                                className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 flex items-start gap-3"
                                                 role="alert"
                                             >
                                                 <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -606,7 +606,7 @@ const ContactSection = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className={`w-20 h-20 rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-colors ${
+                                                    className={`w-20 h-20 border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-colors ${
                                                         isDark
                                                             ? 'border-gray-700 hover:border-gray-600 text-gray-500 hover:text-gray-400'
                                                             : 'border-warm-500 hover:border-warm-500 text-gray-400 hover:text-gray-500'
@@ -641,7 +641,7 @@ const ContactSection = () => {
                                             disabled={isSubmitting || submitState === 'sending'}
                                             whileHover={{ scale: 1.01 }}
                                             whileTap={{ scale: 0.99 }}
-                                            className={`w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                                            className={`w-full py-3.5 font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                                                 isDark
                                                     ? 'bg-warm-50 text-black hover:bg-warm-300'
                                                     : 'bg-black text-white hover:bg-gray-900'
@@ -718,7 +718,7 @@ const ContactSection = () => {
                         {/* Address & Hours */}
                         <motion.div
                             variants={fadeUp}
-                            className={`p-5 rounded-xl border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'}`}
+                            className={`p-5 border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-warm-50 border-warm-400'}`}
                         >
                             <div className="flex items-start gap-3 mb-4">
                                 <MapPin className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
@@ -739,7 +739,7 @@ const ContactSection = () => {
                                     <p className="text-xs text-gray-500 dark:text-gray-400">{t('contact.hoursSunday', 'Sunday: Closed')}</p>
                                 </div>
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium ${
+                            <div className={`flex items-center gap-2 px-3 py-2 text-xs font-medium ${
                                 isDark ? 'bg-green-950/30 text-green-400' : 'bg-green-50 text-green-700'
                             }`}>
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -751,7 +751,7 @@ const ContactSection = () => {
                         <motion.div
                             ref={mapRef}
                             variants={fadeUp}
-                            className={`rounded-xl overflow-hidden border ${isDark ? 'border-gray-800' : 'border-warm-400'}`}
+                            className={`overflow-hidden border ${isDark ? 'border-gray-800' : 'border-warm-400'}`}
                         >
                             {mapLoaded ? (
                                 <iframe
@@ -785,7 +785,7 @@ const ContactSection = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={social.label}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                                    className={`w-10 h-10 flex items-center justify-center transition-colors ${
                                         isDark
                                             ? 'bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white'
                                             : 'bg-warm-300 hover:bg-warm-400 text-gray-500 hover:text-gray-900'

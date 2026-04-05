@@ -71,7 +71,7 @@ const MiniCart = () => {
                             </div>
                             <button
                                 onClick={() => setMiniCartOpen(false)}
-                                className="p-2 rounded-full hover:bg-warm-300 dark:hover:bg-gray-800 transition-colors"
+                                className="p-2 hover:bg-warm-300 dark:hover:bg-gray-800 transition-colors"
                                 aria-label={t('close')}
                             >
                                 <X className="w-5 h-5" />
@@ -81,7 +81,7 @@ const MiniCart = () => {
                         {/* Empty State */}
                         {cartItems.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-                                <div className="w-16 h-16 rounded-full bg-warm-300 dark:bg-gray-800 flex items-center justify-center mb-4">
+                                <div className="w-16 h-16 bg-warm-300 dark:bg-gray-800 flex items-center justify-center mb-4">
                                     <ShoppingBag className="w-8 h-8 text-gray-400" />
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('emptyCart')}</h3>
@@ -89,7 +89,7 @@ const MiniCart = () => {
                                 <Link
                                     to="/products"
                                     onClick={() => setMiniCartOpen(false)}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent-900 text-white rounded-xl text-sm font-medium hover:bg-accent-800 transition-colors"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent-900 text-white text-sm font-medium uppercase tracking-wider hover:bg-accent-800 transition-colors"
                                 >
                                     {t('shopNow')} <ArrowRight className="w-4 h-4" />
                                 </Link>
@@ -113,7 +113,7 @@ const MiniCart = () => {
                                                 <Link
                                                     to={`/products/${item.id}`}
                                                     onClick={() => setMiniCartOpen(false)}
-                                                    className="flex-shrink-0 w-20 h-24 rounded-xl overflow-hidden bg-warm-300 dark:bg-gray-800"
+                                                    className="flex-shrink-0 w-20 h-24 overflow-hidden bg-warm-300 dark:bg-gray-800"
                                                 >
                                                     <img
                                                         src={item.image}
@@ -148,11 +148,11 @@ const MiniCart = () => {
 
                                                     {/* Quantity & Price */}
                                                     <div className="flex items-center justify-between mt-2">
-                                                        <div className="flex items-center border border-warm-400 dark:border-gray-700 rounded-lg">
+                                                        <div className="flex items-center border border-warm-400 dark:border-gray-700">
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)}
                                                                 disabled={item.quantity <= 1}
-                                                                className="p-1.5 hover:bg-warm-300 dark:hover:bg-gray-800 rounded-l-lg disabled:opacity-30 transition-colors"
+                                                                className="p-1.5 hover:bg-warm-300 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
                                                                 aria-label={t('decreaseQuantity')}
                                                             >
                                                                 <Minus className="w-3 h-3" />
@@ -162,7 +162,7 @@ const MiniCart = () => {
                                                             </span>
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)}
-                                                                className="p-1.5 hover:bg-warm-300 dark:hover:bg-gray-800 rounded-r-lg transition-colors"
+                                                                className="p-1.5 hover:bg-warm-300 dark:hover:bg-gray-800 transition-colors"
                                                                 aria-label={t('increaseQuantity')}
                                                             >
                                                                 <Plus className="w-3 h-3" />
@@ -196,7 +196,7 @@ const MiniCart = () => {
                                 <div className="border-t border-warm-300 dark:border-gray-800 px-6 py-4 space-y-3 bg-warm-200/50 dark:bg-gray-800/30">
                                     {/* Coupon indicator */}
                                     {coupon && (
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm">
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-sm">
                                             <Tag className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                             <span className="text-emerald-700 dark:text-emerald-400 font-medium">{coupon.code}</span>
                                             <span className="text-emerald-600 dark:text-emerald-400">
@@ -234,9 +234,9 @@ const MiniCart = () => {
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                                 {t('freeShippingProgress', { amount: (50 - getSubtotal()).toFixed(2) })}
                                             </p>
-                                            <div className="w-full h-1.5 bg-warm-400 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div className="w-full h-1.5 bg-warm-400 dark:bg-gray-700 overflow-hidden">
                                                 <div
-                                                    className="h-full bg-accent-900 dark:bg-white rounded-full transition-all duration-500"
+                                                    className="h-full bg-accent-900 dark:bg-white transition-all duration-500"
                                                     style={{ width: `${Math.min(100, (getSubtotal() / 50) * 100)}%` }}
                                                 />
                                             </div>
@@ -248,7 +248,7 @@ const MiniCart = () => {
                                         <Link
                                             to="/checkout"
                                             onClick={() => setMiniCartOpen(false)}
-                                            className="flex items-center justify-center gap-2 w-full py-3 bg-accent-900 text-white rounded-xl font-medium text-sm uppercase tracking-wider hover:bg-accent-800 transition-colors active:scale-[0.98]"
+                                            className="flex items-center justify-center gap-2 w-full py-3 bg-accent-900 text-white font-medium text-sm uppercase tracking-wider hover:bg-accent-800 transition-colors active:scale-[0.98]"
                                         >
                                             {t('checkout')} <ArrowRight className="w-4 h-4" />
                                         </Link>

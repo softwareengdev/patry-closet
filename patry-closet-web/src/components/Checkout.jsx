@@ -137,7 +137,7 @@ function FormField({ label, id, type = 'text', value, onChange, error, required,
           aria-label={label}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-err` : undefined}
-          className={`w-full rounded-lg border bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 py-2.5 focus:outline-none focus:ring-2 transition-colors ${
+          className={`w-full border bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 py-2.5 focus:outline-none focus:ring-2 transition-colors ${
             Icon ? 'pl-10 pr-3' : 'px-3'
           } ${
             error
@@ -182,7 +182,7 @@ function OrderSummary({ data, collapsible = false, t }) {
       <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
         {items.map((item, idx) => (
           <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="flex gap-3">
-            <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-warm-300 dark:bg-gray-800">
+            <div className="w-14 h-14 flex-shrink-0 overflow-hidden bg-warm-300 dark:bg-gray-800">
               {item.image || item.images?.[0] ? (
                 <img
                   src={item.image || item.images[0]}
@@ -261,7 +261,7 @@ function OrderSummary({ data, collapsible = false, t }) {
 
       {/* Free shipping progress */}
       {shipping > 0 && subtotal < freeShipThreshold && (
-        <div className="bg-warm-200 dark:bg-gray-800/50 rounded-lg p-3">
+        <div className="bg-warm-200 dark:bg-gray-800/50 p-3">
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
             Add <span className="font-semibold text-gray-900 dark:text-white">{fmt(remaining)}</span> more
             for free shipping!
@@ -281,7 +281,7 @@ function OrderSummary({ data, collapsible = false, t }) {
 
   if (collapsible) {
     return (
-      <div className="border border-warm-400 dark:border-gray-700 rounded-xl overflow-hidden bg-warm-50 dark:bg-gray-900">
+      <div className="border border-warm-400 dark:border-gray-700 overflow-hidden bg-warm-50 dark:bg-gray-900">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -315,8 +315,8 @@ function OrderSummary({ data, collapsible = false, t }) {
   }
 
   return (
-    <div className="border border-warm-400 dark:border-gray-700 rounded-xl p-6 bg-warm-50 dark:bg-gray-900">
-      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+    <div className="border border-warm-400 dark:border-gray-700 p-6 bg-warm-50 dark:bg-gray-900">
+      <h2 className="text-lg font-serif font-light tracking-tight text-gray-900 dark:text-white mb-4 flex items-center gap-2">
         <ShoppingBag className="w-5 h-5" />
         {t('orderSummary') || 'Order Summary'}
       </h2>
@@ -336,7 +336,7 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
 
   return (
     <div id="checkout-step-0" className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+      <h2 className="text-xl font-serif font-light tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
         <MapPin className="w-5 h-5" />
         {t('shippingInfo') || 'Shipping Information'}
       </h2>
@@ -446,7 +446,7 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
             onChange={handleChange}
             aria-label={t('country') || 'Country'}
             autoComplete="country"
-            className="w-full rounded-lg border border-warm-500 dark:border-gray-600 bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
+            className="w-full border border-warm-500 dark:border-gray-600 bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
           >
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>
@@ -485,7 +485,7 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
       <button
         type="button"
         onClick={onContinue}
-        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold uppercase tracking-wider py-3 hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
       >
         {t('continueToPayment') || 'Continue to Payment'}
         <CreditCard className="w-4 h-4" />
@@ -530,7 +530,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
 
   return (
     <div id="checkout-step-1" className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+      <h2 className="text-xl font-serif font-light tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
         <CreditCard className="w-5 h-5" />
         {t('payment') || 'Payment'}
       </h2>
@@ -544,7 +544,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
           <button
             type="button"
             disabled
-            className="relative flex items-center justify-center gap-2 py-3 bg-black text-white rounded-lg opacity-50 cursor-not-allowed text-sm font-medium"
+            className="relative flex items-center justify-center gap-2 py-3 bg-black text-white opacity-50 cursor-not-allowed text-sm font-medium"
           >
             {'\uF8FF'} Apple Pay
             <span className="absolute -top-2 -right-2 text-[10px] bg-gray-500 text-white px-1.5 py-0.5 rounded-full leading-tight">
@@ -554,7 +554,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
           <button
             type="button"
             disabled
-            className="relative flex items-center justify-center gap-2 py-3 bg-warm-50 dark:bg-gray-800 text-black dark:text-white border border-warm-500 dark:border-gray-600 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium"
+            className="relative flex items-center justify-center gap-2 py-3 bg-warm-50 dark:bg-gray-800 text-black dark:text-white border border-warm-500 dark:border-gray-600 opacity-50 cursor-not-allowed text-sm font-medium"
           >
             Google Pay
             <span className="absolute -top-2 -right-2 text-[10px] bg-gray-500 text-white px-1.5 py-0.5 rounded-full leading-tight">
@@ -582,7 +582,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
           {t('cardDetails') || 'Card Details'}
         </label>
         <div
-          className={`border rounded-lg p-3.5 bg-warm-50 dark:bg-gray-800 transition-colors focus-within:ring-2 focus-within:border-black dark:focus-within:border-white ${
+          className={`border p-3.5 bg-warm-50 dark:bg-gray-800 transition-colors focus-within:ring-2 focus-within:border-black dark:focus-within:border-white ${
             cardComplete
               ? 'border-green-400 dark:border-green-500 focus-within:ring-green-500/20'
               : 'border-warm-500 dark:border-gray-600 focus-within:ring-black/20 dark:focus-within:ring-white/20'
@@ -599,7 +599,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
           {t('couponCode') || 'Coupon Code'}
         </p>
         {coupon ? (
-          <div className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-3 py-2.5">
+          <div className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-3 py-2.5">
             <span className="text-sm text-green-700 dark:text-green-400 font-medium flex items-center gap-1.5">
               <Check className="w-4 h-4" />
               {coupon.code}
@@ -623,13 +623,13 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
               onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
               placeholder="PATRY10"
               aria-label={t('couponCode') || 'Coupon code'}
-              className="flex-1 rounded-lg border border-warm-500 dark:border-gray-600 bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
+              className="flex-1 border border-warm-500 dark:border-gray-600 bg-warm-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 focus:border-black dark:focus:border-white transition-colors"
               onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
             />
             <button
               type="button"
               onClick={handleApplyCoupon}
-              className="px-4 py-2 bg-warm-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg text-sm font-medium hover:bg-warm-400 dark:hover:bg-gray-600 transition-colors"
+              className="px-4 py-2 bg-warm-300 dark:bg-gray-700 text-gray-900 dark:text-white text-sm font-medium hover:bg-warm-400 dark:hover:bg-gray-600 transition-colors"
             >
               {t('apply') || 'Apply'}
             </button>
@@ -671,7 +671,7 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
         type="button"
         onClick={onPlaceOrder}
         disabled={processing || !cardComplete}
-        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold uppercase tracking-wider py-3.5 hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {processing ? (
           <>
@@ -745,7 +745,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
       </div>
 
       {/* Order number */}
-      <div className="inline-flex items-center gap-2 bg-warm-300 dark:bg-gray-800 rounded-lg px-4 py-2.5">
+      <div className="inline-flex items-center gap-2 bg-warm-300 dark:bg-gray-800 px-4 py-2.5">
         <Package className="w-4 h-4 text-gray-500" />
         <span className="text-sm text-gray-600 dark:text-gray-400">
           {t('orderNumber') || 'Order'}:
@@ -756,7 +756,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
       </div>
 
       {/* Order details card */}
-      <div className="text-left bg-warm-200 dark:bg-gray-800/50 rounded-xl p-5 space-y-4 max-w-md mx-auto">
+      <div className="text-left bg-warm-200 dark:bg-gray-800/50 p-5 space-y-4 max-w-md mx-auto">
         {/* Shipping address */}
         <div>
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
@@ -813,14 +813,14 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
         <button
           type="button"
           onClick={() => navigate('/products')}
-          className="flex-1 bg-black dark:bg-white text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
+          className="flex-1 bg-black dark:bg-white text-white dark:text-black font-semibold uppercase tracking-wider py-3 hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
         >
           {t('continueShopping') || 'Continue Shopping'}
         </button>
         <button
           type="button"
           disabled
-          className="flex-1 border border-warm-500 dark:border-gray-600 text-gray-400 dark:text-gray-500 font-semibold py-3 rounded-lg cursor-not-allowed"
+          className="flex-1 border border-warm-500 dark:border-gray-600 text-gray-400 dark:text-gray-500 font-semibold py-3 cursor-not-allowed"
         >
           {t('viewOrder') || 'View Order'}
         </button>
@@ -965,7 +965,7 @@ function Checkout() {
           transition={{ duration: 0.4 }}
         >
           <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl font-serif font-light tracking-tight text-gray-900 dark:text-white mb-2">
             {t('emptyCart') || 'Your cart is empty'}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
@@ -973,7 +973,7 @@ function Checkout() {
           </p>
           <Link
             to="/products"
-            className="inline-flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold uppercase tracking-wider px-6 py-3 hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
           >
             <ShoppingBag className="w-4 h-4" />
             {t('shopNow') || 'Shop Now'}

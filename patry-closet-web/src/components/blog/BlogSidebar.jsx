@@ -27,7 +27,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
 
   const allTags = getAllTags().slice(0, 12);
 
-  const cardClass = `rounded-xl border p-5 ${
+  const cardClass = `border p-5 ${
     isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-50 border-warm-300'
   }`;
 
@@ -44,13 +44,13 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
             <Link
               key={post.id}
               to={`/blog/${post.slug}`}
-              className={`group flex gap-3 p-2 -mx-2 rounded-lg transition-colors
+              className={`group flex gap-3 p-2 -mx-2 transition-colors
                 ${isDark ? 'hover:bg-gray-800' : 'hover:bg-warm-200'}`}
             >
               <img
                 src={post.coverImage}
                 alt={post.coverImageAlt}
-                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                className="w-16 h-16 object-cover flex-shrink-0"
                 loading="lazy"
               />
               <div className="min-w-0 flex-1">
@@ -79,7 +79,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
               <button
                 key={cat.id}
                 onClick={() => onFilterChange?.({ ...currentFilters, category: isActive ? '' : cat.id, page: 1 })}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all
+                className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium transition-all
                   ${isActive
                     ? isDark ? 'bg-amber-500/20 text-amber-300' : 'bg-amber-50 text-amber-700'
                     : isDark ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-warm-200'
@@ -108,7 +108,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
               <button
                 key={tag}
                 onClick={() => onFilterChange?.({ ...currentFilters, tag: isActive ? '' : tag, page: 1 })}
-                className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all
+                className={`px-2.5 py-1 text-[10px] font-medium transition-all
                   ${isActive
                     ? isDark ? 'bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40' : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
                     : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-750 hover:text-gray-300' : 'bg-warm-300 text-gray-500 hover:bg-warm-400'
@@ -123,7 +123,7 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
 
       {/* ─── Newsletter ─── */}
       <motion.div variants={fadeIn} initial="hidden" animate="visible"
-        className={`rounded-xl border p-5 ${
+        className={`border p-5 ${
           isDark
             ? 'bg-gradient-to-br from-amber-900/20 to-gray-900/50 border-amber-800/30'
             : 'bg-gradient-to-br from-amber-50 to-white border-amber-100'
@@ -140,13 +140,13 @@ const BlogSidebar = ({ currentFilters, onFilterChange }) => {
           <input
             type="email"
             placeholder={t('blog.newsletterPlaceholder', 'Your email')}
-            className={`flex-1 px-3 py-2 text-xs rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
+            className={`flex-1 px-3 py-2 text-xs border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
               ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-warm-50 border-warm-400 text-gray-900 placeholder:text-gray-400'}`}
             aria-label={t('blog.newsletterPlaceholder', 'Your email')}
           />
           <button
             type="submit"
-            className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition-colors"
+            className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold uppercase tracking-wider transition-colors"
           >
             <ArrowRight className="w-3.5 h-3.5" />
           </button>

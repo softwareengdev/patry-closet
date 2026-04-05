@@ -67,7 +67,7 @@ const BlogPostPage = () => {
           </p>
           <Link
             to="/blog"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium uppercase tracking-wider transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             {t('blog.backToBlog', 'Back to Blog')}
@@ -237,7 +237,7 @@ const BlogPostPage = () => {
               prose-headings:font-serif prose-headings:font-medium prose-headings:tracking-tight
               prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:mt-10 prose-h2:mb-4
               prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3
-              prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
+              prose-img:shadow-lg prose-img:my-8
               prose-table:text-sm
               prose-th:px-4 prose-th:py-2 prose-td:px-4 prose-td:py-2
               prose-li:marker:text-amber-500
@@ -250,7 +250,7 @@ const BlogPostPage = () => {
                     <img
                       {...props}
                       loading="lazy"
-                      className="w-full rounded-xl shadow-lg"
+                      className="w-full shadow-lg"
                     />
                   ),
                   a: ({ node, children, href, ...props }) => {
@@ -264,7 +264,7 @@ const BlogPostPage = () => {
                     );
                   },
                   table: ({ node, ...props }) => (
-                    <div className="overflow-x-auto my-6 rounded-lg border border-warm-400 dark:border-gray-700">
+                    <div className="overflow-x-auto my-6 border border-warm-400 dark:border-gray-700">
                       <table {...props} className="w-full" />
                     </div>
                   ),
@@ -283,7 +283,7 @@ const BlogPostPage = () => {
                     <Link
                       key={tag}
                       to={`/blog?tag=${tag}`}
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-all
+                      className={`px-2.5 py-1 text-[10px] font-medium transition-all
                         ${isDark
                           ? 'bg-gray-800 text-gray-400 hover:bg-gray-750 hover:text-amber-400'
                           : 'bg-warm-300 text-gray-500 hover:bg-amber-50 hover:text-amber-700'
@@ -306,7 +306,7 @@ const BlogPostPage = () => {
             </div>
 
             {/* Author bio */}
-            <div className={`mt-10 p-6 rounded-xl border ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-200 border-warm-300'}`}>
+            <div className={`mt-10 p-6 border ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-200 border-warm-300'}`}>
               <div className="flex items-start gap-4">
                 <img
                   src={post.author.avatar}
@@ -332,7 +332,7 @@ const BlogPostPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className={`mt-14 p-8 sm:p-10 rounded-2xl text-center ${
+              className={`mt-14 p-8 sm:p-10 text-center ${
                 isDark
                   ? 'bg-gradient-to-br from-amber-900/20 to-gray-900 border border-amber-800/20'
                   : 'bg-gradient-to-br from-amber-50 to-white border border-amber-100'
@@ -346,7 +346,7 @@ const BlogPostPage = () => {
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-full hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold uppercase tracking-wider hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors"
               >
                 {t('blog.shopNow', 'Shop Now')}
               </Link>

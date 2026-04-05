@@ -66,7 +66,7 @@ const TableOfContents = ({ content }) => {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3, duration: 0.4 }}
-      className={`sticky top-24 rounded-xl border p-4 ${
+      className={`sticky top-24 border p-4 ${
         isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-50 border-warm-300'
       }`}
       aria-label={t('blog.tableOfContents', 'Table of contents')}
@@ -98,7 +98,7 @@ const TableOfContents = ({ content }) => {
               <li key={h.id}>
                 <button
                   onClick={() => handleClick(h.id)}
-                  className={`block w-full text-left text-xs py-1.5 px-2 rounded-md transition-all leading-snug
+                  className={`block w-full text-left text-xs py-1.5 px-2 transition-all leading-snug
                     ${h.level === 3 ? 'pl-5' : ''}
                     ${activeId === h.id
                       ? isDark

@@ -107,7 +107,7 @@ const AccountPage = () => {
                 </div>
                 <button
                     onClick={handleLogout}
-                    className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-wider transition-colors ${
                         isDark ? 'hover:bg-red-950/20 hover:text-red-400' : 'hover:bg-red-50 hover:text-red-600'
                     }`}
                 >
@@ -128,16 +128,16 @@ const AccountPage = () => {
                                 <button
                                     key={tab.key}
                                     onClick={() => handleTabClick(tab.key)}
-                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all text-left ${
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all text-left border-l-2 ${
                                         isActive
-                                            ? isDark ? 'bg-gray-800 font-semibold' : 'bg-warm-300 font-semibold'
-                                            : 'hover:bg-warm-200 dark:hover:bg-gray-800/50'
+                                            ? isDark ? 'border-white font-semibold bg-gray-800/50' : 'border-black font-semibold bg-warm-200'
+                                            : 'border-transparent hover:bg-warm-200 dark:hover:bg-gray-800/50'
                                     }`}
                                 >
                                     <Icon className={`w-4 h-4 ${isActive ? config.color : 'text-gray-400'}`} />
                                     <span className="flex-1">{tab.label}</span>
                                     {tab.badge && (
-                                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500 text-white rounded-full">{tab.badge}</span>
+                                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500 text-white">{tab.badge}</span>
                                     )}
                                 </button>
                             );
@@ -145,14 +145,14 @@ const AccountPage = () => {
 
                         {/* Wishlist shortcut */}
                         <Link to="/wishlist"
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-warm-200 dark:hover:bg-gray-800/50 text-left">
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-warm-200 dark:hover:bg-gray-800/50 text-left border-l-2 border-transparent">
                             <Heart className="w-4 h-4 text-pink-500" />
                             <span>{t('account.wishlist', 'Wishlist')}</span>
                         </Link>
 
                         {/* Mobile logout */}
                         <button onClick={handleLogout}
-                            className="sm:hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-left mt-4">
+                            className="sm:hidden w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-left mt-4 border-l-2 border-transparent">
                             <LogOut className="w-4 h-4" />
                             {t('account.logout', 'Sign Out')}
                         </button>
@@ -171,33 +171,33 @@ const AccountPage = () => {
                                     initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     onClick={() => handleTabClick(tab.key)}
-                                    className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
+                                    className={`w-full flex items-center gap-3 p-4 border text-left transition-all ${
                                         isDark ? 'border-gray-800 hover:border-gray-700' : 'border-warm-400 hover:border-warm-500'
                                     }`}
                                 >
-                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                                    <div className={`w-9 h-9 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                                         <Icon className={`w-4 h-4 ${config.color}`} />
                                     </div>
                                     <span className="flex-1 text-sm font-medium">{tab.label}</span>
                                     {tab.badge && (
-                                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500 text-white rounded-full">{tab.badge}</span>
+                                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500 text-white">{tab.badge}</span>
                                     )}
                                     <ChevronLeft className="w-4 h-4 text-gray-300 rotate-180" />
                                 </motion.button>
                             );
                         })}
                         <Link to="/wishlist"
-                            className={`flex items-center gap-3 p-4 rounded-xl border text-left ${
+                            className={`flex items-center gap-3 p-4 border text-left ${
                                 isDark ? 'border-gray-800 hover:border-gray-700' : 'border-warm-400 hover:border-warm-500'
                             }`}>
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
+                            <div className={`w-9 h-9 flex items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-warm-300'}`}>
                                 <Heart className="w-4 h-4 text-pink-500" />
                             </div>
                             <span className="flex-1 text-sm font-medium">{t('account.wishlist', 'Wishlist')}</span>
                             <ChevronLeft className="w-4 h-4 text-gray-300 rotate-180" />
                         </Link>
                         <button onClick={handleLogout}
-                            className="w-full flex items-center gap-3 p-4 rounded-xl text-sm text-red-500 mt-4">
+                            className="w-full flex items-center gap-3 p-4 text-sm text-red-500 mt-4">
                             <LogOut className="w-4 h-4" />
                             {t('account.logout', 'Sign Out')}
                         </button>

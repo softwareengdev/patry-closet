@@ -133,7 +133,7 @@ const BlogPage = () => {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-2xl"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/10 mb-6">
               <BookOpen className="w-3.5 h-3.5 text-amber-400" />
               <span className="text-[11px] font-medium tracking-wider uppercase text-amber-300">
                 {t('blog.journalBadge', 'Patry Closet Journal')}
@@ -158,12 +158,12 @@ const BlogPage = () => {
             >
               <Link
                 to={`/blog/${heroPost.slug}`}
-                className="group inline-flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 pr-6 hover:bg-warm-50/10 transition-all"
+                className="group inline-flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 p-4 pr-6 hover:bg-warm-50/10 transition-all"
               >
                 <img
                   src={heroPost.coverImage}
                   alt={heroPost.coverImageAlt}
-                  className="w-20 h-16 sm:w-28 sm:h-20 object-cover rounded-lg flex-shrink-0"
+                  className="w-20 h-16 sm:w-28 sm:h-20 object-cover flex-shrink-0"
                 />
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -240,7 +240,7 @@ const BlogPage = () => {
                   {hasNextPage && !isFetchingNextPage && (
                     <button
                       onClick={() => fetchNextPage()}
-                      className={`px-6 py-2.5 rounded-lg text-xs font-semibold transition-all
+                      className={`px-6 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all
                         ${isDark
                           ? 'bg-gray-800 text-gray-300 hover:bg-gray-750 hover:text-white border border-gray-700'
                           : 'bg-warm-50 text-gray-700 hover:bg-warm-200 hover:text-gray-900 border border-warm-400'
@@ -275,7 +275,7 @@ const BlogPage = () => {
 const BlogGridSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
     {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className={`rounded-xl overflow-hidden border border-warm-300 dark:border-gray-800 ${i === 0 ? 'sm:col-span-2 sm:grid sm:grid-cols-2' : ''}`}>
+      <div key={i} className={`overflow-hidden border border-warm-300 dark:border-gray-800 ${i === 0 ? 'sm:col-span-2 sm:grid sm:grid-cols-2' : ''}`}>
         <div className={`bg-warm-400 dark:bg-gray-800 animate-pulse ${i === 0 ? 'aspect-auto min-h-[200px]' : 'aspect-[16/10]'}`} />
         <div className="p-5 space-y-3">
           <div className="flex gap-2">
@@ -299,7 +299,7 @@ const EmptyState = ({ t, isDark }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
-    className={`text-center py-16 px-6 rounded-xl border
+    className={`text-center py-16 px-6 border
       ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-50 border-warm-300'}`}
   >
     <BookOpen className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
@@ -311,7 +311,7 @@ const EmptyState = ({ t, isDark }) => (
     </p>
     <Link
       to="/blog"
-      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
+      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium uppercase tracking-wider transition-colors"
     >
       {t('blog.clearFiltersButton', 'View All Articles')}
     </Link>

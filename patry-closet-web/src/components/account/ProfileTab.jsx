@@ -60,13 +60,13 @@ const ProfileTab = () => {
     };
 
     const inputClass = (error) =>
-        `w-full px-4 py-3 rounded-xl border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 text-sm ${
+        `w-full px-4 py-3 border-2 transition-colors bg-transparent focus:outline-none focus:ring-0 text-sm ${
             error ? 'border-red-400 focus:border-red-500' : 'border-warm-400 dark:border-gray-700 focus:border-black dark:focus:border-white'
         }`;
 
     return (
         <div className="max-w-2xl">
-            <h2 className="text-xl font-bold mb-1">{t('account.profile', 'My Profile')}</h2>
+            <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.profile', 'My Profile')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">{t('account.profileDesc', 'Edit your personal information')}</p>
 
             {/* Avatar */}
@@ -167,7 +167,7 @@ const ProfileTab = () => {
                         disabled={!isDirty || saveStatus === 'saving'}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="px-8 py-3 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         {saveStatus === 'saving' ? <><Loader2 className="w-4 h-4 animate-spin" />{t('account.saving', 'Saving...')}</>
                          : saveStatus === 'saved' ? <><Check className="w-4 h-4" />{t('account.saved', 'Saved!')}</>

@@ -87,7 +87,7 @@ const PreferencesTab = () => {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onClick}
-            className={`relative px-3.5 py-2 rounded-full text-sm font-medium transition-all border-2 ${
+            className={`relative px-3.5 py-2 text-sm font-medium transition-all border-2 ${
                 active
                     ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
                     : isDark
@@ -102,7 +102,7 @@ const PreferencesTab = () => {
 
     return (
         <div className="max-w-2xl">
-            <h2 className="text-xl font-bold mb-1">{t('account.preferences', 'Style Preferences')}</h2>
+            <h2 className="font-serif text-xl font-light tracking-tight mb-1">{t('account.preferences', 'Style Preferences')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
                 {t('account.preferencesSubtitle', 'Tell us about your style to get personalized recommendations')}
             </p>
@@ -196,7 +196,7 @@ const PreferencesTab = () => {
                     disabled={saving}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className="px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                    className="px-8 py-3 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
                 >
                     {saving ? <><Loader2 className="w-4 h-4 animate-spin" />{t('account.saving', 'Saving...')}</>
                      : saved ? <><Check className="w-4 h-4" />{t('account.saved', 'Saved!')}</>

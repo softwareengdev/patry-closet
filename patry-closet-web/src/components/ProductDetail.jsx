@@ -240,7 +240,7 @@ const ProductDetail = () => {
           {/* ════════════ LEFT: IMAGE GALLERY ════════════ */}
           <section aria-label="Product images" className="space-y-4">
             {/* Main image */}
-            <div className="relative rounded-2xl overflow-hidden bg-warm-50 dark:bg-gray-900 shadow-sm group">
+            <div className="relative overflow-hidden bg-warm-50 dark:bg-gray-900 shadow-sm group">
               <TransformWrapper
                 key={selectedImage}
                 initialScale={1}
@@ -269,14 +269,14 @@ const ProductDetail = () => {
               </TransformWrapper>
 
               {/* Image counter */}
-              <span className="absolute bottom-4 left-4 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur-sm">
+              <span className="absolute bottom-4 left-4 bg-black/60 text-white text-xs font-medium px-2.5 py-1 backdrop-blur-sm">
                 {selectedImage + 1}/{images.length}
               </span>
 
               {/* Expand button */}
               <button
                 onClick={() => setLightboxOpen(true)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                className="absolute top-4 right-4 p-2 bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                 aria-label="Open fullscreen view"
               >
                 <Maximize2 size={18} />
@@ -293,7 +293,7 @@ const ProductDetail = () => {
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
-                  className={`flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-xl overflow-hidden border-2 transition-all snap-start ${
+                  className={`flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 overflow-hidden border-2 transition-all snap-start ${
                     selectedImage === idx
                       ? 'border-gray-900 dark:border-white ring-2 ring-gray-900/20 dark:ring-white/20'
                       : 'border-transparent opacity-60 hover:opacity-100'
@@ -359,7 +359,7 @@ const ProductDetail = () => {
                 </span>
               )}
               {product.discount > 0 && (
-                <span className="text-sm font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded-full">
+                <span className="text-sm font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-0.5">
                   -{product.discount}%
                 </span>
               )}
@@ -449,7 +449,7 @@ const ProductDetail = () => {
                           }
                         }}
                         disabled={disabled}
-                        className={`relative min-w-[3rem] px-4 py-2.5 rounded-lg text-sm font-medium border transition-all flex items-center justify-center gap-1.5 ${
+                        className={`relative min-w-[3rem] px-4 py-2.5 text-sm font-medium border transition-all flex items-center justify-center gap-1.5 ${
                           disabled
                             ? 'border-warm-400 dark:border-gray-700 text-gray-300 dark:text-gray-600 cursor-not-allowed line-through'
                             : isActive
@@ -480,7 +480,7 @@ const ProductDetail = () => {
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 {t('quantity', 'Quantity')}
               </p>
-              <div className="inline-flex items-center border border-warm-500 dark:border-gray-600 rounded-lg overflow-hidden">
+              <div className="inline-flex items-center border border-warm-500 dark:border-gray-600 overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
@@ -511,7 +511,7 @@ const ProductDetail = () => {
                 disabled={isOutOfStock}
                 whileHover={{ scale: isOutOfStock ? 1 : 1.02 }}
                 whileTap={{ scale: isOutOfStock ? 1 : 0.97 }}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl text-base font-semibold transition-colors ${
+                className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-medium uppercase tracking-wider transition-colors ${
                   addedFeedback
                     ? 'bg-emerald-600 text-white'
                     : isOutOfStock
@@ -543,7 +543,7 @@ const ProductDetail = () => {
                 onClick={() => toggleWishlist(product)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.92 }}
-                className={`w-14 flex items-center justify-center rounded-xl border transition-colors ${
+                className={`w-14 flex items-center justify-center border transition-colors ${
                   isInWishlist(product.id)
                     ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-500'
                     : 'border-warm-500 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-500 hover:border-red-300'
@@ -571,7 +571,7 @@ const ProductDetail = () => {
               ].map(({ icon: Icon, label }) => (
                 <div
                   key={label}
-                  className="flex flex-col items-center gap-1 py-3 rounded-xl bg-warm-300 dark:bg-gray-900 text-center"
+                  className="flex flex-col items-center gap-1 py-3 bg-warm-300 dark:bg-gray-900 text-center"
                 >
                   <Icon size={18} className="text-gray-500 dark:text-gray-400" />
                   <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">{label}</span>
@@ -619,7 +619,7 @@ const ProductDetail = () => {
                   {isActive && (
                     <motion.span
                       layoutId="tab-underline"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white rounded-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -697,7 +697,7 @@ const ProductDetail = () => {
                     Shipping Methods
                   </h3>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm border border-warm-400 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm border border-warm-400 dark:border-gray-700 overflow-hidden">
                       <thead className="bg-warm-300 dark:bg-gray-800 text-gray-900 dark:text-white">
                         <tr>
                           <th className="text-left px-4 py-3 font-semibold">Method</th>
@@ -804,9 +804,9 @@ const ProductDetail = () => {
                             {stars}
                           </span>
                           <Star size={12} className="text-amber-400" fill="currentColor" />
-                          <div className="flex-1 h-2.5 bg-warm-400 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2.5 bg-warm-400 dark:bg-gray-700 overflow-hidden">
                             <motion.div
-                              className="h-full bg-amber-400 rounded-full"
+                              className="h-full bg-amber-400"
                               initial={{ width: 0 }}
                               animate={{ width: `${pct}%` }}
                               transition={{ duration: 0.6, delay: stars * 0.08 }}
@@ -869,9 +869,12 @@ const ProductDetail = () => {
         {/* ══════════════════════════════════════════════════════════════ */}
         {relatedProducts.length > 0 && (
           <section className="mt-16 lg:mt-24" aria-label="Related products">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 dark:text-white text-center mb-8">
+            <h2 className="text-[11px] font-medium uppercase tracking-[0.2em] text-gray-400 text-center mb-3">
               {t('relatedProducts', 'You May Also Like')}
             </h2>
+            <p className="text-2xl sm:text-3xl font-serif font-light tracking-tight text-gray-900 dark:text-white text-center mb-8">
+              {t('relatedProductsHeading', 'Complete the Look')}
+            </p>
             <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
               {relatedProducts.slice(0, 8).map((rel) => (
                 <div
@@ -902,7 +905,7 @@ const ProductDetail = () => {
           >
             <button
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white hover:bg-warm-50/20 transition-colors z-10"
+              className="absolute top-5 right-5 p-2 bg-white/10 text-white hover:bg-warm-50/20 transition-colors z-10"
               aria-label="Close fullscreen view"
             >
               <X size={24} />
@@ -933,7 +936,7 @@ const ProductDetail = () => {
                     e.stopPropagation();
                     setSelectedImage(idx);
                   }}
-                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                  className={`w-14 h-14 overflow-hidden border-2 transition-all ${
                     selectedImage === idx ? 'border-white' : 'border-transparent opacity-50 hover:opacity-80'
                   }`}
                   aria-label={`View image ${idx + 1}`}

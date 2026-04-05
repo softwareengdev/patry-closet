@@ -202,7 +202,7 @@ const PrivacyPage = () => {
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight text-gray-900 dark:text-white mb-3">
                                 Política de Privacidad
                             </h1>
-                            <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-warm-200 text-gray-500'}`}>
+                            <span className={`inline-block text-xs font-medium px-3 py-1 ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-warm-200 text-gray-500'}`}>
                                 Última actualización: 1 de abril de 2026
                             </span>
                         </div>
@@ -210,7 +210,7 @@ const PrivacyPage = () => {
                         {/* Content Sections */}
                         <div className="space-y-5">
                             {sections.map((section, i) => (
-                                <div key={i} className={`rounded-xl border p-6 sm:p-8 ${cardClass}`}>
+                                <div key={i} className={`border p-6 sm:p-8 ${cardClass}`}>
                                     <h2 className="text-lg sm:text-xl font-serif font-medium mb-4 tracking-tight">
                                         {section.title}
                                     </h2>

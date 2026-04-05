@@ -91,7 +91,7 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
                         exit={{ opacity: 0, scale: 0.92, y: 20 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-warm-50 dark:bg-gray-900 rounded-2xl shadow-2xl"
+                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-warm-50 dark:bg-gray-900 shadow-2xl"
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('sizeGuide')}
@@ -113,12 +113,12 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
 
                         <div className="p-6 space-y-6">
                             {/* Tabs */}
-                            <div className="flex gap-1 p-1 bg-warm-300 dark:bg-gray-800 rounded-xl">
+                            <div className="flex gap-1 p-1 bg-warm-300 dark:bg-gray-800">
                                 {tabs.map((tab) => (
                                     <button
                                         key={tab.key}
                                         onClick={() => setActiveTab(tab.key)}
-                                        className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                                        className={`flex-1 py-2.5 text-sm font-medium transition-all ${
                                             activeTab === tab.key
                                                 ? 'bg-warm-50 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -130,7 +130,7 @@ const SizeGuideModal = ({ isOpen, onClose, category = 'women', selectedSize }) =
                             </div>
 
                             {/* Table */}
-                            <div className="overflow-x-auto rounded-xl border border-warm-400 dark:border-gray-700">
+                            <div className="overflow-x-auto border border-warm-400 dark:border-gray-700">
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="bg-warm-200 dark:bg-gray-800">

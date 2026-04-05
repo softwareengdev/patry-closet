@@ -31,7 +31,7 @@ const BlogFilters = ({
     onFilterChange({ ...filters, [key]: value, page: 1 });
   };
 
-  const chipBase = `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer select-none`;
+  const chipBase = `inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all cursor-pointer select-none`;
   const chipActive = isDark
     ? 'bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40'
     : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
@@ -51,7 +51,7 @@ const BlogFilters = ({
             value={filters.query || ''}
             onChange={e => updateFilter('query', e.target.value)}
             placeholder={t('blog.searchArticles', 'Search articles...')}
-            className={`w-full pl-9 pr-4 py-2 text-sm rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
+            className={`w-full pl-9 pr-4 py-2 text-sm border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
               ${isDark
                 ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500'
                 : 'bg-warm-50 border-warm-400 text-gray-900 placeholder:text-gray-400'
@@ -65,7 +65,7 @@ const BlogFilters = ({
           <select
             value={filters.sort || 'newest'}
             onChange={e => updateFilter('sort', e.target.value)}
-            className={`text-xs font-medium px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
+            className={`text-xs font-medium px-3 py-2 border transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/30
               ${isDark
                 ? 'bg-gray-800 border-gray-700 text-gray-300'
                 : 'bg-warm-50 border-warm-400 text-gray-700'
@@ -82,7 +82,7 @@ const BlogFilters = ({
           {/* Filter toggle */}
           <button
             onClick={onToggle}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-all
+            className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border transition-all
               ${isOpen
                 ? isDark ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-700'
                 : isDark ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-300' : 'bg-warm-50 border-warm-400 text-gray-600 hover:text-gray-800'
@@ -103,7 +103,7 @@ const BlogFilters = ({
           {activeCount > 0 && (
             <button
               onClick={handleClear}
-              className="inline-flex items-center gap-1 px-2.5 py-2 rounded-lg text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-2 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
               aria-label={t('blog.clearFilters', 'Clear filters')}
             >
               <X className="w-3 h-3" />
@@ -128,7 +128,7 @@ const BlogFilters = ({
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <div className={`p-4 rounded-xl border space-y-4
+            <div className={`p-4 border space-y-4
               ${isDark ? 'bg-gray-900/50 border-gray-800' : 'bg-warm-200 border-warm-300'}`}>
 
               {/* Categories */}
