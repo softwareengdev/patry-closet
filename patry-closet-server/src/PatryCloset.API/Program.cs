@@ -1,6 +1,14 @@
+using System.Text;
 using Serilog;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PatryCloset.Application;
 using PatryCloset.Infrastructure;
+using PatryCloset.Infrastructure.Identity;
+using PatryCloset.Infrastructure.Persistence;
+using PatryCloset.Infrastructure.Persistence.Seeding;
 using PatryCloset.API.Middleware;
 using PatryCloset.API.Services;
 using PatryCloset.Domain.Interfaces;
@@ -29,6 +37,52 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // ─── Current User Service ───
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// ─── JWT Authentication ───
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSection["Secret"] ?? throw new InvalidOperationException("JWT Secret not configured");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSection["Issuer"],
+        ValidAudience = jwtSection["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ClockSkew = TimeSpan.Zero,
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            if (context.Exception is SecurityTokenExpiredException)
+            {
+                context.Response.Headers.Append("X-Token-Expired", "true");
+            }
+            return Task.CompletedTask;
+        },
+    };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Admin", "Manager"));
+    options.AddPolicy("CustomerOrAbove", policy => policy.RequireRole("Admin", "Manager", "Customer"));
+});
 
 // ─── API Versioning ───
 builder.Services.AddApiVersioning(options =>
@@ -115,6 +169,30 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+// ─── Database Migration & Seeding ───
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        await context.Database.MigrateAsync();
+        Log.Information("✅ Database migrated successfully");
+
+        await ApplicationDbContextSeeder.SeedAsync(context, userManager, roleManager, logger);
+        Log.Information("✅ Database seeded successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "❌ Error during database migration/seeding");
+        // Don't crash the app — allow it to start even if DB isn't ready (e.g., Docker startup order)
+    }
+}
 
 // ─── Middleware Pipeline ───
 app.UseSerilogRequestLogging(options =>

@@ -30,6 +30,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         base.OnModelCreating(builder);
 
         builder.HasDefaultSchema("patrycloset");
+
+        // Exclude domain event types from EF Core model — they are not persisted
+        builder.Ignore<PatryCloset.Domain.Common.DomainEvent>();
+        builder.Ignore<PatryCloset.Domain.Events.OrderCreatedEvent>();
+        builder.Ignore<PatryCloset.Domain.Events.OrderStatusChangedEvent>();
+        builder.Ignore<PatryCloset.Domain.Events.StockDepletedEvent>();
+        builder.Ignore<PatryCloset.Domain.Events.PaymentCompletedEvent>();
+
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

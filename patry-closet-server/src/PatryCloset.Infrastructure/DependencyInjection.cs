@@ -50,6 +50,7 @@ public static class DependencyInjection
                 options.User.RequireUniqueEmail = true;
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.SignIn.RequireConfirmedEmail = false;
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -58,6 +59,10 @@ public static class DependencyInjection
         // Repositories & UoW
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
+
+        // Auth & Token Services
+        services.AddSingleton<ITokenService, TokenService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         // Services
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
