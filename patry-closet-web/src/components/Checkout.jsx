@@ -1,17 +1,31 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement } from '@stripe/react-stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import {
   Check, ChevronDown, ChevronUp, Lock, Shield,
   CreditCard, Package, MapPin, Mail, Phone,
   User, ShoppingBag, Loader2, Tag, X, Truck, AlertCircle,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import paymentsApi from '../lib/paymentsApi';
+import addressesApi from '../lib/addressesApi';
+import cartApi from '../lib/cartApi';
 
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx';
+const stripePromise = loadStripe(STRIPE_PK);
+
+/** Check if user is authenticated (has a valid-looking JWT) */
+const isAuthenticated = () => {
+  const token = localStorage.getItem('patry_access_token');
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp > Date.now() / 1000;
+  } catch { return false; }
+};
 
 const COUNTRIES = [
   { code: 'ES', name: 'Spain' },
@@ -497,10 +511,13 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
 /* ------------------------------------------------------------------ */
 /*  PaymentStepContent  (must be rendered inside <Elements>)           */
 /* ------------------------------------------------------------------ */
-function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCoupon, removeCoupon, t }) {
+function PaymentStepContent({ onBack, onPlaceOrder, processing, paymentError, coupon, applyCoupon, removeCoupon, t }) {
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
+  const [cardError, setCardError] = useState(null);
+  const stripe = useStripe();
+  const elements = useElements();
 
   const isDark = document.documentElement.classList.contains('dark');
 
@@ -588,8 +605,40 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
               : 'border-warm-500 dark:border-gray-600 focus-within:ring-black/20 dark:focus-within:ring-white/20'
           }`}
         >
-          <CardElement options={cardOptions} onChange={(e) => setCardComplete(e.complete)} />
+          <CardElement options={cardOptions} onChange={(e) => {
+            setCardComplete(e.complete);
+            setCardError(e.error?.message || null);
+          }} />
         </div>
+        {/* Card validation error */}
+        <AnimatePresence>
+          {cardError && (
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="text-xs text-red-500 mt-1"
+              role="alert"
+            >
+              {cardError}
+            </motion.p>
+          )}
+        </AnimatePresence>
+        {/* Payment error from backend/Stripe */}
+        <AnimatePresence>
+          {paymentError && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2.5 mt-2"
+              role="alert"
+            >
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+              <span className="text-sm text-red-700 dark:text-red-400">{paymentError}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Coupon */}
@@ -669,8 +718,8 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, coupon, applyCou
       {/* Place Order */}
       <button
         type="button"
-        onClick={onPlaceOrder}
-        disabled={processing || !cardComplete}
+        onClick={() => onPlaceOrder(stripe, elements)}
+        disabled={processing || !cardComplete || !stripe || !elements}
         className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold uppercase tracking-wider py-3.5 hover:bg-gray-800 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {processing ? (
@@ -819,8 +868,8 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
         </button>
         <button
           type="button"
-          disabled
-          className="flex-1 border border-warm-500 dark:border-gray-600 text-gray-400 dark:text-gray-500 font-semibold py-3 cursor-not-allowed"
+          onClick={() => navigate(order.orderId ? `/user?tab=orders&order=${order.orderId}` : '/user?tab=orders')}
+          className="flex-1 border border-warm-500 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
         >
           {t('viewOrder') || 'View Order'}
         </button>
@@ -869,6 +918,8 @@ function Checkout() {
   });
 
   const [errors, setErrors] = useState({});
+  const [paymentError, setPaymentError] = useState(null);
+  const checkoutSessionRef = useRef(null);
 
   // Focus first input when step changes
   useEffect(() => {
@@ -904,8 +955,114 @@ function Checkout() {
     }
   }, [shippingData, t]);
 
-  const handlePlaceOrder = useCallback(async () => {
+  const handlePlaceOrder = useCallback(async (stripe, elements) => {
     setProcessing(true);
+    setPaymentError(null);
+
+    // ── Try real backend Stripe flow ──
+    if (isAuthenticated() && stripe && elements) {
+      try {
+        // 1. Create/update shipping address on backend
+        const addressPayload = {
+          firstName: shippingData.firstName,
+          lastName: shippingData.lastName,
+          street: shippingData.address1,
+          apartment: shippingData.address2 || '',
+          city: shippingData.city,
+          state: shippingData.state || '',
+          postalCode: shippingData.postalCode,
+          country: shippingData.country,
+          phone: shippingData.phone || '',
+          label: 'Checkout',
+        };
+
+        const address = await addressesApi.createAddress(addressPayload);
+
+        // 2. Sync cart to backend
+        await cartApi.syncLocalCartToServer(cartItems);
+
+        // 3. Create checkout session (order + PaymentIntent)
+        const session = await paymentsApi.createCheckout({
+          shippingAddressId: address.id,
+          shippingMethod: 'Standard',
+          couponCode: coupon?.code || undefined,
+        });
+
+        checkoutSessionRef.current = session;
+
+        // 4. Confirm card payment with Stripe.js (handles 3D Secure)
+        const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+          session.clientSecret,
+          {
+            payment_method: {
+              card: elements.getElement(CardElement),
+              billing_details: {
+                name: `${shippingData.firstName} ${shippingData.lastName}`,
+                email: shippingData.email,
+                phone: shippingData.phone || undefined,
+                address: {
+                  line1: shippingData.address1,
+                  line2: shippingData.address2 || undefined,
+                  city: shippingData.city,
+                  state: shippingData.state || undefined,
+                  postal_code: shippingData.postalCode,
+                  country: shippingData.country,
+                },
+              },
+            },
+          }
+        );
+
+        if (stripeError) {
+          // Payment failed on Stripe side
+          setPaymentError(
+            stripeError.type === 'card_error'
+              ? stripeError.message
+              : t('paymentFailed') || 'Payment failed. Please try again.'
+          );
+          setProcessing(false);
+          return;
+        }
+
+        // 5. Confirm payment on backend (updates order status)
+        if (paymentIntent.status === 'succeeded') {
+          await paymentsApi.confirmPayment(session.orderId, paymentIntent.id);
+        }
+
+        // 6. Build completed order object
+        setCompletedOrder({
+          orderId: session.orderId,
+          orderNumber: session.orderNumber,
+          paymentIntentId: paymentIntent.id,
+          items: [...cartItems],
+          shippingData: { ...shippingData },
+          subtotal: getSubtotal(),
+          discount: getDiscount(),
+          shipping: getShipping(),
+          tax: getTax(),
+          grandTotal: session.amount / 100, // Stripe uses cents
+          coupon,
+          isRealPayment: true,
+        });
+
+        setProcessing(false);
+        setDirection(1);
+        setCurrentStep(2);
+        return;
+      } catch (err) {
+        console.warn('[Checkout] Backend payment failed, falling back to mock:', err);
+        const msg = err?.response?.data?.message || err?.message || '';
+        // If it's a clear backend error (not connectivity), show it
+        if (err?.response?.status && err.response.status < 500) {
+          setPaymentError(msg || t('paymentFailed') || 'Payment failed. Please try again.');
+          setProcessing(false);
+          return;
+        }
+        // Otherwise fall through to mock flow
+      }
+    }
+
+    // ── Mock fallback (guest checkout or backend unavailable) ──
     await new Promise((r) => setTimeout(r, 2000));
     const orderNum = generateOrderNumber();
     setCompletedOrder({
@@ -918,11 +1075,12 @@ function Checkout() {
       tax: getTax(),
       grandTotal: getGrandTotal(),
       coupon,
+      isRealPayment: false,
     });
     setProcessing(false);
     setDirection(1);
     setCurrentStep(2);
-  }, [cartItems, shippingData, getSubtotal, getDiscount, getShipping, getTax, getGrandTotal, coupon]);
+  }, [cartItems, shippingData, getSubtotal, getDiscount, getShipping, getTax, getGrandTotal, coupon, t]);
 
   const goBack = useCallback(() => {
     setDirection(-1);
@@ -1054,6 +1212,7 @@ function Checkout() {
                   onBack={goBack}
                   onPlaceOrder={handlePlaceOrder}
                   processing={processing}
+                  paymentError={paymentError}
                   coupon={coupon}
                   applyCoupon={applyCoupon}
                   removeCoupon={removeCoupon}

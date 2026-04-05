@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Package, ChevronDown, ChevronUp, ExternalLink, Truck, CheckCircle, Clock, XCircle, RotateCcw, Loader2 } from 'lucide-react';
 import { ThemeContext } from '../../context/ThemeContext';
 import authService from '../../lib/authService';
+import ordersApi from '../../lib/ordersApi';
 
 const STATUS_CONFIG = {
     pending: { color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', icon: Clock, label: 'Pending' },
@@ -24,6 +25,37 @@ const OrdersTab = () => {
 
     useEffect(() => {
         const loadOrders = async () => {
+            try {
+                // Try real API first
+                const token = localStorage.getItem('patry_access_token');
+                if (token) {
+                    const { orders: apiOrders } = await ordersApi.getOrders();
+                    if (apiOrders && apiOrders.length > 0) {
+                        // Map backend order format to frontend format
+                        setOrders(apiOrders.map(o => ({
+                            id: o.id,
+                            orderNumber: o.orderNumber,
+                            status: (o.status || 'pending').toLowerCase(),
+                            date: o.createdAt || o.orderDate,
+                            total: o.totalAmount || o.total,
+                            items: (o.items || []).map(item => ({
+                                name: item.productName || item.name,
+                                image: item.imageUrl || item.image,
+                                quantity: item.quantity,
+                                price: item.unitPrice || item.price,
+                                size: item.size,
+                                color: item.color,
+                            })),
+                            trackingNumber: o.trackingNumber,
+                            paymentStatus: o.paymentStatus,
+                        })));
+                        setLoading(false);
+                        return;
+                    }
+                }
+            } catch {
+                // Fall back to mock data
+            }
             try {
                 const data = await authService.getOrders();
                 setOrders(data);

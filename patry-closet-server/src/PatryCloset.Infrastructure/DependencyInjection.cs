@@ -5,6 +5,7 @@ using PatryCloset.Application.Common.Interfaces;
 using PatryCloset.Domain.Interfaces;
 using PatryCloset.Infrastructure.Caching;
 using PatryCloset.Infrastructure.Identity;
+using PatryCloset.Infrastructure.Payments;
 using PatryCloset.Infrastructure.Persistence;
 using PatryCloset.Infrastructure.Persistence.Interceptors;
 using PatryCloset.Infrastructure.Persistence.Repositories;
@@ -85,6 +86,11 @@ public static class DependencyInjection
             services.AddDistributedMemoryCache();
         }
         services.AddScoped<ICacheService, CacheService>();
+
+        // Stripe Payments
+        services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
+        services.AddScoped<IPaymentService, StripePaymentService>();
+        services.AddScoped<StripeWebhookHandler>();
 
         return services;
     }
