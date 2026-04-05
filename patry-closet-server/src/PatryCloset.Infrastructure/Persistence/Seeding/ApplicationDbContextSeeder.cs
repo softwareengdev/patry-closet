@@ -99,11 +99,12 @@ public static class ApplicationDbContextSeeder
             {
                 for (int i = 0; i < subs.Length; i++)
                 {
+                    // Prefix subcategory slug with parent slug to avoid duplicates (e.g. "mujeres-pantalones")
                     context.Categories.Add(new Category
                     {
                         Id = Guid.NewGuid(),
                         Name = char.ToUpper(subs[i][0]) + subs[i][1..],
-                        Slug = subs[i],
+                        Slug = $"{slug}-{subs[i]}",
                         SortOrder = i + 1,
                         IsActive = true,
                         ParentCategoryId = parent.Id,
@@ -153,8 +154,8 @@ public static class ApplicationDbContextSeeder
 
         foreach (var p in products)
         {
-            // Resolve category: use subcategory slug to find the subcategory, fallback to top-level
-            var categorySlug = p.Category.ToLowerInvariant() switch
+            // Resolve category: use "parent-subcategory" prefixed slug, fallback to top-level
+            var parentSlug = p.Category.ToLowerInvariant() switch
             {
                 "mujeres" => "mujeres",
                 "hombres" => "hombres",
@@ -162,15 +163,15 @@ public static class ApplicationDbContextSeeder
                 _ => "mujeres",
             };
 
-            // Find the actual subcategory if it exists
             Guid categoryId;
-            if (!string.IsNullOrEmpty(p.Subcategory) && catMap.TryGetValue(p.Subcategory, out var subId))
+            var subSlug = !string.IsNullOrEmpty(p.Subcategory) ? $"{parentSlug}-{p.Subcategory}" : null;
+            if (subSlug is not null && catMap.TryGetValue(subSlug, out var subId))
             {
                 categoryId = subId;
             }
             else
             {
-                categoryId = catMap.GetValueOrDefault(categorySlug, catMap["mujeres"]);
+                categoryId = catMap.GetValueOrDefault(parentSlug, catMap["mujeres"]);
             }
 
             var slug = GenerateSlug(p.Name);
@@ -193,7 +194,7 @@ public static class ApplicationDbContextSeeder
                 IsFeatured = p.Popularity >= 85,
                 CategoryId = categoryId,
                 SubcategorySlug = p.Subcategory,
-                Gender = categorySlug == "hombres" ? Gender.Male : Gender.Female,
+                Gender = parentSlug == "hombres" ? Gender.Male : Gender.Female,
                 CreatedAt = now,
             };
 
@@ -217,13 +218,19 @@ public static class ApplicationDbContextSeeder
                 ColorMap.TryGetValue(color, out var hex);
                 foreach (var size in p.Sizes)
                 {
+                    // Use full slug (up to 20 chars) + first 3 of color + size for unique SKU
+                    var skuSlug = slug.ToUpperInvariant().Replace("-", "");
+                    if (skuSlug.Length > 20) skuSlug = skuSlug[..20];
+                    var skuColor = color.Replace(" ", "").ToUpperInvariant();
+                    if (skuColor.Length > 4) skuColor = skuColor[..4];
+
                     product.Variants.Add(new ProductVariant
                     {
                         Id = Guid.NewGuid(),
                         Color = color,
                         ColorHex = hex,
                         Size = size,
-                        Sku = $"PC-{slug.ToUpperInvariant()[..Math.Min(8, slug.Length)]}-{color[..Math.Min(3, color.Length)].ToUpperInvariant()}-{size}",
+                        Sku = $"PC-{skuSlug}-{skuColor}-{size}",
                         StockQuantity = p.InStock ? Random.Shared.Next(3, 25) : 0,
                         IsActive = true,
                         ProductId = product.Id,
