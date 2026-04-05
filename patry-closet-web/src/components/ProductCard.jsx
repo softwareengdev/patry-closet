@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { COLOR_MAP } from '../data/products';
 import OptimizedImage from './ui/OptimizedImage';
 import { SIZES } from '../lib/imageUtils';
+import { preloadProductDetail } from '../lib/preloadRoute';
 
 /* ─── Badge component ─── */
 const ProductBadge = ({ badge, discount }) => {
@@ -124,6 +125,7 @@ const ProductCard = ({ product, onQuickView }) => {
     const wishlisted = isInWishlist(product.id);
 
     const handleMouseEnter = () => {
+        preloadProductDetail();
         hoverTimeoutRef.current = setTimeout(() => setIsHovered(true), 50);
     };
     const handleMouseLeave = () => {

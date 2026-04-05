@@ -5,25 +5,27 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
 import CuratedStories from './components/CuratedStories';
-import ProductsPage from './components/ProductsPage';
-import ProductDetail from './components/ProductDetail';
 import ContactSection from './components/ContactSection';
 import FooterSection from './components/FooterSection';
-import Cart from './components/Cart';
-import WishlistPage from './components/WishlistPage';
-import Checkout from './components/Checkout';
 import CookieConsent from './components/CookieConsent';
 import ErrorBoundary from './components/ErrorBoundary';
 import SEOHead, { getOrganizationSchema, getWebSiteSchema, getLocalBusinessSchema, getBrandSchema, getPersonSchema } from './components/SEOHead';
 
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import AccountPage from './pages/AccountPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
-// Code-split legal & blog pages (loaded on demand)
+// Code-split route pages (loaded on demand)
+const ProductsPage = lazy(() => import('./components/ProductsPage'));
+const ProductDetail = lazy(() => import('./components/ProductDetail'));
+const Cart = lazy(() => import('./components/Cart'));
+const WishlistPage = lazy(() => import('./components/WishlistPage'));
+const Checkout = lazy(() => import('./components/Checkout'));
+
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
+
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
@@ -36,6 +38,11 @@ import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 import usePageTracking from './hooks/usePageTracking';
+
+// Eagerly loaded skeleton fallbacks (tiny components, no code-splitting needed)
+import ProductsPageSkeleton from './components/ui/ProductsPageSkeleton';
+import ProductDetailSkeleton from './components/ui/ProductDetailSkeleton';
+import AccountSkeleton from './components/ui/AccountSkeleton';
 
 const pageTransition = {
     initial: { opacity: 0, y: 12 },
@@ -105,19 +112,19 @@ function AppContent() {
                             </motion.div>
                         } />
                         <Route path="/products" element={
-                            <motion.div {...pageTransition}><ErrorBoundary><ProductsPage /></ErrorBoundary></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<ProductsPageSkeleton />}><ErrorBoundary><ProductsPage /></ErrorBoundary></Suspense></motion.div>
                         } />
                         <Route path="/products/:id" element={
-                            <motion.div {...pageTransition}><ErrorBoundary><ProductDetail /></ErrorBoundary></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<ProductDetailSkeleton />}><ErrorBoundary><ProductDetail /></ErrorBoundary></Suspense></motion.div>
                         } />
                         <Route path="/cart" element={
-                            <motion.div {...pageTransition}><ErrorBoundary><Cart /></ErrorBoundary></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><ErrorBoundary><Cart /></ErrorBoundary></Suspense></motion.div>
                         } />
                         <Route path="/wishlist" element={
-                            <motion.div {...pageTransition}><ErrorBoundary><WishlistPage /></ErrorBoundary></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><ErrorBoundary><WishlistPage /></ErrorBoundary></Suspense></motion.div>
                         } />
                         <Route path="/checkout" element={
-                            <motion.div {...pageTransition}><ErrorBoundary><Checkout /></ErrorBoundary></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><ErrorBoundary><Checkout /></ErrorBoundary></Suspense></motion.div>
                         } />
                         <Route path="/blog" element={
                             <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><BlogPage /></Suspense></motion.div>
@@ -142,27 +149,27 @@ function AppContent() {
 
                         {/* Auth routes */}
                         <Route path="/login" element={
-                            <motion.div {...pageTransition}><LoginPage /></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><LoginPage /></Suspense></motion.div>
                         } />
                         <Route path="/register" element={
-                            <motion.div {...pageTransition}><RegisterPage /></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><RegisterPage /></Suspense></motion.div>
                         } />
                         <Route path="/forgot-password" element={
-                            <motion.div {...pageTransition}><ForgotPasswordPage /></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense></motion.div>
                         } />
                         <Route path="/account/verify-email" element={
-                            <motion.div {...pageTransition}><VerifyEmailPage /></motion.div>
+                            <motion.div {...pageTransition}><Suspense fallback={<PageLoader />}><VerifyEmailPage /></Suspense></motion.div>
                         } />
 
                         {/* Protected routes */}
                         <Route path="/account" element={
                             <motion.div {...pageTransition}>
-                                <ProtectedRoute><AccountPage /></ProtectedRoute>
+                                <Suspense fallback={<AccountSkeleton />}><ProtectedRoute><AccountPage /></ProtectedRoute></Suspense>
                             </motion.div>
                         } />
                         <Route path="/account/*" element={
                             <motion.div {...pageTransition}>
-                                <ProtectedRoute><AccountPage /></ProtectedRoute>
+                                <Suspense fallback={<AccountSkeleton />}><ProtectedRoute><AccountPage /></ProtectedRoute></Suspense>
                             </motion.div>
                         } />
                     </Routes>

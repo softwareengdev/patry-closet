@@ -11,6 +11,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './i18n/en.json';
 import es from './i18n/es.json';
 import { initGA4 } from './lib/analytics';
+import { reportWebVitals } from './lib/webVitals';
 
 // Initialize GA4 if user has already consented
 const cookieConsent = localStorage.getItem('cookie-consent');
@@ -45,3 +46,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </QueryClientProvider>
     </React.StrictMode>,
 )
+
+reportWebVitals();

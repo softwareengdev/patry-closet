@@ -18,6 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import SearchAutocomplete from './SearchAutocomplete';
 import MiniCart from './MiniCart';
+import { preloadRoute } from '../lib/preloadRoute';
 
 /* ─── Mega-menu category data ─── */
 const megaMenuData = {
@@ -275,6 +276,7 @@ const Navbar = ({ isTransparent = false }) => {
                                 >
                                     <Link
                                         to="/products"
+                                        onMouseEnter={() => preloadRoute('/products')}
                                         className={`flex items-center gap-1 py-6 transition-colors duration-200 relative ${activeMega === key ? (isHighContrast ? 'text-hc-accent' : 'text-accent-900 dark:text-white') : `hover:${isHighContrast ? 'text-hc-accent' : 'text-accent-900 dark:text-white'}`}`}
                                     >
                                         {t(key)}
@@ -314,7 +316,7 @@ const Navbar = ({ isTransparent = false }) => {
                             </motion.button>
 
                             {/* Wishlist */}
-                            <Link to="/wishlist" className="relative group" onClick={closeMega}>
+                            <Link to="/wishlist" className="relative group" onClick={closeMega} onMouseEnter={() => preloadRoute('/wishlist')}>
                                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                                     <Heart className={`w-5 h-5 group-hover:text-rose transition-colors ${iconClass}`} />
                                 </motion.div>

@@ -15,7 +15,17 @@ import { useProducts, useCategories } from '../hooks/useProducts';
 
 /* ─── Derive available facet values from product data ─── */
 const ALL_CATEGORIES = [...new Set(mockProducts.map(p => p.category))];
-const ALL_SUBCATEGORIES = [...new Set(mockProducts.map(p => p.subcategory))];
+const ALL_SUBCATEGORIES = [...new Set(mockProducts.map(p => p.subcategory).filter(Boolean))];
+const SUBCATEGORIES_BY_CATEGORY = mockProducts.reduce((acc, p) => {
+    if (p.category && p.subcategory) {
+        if (!acc[p.category]) acc[p.category] = new Set();
+        acc[p.category].add(p.subcategory);
+    }
+    return acc;
+}, {});
+Object.keys(SUBCATEGORIES_BY_CATEGORY).forEach(k => {
+    SUBCATEGORIES_BY_CATEGORY[k] = [...SUBCATEGORIES_BY_CATEGORY[k]];
+});
 const ALL_COLORS = [...new Set(mockProducts.flatMap(p => p.colors))];
 const ALL_SIZES = [...new Set(mockProducts.flatMap(p => p.sizes).filter(Boolean))];
 const ALL_BRANDS = [...new Set(mockProducts.map(p => p.brand))];
@@ -62,6 +72,14 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
     const selectedSizes = filters.sizes || [];
     const selectedBrands = filters.brands || [];
 
+    const availableSubcategories = filters.category ? (SUBCATEGORIES_BY_CATEGORY[filters.category] || []) : ALL_SUBCATEGORIES;
+
+    const handleCategoryChange = (cat) => {
+        onFilterChange('category', cat);
+        // Clear subcategory when category changes
+        if (cat !== filters.category) onFilterChange('subcategory', '');
+    };
+
     const toggleArrayFilter = (key, value) => {
         const current = filters[key] || [];
         const next = current.includes(value)
@@ -90,7 +108,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
             <FilterSection title={t('categories')} defaultOpen={true} count={filters.category ? 1 : 0}>
                 <div className="space-y-1">
                     <button
-                        onClick={() => onFilterChange('category', '')}
+                        onClick={() => handleCategoryChange('')}
                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!filters.category ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                     >
                         {t('all')}
@@ -98,7 +116,7 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                     {ALL_CATEGORIES.map(cat => (
                         <button
                             key={cat}
-                            onClick={() => onFilterChange('category', cat)}
+                            onClick={() => handleCategoryChange(cat)}
                             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${filters.category === cat ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
                         >
                             <span>{cat}</span>
@@ -109,6 +127,32 @@ const FilterContent = ({ filters, onFilterChange, onReset, sort, onSortChange, v
                     ))}
                 </div>
             </FilterSection>
+
+            {/* Subcategory — dynamic based on selected category */}
+            {availableSubcategories.length > 0 && (
+                <FilterSection title={t('subcategory') || 'Subcategoría'} defaultOpen={!!filters.category} count={filters.subcategory ? 1 : 0}>
+                    <div className="space-y-1">
+                        <button
+                            onClick={() => onFilterChange('subcategory', '')}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!filters.subcategory ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
+                        >
+                            {t('all')}
+                        </button>
+                        {availableSubcategories.map(sub => (
+                            <button
+                                key={sub}
+                                onClick={() => onFilterChange('subcategory', sub)}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${filters.subcategory === sub ? 'bg-accent-900 text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-warm-200 dark:hover:bg-gray-800/50'}`}
+                            >
+                                <span>{sub}</span>
+                                <span className="text-xs opacity-60">
+                                    ({mockProducts.filter(p => p.subcategory === sub && (!filters.category || p.category === filters.category)).length})
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </FilterSection>
+            )}
 
             {/* Price range */}
             <FilterSection title={t('price')} defaultOpen={true} count={filters.price[0] > PRICE_MIN || filters.price[1] < PRICE_MAX ? 1 : 0}>
@@ -380,6 +424,7 @@ const ProductsPage = () => {
         colors: searchParams.get('colors')?.split(',').filter(Boolean) || [],
         sizes: searchParams.get('sizes')?.split(',').filter(Boolean) || [],
         brands: searchParams.get('brands')?.split(',').filter(Boolean) || [],
+        subcategory: searchParams.get('subcategory') || '',
         badge: searchParams.get('badge') || '',
         inStock: searchParams.get('inStock') === 'true',
         search: searchParams.get('search') || '',
@@ -417,6 +462,7 @@ const ProductsPage = () => {
         if (newFilters.colors.length) params.set('colors', newFilters.colors.join(','));
         if (newFilters.sizes.length) params.set('sizes', newFilters.sizes.join(','));
         if (newFilters.brands.length) params.set('brands', newFilters.brands.join(','));
+        if (newFilters.subcategory) params.set('subcategory', newFilters.subcategory);
         if (newFilters.badge) params.set('badge', newFilters.badge);
         if (newFilters.inStock) params.set('inStock', 'true');
         if (newSort && newSort !== 'popularity-desc') params.set('sort', newSort);
@@ -437,7 +483,7 @@ const ProductsPage = () => {
     }, [filters, syncFiltersToURL]);
 
     const resetAllFilters = useCallback(() => {
-        const defaults = { category: '', price: [PRICE_MIN, PRICE_MAX], colors: [], sizes: [], brands: [], badge: '', inStock: false, search: '' };
+        const defaults = { category: '', subcategory: '', price: [PRICE_MIN, PRICE_MAX], colors: [], sizes: [], brands: [], badge: '', inStock: false, search: '' };
         setFilters(defaults);
         setSort('popularity-desc');
         setSearchParams({}, { replace: true });
@@ -447,9 +493,10 @@ const ProductsPage = () => {
     const apiFilters = useMemo(() => ({
         search: filters.search || undefined,
         category: filters.category || undefined,
-        color: filters.colors?.length === 1 ? filters.colors[0] : undefined,
-        size: filters.sizes?.length === 1 ? filters.sizes[0] : undefined,
-        brand: filters.brands?.length === 1 ? filters.brands[0] : undefined,
+        subcategory: filters.subcategory || undefined,
+        color: filters.colors?.length ? filters.colors.join(',') : undefined,
+        size: filters.sizes?.length ? filters.sizes.join(',') : undefined,
+        brand: filters.brands?.length ? filters.brands.join(',') : undefined,
         badge: filters.badge || undefined,
         inStock: filters.inStock || undefined,
         minPrice: filters.price?.[0] > 0 ? filters.price[0] : undefined,
@@ -481,6 +528,7 @@ const ProductsPage = () => {
             );
         }
         if (filters.category) products = products.filter(p => p.category === filters.category || p.subcategory === filters.category);
+        if (filters.subcategory) products = products.filter(p => p.subcategory === filters.subcategory);
         if (filters.colors.length) products = products.filter(p => p.colors.some(c => filters.colors.includes(c)));
         if (filters.sizes.length) products = products.filter(p => p.sizes.length === 0 || p.sizes.some(s => filters.sizes.includes(s)));
         if (filters.brands.length) products = products.filter(p => filters.brands.includes(p.brand));
@@ -541,6 +589,7 @@ const ProductsPage = () => {
         const chips = [];
         if (filters.search) chips.push({ key: 'search', label: `"${filters.search}"` });
         if (filters.category) chips.push({ key: 'category', label: filters.category });
+        if (filters.subcategory) chips.push({ key: 'subcategory', label: filters.subcategory });
         filters.colors.forEach(c => chips.push({ key: 'colors', label: c, value: c }));
         filters.sizes.forEach(s => chips.push({ key: 'sizes', label: s, value: s }));
         filters.brands.forEach(b => chips.push({ key: 'brands', label: b, value: b }));
