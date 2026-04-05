@@ -15,11 +15,26 @@ public class HealthCheckTests : IClassFixture<PatryClosetWebApplicationFactory>
     }
 
     [Fact]
-    public async Task HealthEndpoint_ReturnsOk()
+    public async Task HealthLiveEndpoint_ReturnsOk()
+    {
+        var response = await _client.GetAsync("/health/live");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task HealthEndpoint_ReturnsJsonWithChecks()
     {
         var response = await _client.GetAsync("/health");
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        // May return 200 (Healthy) or 503 (Unhealthy) depending on DB/Redis availability
+        var body = await response.Content.ReadAsStringAsync();
+        var json = JsonDocument.Parse(body);
+        var root = json.RootElement;
+
+        root.TryGetProperty("status", out _).Should().BeTrue();
+        root.TryGetProperty("duration", out _).Should().BeTrue();
+        root.TryGetProperty("checks", out _).Should().BeTrue();
     }
 
     [Fact]

@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -222,7 +223,26 @@ if (!builder.Environment.IsDevelopment())
 }
 
 // ─── Health Checks ───
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "postgresql",
+        tags: ["db", "ready"])
+    .AddRedis(
+        builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379",
+        name: "redis",
+        tags: ["cache", "ready"])
+    .AddDbContextCheck<ApplicationDbContext>(
+        name: "ef-core",
+        tags: ["db", "ready"]);
+
+// ─── Forwarded Headers (for Nginx/reverse proxy) ───
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 var app = builder.Build();
 
@@ -252,7 +272,10 @@ using (var scope = app.Services.CreateScope())
 
 // ─── Middleware Pipeline (order matters!) ───
 
-// 1. Correlation ID — first, so all logs have trace ID
+// 0. Forwarded headers — must be first for correct IP/scheme detection behind proxy
+app.UseForwardedHeaders();
+
+// 1. Correlation ID — so all logs have trace ID
 app.UseMiddleware<CorrelationIdMiddleware>();
 
 // 2. Request timing — wraps everything for perf metrics
@@ -276,9 +299,10 @@ app.UseSerilogRequestLogging(options =>
 // 5. Exception handling — catches all downstream exceptions
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// Swagger available in all environments (production is read-only for API consumers)
+app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patry Closet API v1");
@@ -291,6 +315,14 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHsts();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patry Closet API v1");
+        c.RoutePrefix = "swagger";
+        c.DocumentTitle = "PATRY♡CLOSET API";
+        c.DefaultModelsExpandDepth(0);
+        c.SupportedSubmitMethods(); // Disable Try It Out in production
+    });
 }
 
 app.UseHttpsRedirection();
@@ -303,15 +335,44 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/health");
+// Health check endpoints
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => true,
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            duration = report.TotalDuration.TotalMilliseconds,
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                duration = e.Value.Duration.TotalMilliseconds,
+                description = e.Value.Description,
+                exception = e.Value.Exception?.Message
+            })
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => false
+});
 
 // ─── Startup log ───
 Log.Information("🚀 Patry Closet API starting on {Environment}", app.Environment.EnvironmentName);
 
 app.Run();
-
-// Required for WebApplicationFactory<Program> in integration tests
-public partial class Program { }
 
 // Required for WebApplicationFactory<Program> in integration tests
 public partial class Program { }

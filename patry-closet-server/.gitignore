@@ -30,3 +30,6 @@ secrets.json
 ## Docker volumes
 postgres-data/
 redis-data/
+
+## Environment
+.env
