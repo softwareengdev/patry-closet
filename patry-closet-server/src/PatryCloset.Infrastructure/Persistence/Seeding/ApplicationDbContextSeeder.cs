@@ -19,6 +19,7 @@ public static class ApplicationDbContextSeeder
         await SeedAdminUserAsync(userManager, logger);
         await SeedCategoriesAsync(context, logger);
         await SeedProductsAsync(context, logger);
+        await SeedBlogAsync(context, logger);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager, ILogger logger)
@@ -428,4 +429,281 @@ public static class ApplicationDbContextSeeder
             ["https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80"],
             "Accesorios", "gafas", ["Dorado", "Plateado", "Negro"], ["Única"], null, 4.6m, 198, 86, "Luxe Atelier", true),
     ];
+
+    // ─── Blog Seed Data ───
+
+    private static async Task SeedBlogAsync(ApplicationDbContext context, ILogger logger)
+    {
+        if (await context.BlogAuthors.AnyAsync())
+            return;
+
+        var authors = new BlogAuthor[]
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Patricia Mendoza",
+                Slug = "patricia-mendoza",
+                Role = "Directora Creativa",
+                AvatarUrl = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+                Bio = "Fundadora y directora creativa de PATRY♡CLOSET con más de 15 años de experiencia en moda sostenible.",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Elena Ruiz",
+                Slug = "elena-ruiz",
+                Role = "Editora de Moda",
+                AvatarUrl = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80",
+                Bio = "Periodista de moda y experta en tendencias internacionales.",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Marcos Delgado",
+                Slug = "marcos-delgado",
+                Role = "Experto en Sostenibilidad",
+                AvatarUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+                Bio = "Consultor en moda sostenible y economía circular.",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Lucía Fernández",
+                Slug = "lucia-fernandez",
+                Role = "Estilista Senior",
+                AvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+                Bio = "Estilista profesional especializada en moda contemporánea y street style.",
+            },
+        };
+
+        context.BlogAuthors.AddRange(authors);
+        await context.SaveChangesAsync();
+
+        var now = DateTime.UtcNow;
+        var posts = new BlogPost[]
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Las 10 Tendencias que Dominarán este Otoño-Invierno 2025",
+                Slug = "tendencias-otono-invierno-2025",
+                Excerpt = "Descubre las tendencias más impactantes de la temporada: desde el quiet luxury hasta los tonos burgundy que transformarán tu armario.",
+                Content = @"# Las 10 Tendencias que Dominarán este Otoño-Invierno 2025
+
+La temporada otoño-invierno 2025 llega cargada de propuestas que fusionan elegancia atemporal con toques de audacia contemporánea. En PATRY♡CLOSET hemos seleccionado las diez tendencias que no pueden faltar en tu armario.
+
+## 1. Quiet Luxury
+El lujo silencioso sigue reinando. Prendas de calidad excepcional, cortes impecables y materiales nobles hablan por sí solos sin necesidad de logos evidentes.
+
+## 2. Burgundy Total Look
+El color estrella de la temporada. Desde abrigos hasta accesorios, el burgundy aporta sofisticación y calidez.
+
+## 3. Texturas Envolventes
+Terciopelo, punto grueso y piel vuelta crean looks táctiles que invitan al abrazo.
+
+## 4. Sastrería Oversized
+Blazers amplios y pantalones de pinza con siluetas relajadas pero estructuradas.
+
+## 5. Botas Statement
+Las botas se convierten en protagonistas con diseños de caña alta y tacones escultóricos.",
+                CoverImage = "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80",
+                CoverImageAlt = "Tendencias moda otoño-invierno 2025",
+                Category = "trends",
+                Season = "fall-winter",
+                Tags = """["tendencias","otoño-invierno","quiet-luxury","burgundy"]""",
+                Badge = "trending",
+                ReadingTime = 8,
+                Featured = true,
+                Trending = true,
+                Published = true,
+                PublishedAt = now.AddDays(-2),
+                AuthorId = authors[1].Id,
+                ViewCount = 1240,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Guía Completa: Cómo Crear un Armario Cápsula Sostenible",
+                Slug = "armario-capsula-sostenible",
+                Excerpt = "Aprende a construir un guardarropa minimalista y versátil que reduce tu impacto ambiental sin sacrificar estilo.",
+                Content = @"# Cómo Crear un Armario Cápsula Sostenible
+
+Un armario cápsula es una colección reducida de prendas versátiles que se combinan entre sí para crear múltiples looks. En PATRY♡CLOSET creemos que menos es más.
+
+## ¿Qué es un Armario Cápsula?
+Se trata de seleccionar entre 30 y 40 prendas esenciales que reflejen tu estilo personal y que puedan combinarse de múltiples maneras.
+
+## Pasos para Construirlo
+
+### 1. Audita tu Armario Actual
+Revisa cada prenda y pregúntate: ¿La he usado en los últimos 6 meses? ¿Me hace sentir bien?
+
+### 2. Define tu Paleta de Colores
+Elige 3-4 colores neutros base y 2-3 colores de acento que te favorezcan.
+
+### 3. Invierte en Básicos de Calidad
+Un buen blazer, unos pantalones bien cortados y una camisa blanca impecable son la base de todo.",
+                CoverImage = "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=1200&q=80",
+                CoverImageAlt = "Armario cápsula sostenible organizado",
+                Category = "sustainability",
+                Season = "all-year",
+                Tags = """["sostenibilidad","armario-cápsula","minimalismo","moda-consciente"]""",
+                ReadingTime = 12,
+                Featured = true,
+                Trending = false,
+                Published = true,
+                PublishedAt = now.AddDays(-5),
+                AuthorId = authors[2].Id,
+                ViewCount = 890,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Cómo Combinar Estampados como una Experta",
+                Slug = "combinar-estampados-guia",
+                Excerpt = "Domina el arte del pattern mixing con nuestras reglas de oro para mezclar estampados sin miedo.",
+                Content = @"# Cómo Combinar Estampados como una Experta
+
+Mezclar estampados puede parecer intimidante, pero con las reglas adecuadas se convierte en tu mejor herramienta de estilo.
+
+## Regla 1: Varía las Escalas
+Combina un estampado grande con uno pequeño. Por ejemplo, rayas anchas con lunares pequeños.
+
+## Regla 2: Mantén una Paleta Común
+Asegúrate de que los estampados compartan al menos un color en común.
+
+## Regla 3: Usa un Neutro como Puente
+Una prenda lisa en color neutro entre dos estampados suaviza la transición.
+
+## Combinaciones Infalibles
+- Rayas + Flores
+- Cuadros + Lunares
+- Animal print + Geométricos (con moderación)",
+                CoverImage = "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
+                CoverImageAlt = "Mujer con outfit de estampados combinados",
+                Category = "style-guides",
+                Season = "all-year",
+                Tags = """["estilo","estampados","pattern-mixing","guía"]""",
+                ReadingTime = 6,
+                Featured = false,
+                Trending = true,
+                Published = true,
+                PublishedAt = now.AddDays(-8),
+                AuthorId = authors[3].Id,
+                ViewCount = 654,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Detrás de PATRY♡CLOSET: Nuestra Historia y Valores",
+                Slug = "historia-patry-closet",
+                Excerpt = "Conoce cómo nació PATRY♡CLOSET y los principios que guían cada decisión, desde el diseño hasta la entrega.",
+                Content = @"# Detrás de PATRY♡CLOSET: Nuestra Historia y Valores
+
+PATRY♡CLOSET nació de un sueño: hacer que la moda de calidad sea accesible y sostenible para todas.
+
+## Nuestros Inicios
+Todo empezó en un pequeño taller en Madrid, donde Patricia Mendoza comenzó a diseñar prendas que combinaban artesanía tradicional con diseño contemporáneo.
+
+## Nuestros Valores
+- **Sostenibilidad**: Cada decisión considera su impacto ambiental.
+- **Calidad sobre cantidad**: Prendas diseñadas para durar temporadas.
+- **Inclusividad**: Moda para todos los cuerpos y estilos.
+- **Transparencia**: Cadena de suministro abierta y honesta.
+
+## Mirando al Futuro
+Seguimos comprometidos con innovar en materiales sostenibles y prácticas éticas de producción.",
+                CoverImage = "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80",
+                CoverImageAlt = "Taller de diseño PATRY CLOSET",
+                Category = "behind-the-brand",
+                Season = null,
+                Tags = """["marca","historia","valores","sostenibilidad"]""",
+                Badge = "new",
+                ReadingTime = 10,
+                Featured = true,
+                Trending = false,
+                Published = true,
+                PublishedAt = now.AddDays(-12),
+                AuthorId = authors[0].Id,
+                ViewCount = 1580,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Colaboración Exclusiva: PATRY♡CLOSET × Artesanos Locales",
+                Slug = "colaboracion-artesanos-locales",
+                Excerpt = "Descubre nuestra nueva colección cápsula creada en colaboración con artesanos textiles de toda España.",
+                Content = @"# Colaboración Exclusiva: PATRY♡CLOSET × Artesanos Locales
+
+Nos emociona presentar nuestra colección más especial: una colaboración con maestros artesanos de distintas regiones de España.
+
+## El Proyecto
+Durante 6 meses, nuestro equipo de diseño trabajó codo a codo con artesanos textiles de Galicia, Andalucía y Cataluña.
+
+## Las Piezas
+Cada pieza de la colección incorpora técnicas artesanales tradicionales:
+- **Encaje de bolillos** de Camariñas en blusas contemporáneas
+- **Bordado a mano** andaluz en chaquetas denim
+- **Tejido a telar** catalán en accesorios premium
+
+## Edición Limitada
+Solo 200 unidades de cada diseño, numeradas y certificadas. Cada prenda incluye una etiqueta con la historia del artesano que la creó.",
+                CoverImage = "https://images.unsplash.com/photo-1558171813-4c088753af8f?auto=format&fit=crop&w=1200&q=80",
+                CoverImageAlt = "Artesana tejiendo en telar tradicional",
+                Category = "collaborations",
+                Season = "spring-summer",
+                Tags = """["colaboración","artesanía","edición-limitada","hecho-en-españa"]""",
+                Badge = "new",
+                ReadingTime = 7,
+                Featured = true,
+                Trending = true,
+                Published = true,
+                PublishedAt = now.AddDays(-1),
+                AuthorId = authors[0].Id,
+                ViewCount = 2100,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Primavera-Verano 2025: Colores que Iluminan",
+                Slug = "colores-primavera-verano-2025",
+                Excerpt = "Los tonos pastel y los estallidos de color neón se fusionan en la paleta más vibrante de la próxima temporada.",
+                Content = @"# Primavera-Verano 2025: Colores que Iluminan
+
+La próxima temporada primavera-verano viene cargada de optimismo cromático. Te contamos qué colores dominarán las calles.
+
+## Pasteles Sofisticados
+El lavanda, rosa cuarzo y azul cielo se presentan en versiones más maduras y sofisticadas.
+
+## Neón Controlado
+Toques de verde lima, naranja eléctrico y fucsia como acentos en looks neutros.
+
+## El Blanco Óptico
+El blanco puro se consolida como el nuevo negro. Looks total white con diferentes texturas.
+
+## Cómo Incorporarlos
+- Empieza por accesorios si los colores vivos te intimidan
+- Combina un color pastel con uno neutro para equilibrio
+- Usa el neón como acento, nunca como base del look",
+                CoverImage = "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80",
+                CoverImageAlt = "Paleta de colores primavera verano 2025",
+                Category = "trends",
+                Season = "spring-summer",
+                Tags = """["tendencias","primavera-verano","colores","paleta"]""",
+                ReadingTime = 5,
+                Featured = false,
+                Trending = false,
+                Published = true,
+                PublishedAt = now.AddDays(-15),
+                AuthorId = authors[1].Id,
+                ViewCount = 430,
+            },
+        };
+
+        context.BlogPosts.AddRange(posts);
+        await context.SaveChangesAsync();
+
+        logger.LogInformation("Seeded {Count} blog authors and {PostCount} blog posts", authors.Length, posts.Length);
+    }
 }
