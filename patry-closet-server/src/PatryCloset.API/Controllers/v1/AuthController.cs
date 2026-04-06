@@ -48,7 +48,9 @@ public sealed class AuthController(ISender mediator) : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        var command = new LoginCommand(request.Email, request.Password);
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var command = new LoginCommand(request.Email, request.Password, ipAddress, userAgent);
         var result = await mediator.Send(command, ct);
 
         if (!result.IsSuccess)
@@ -86,7 +88,9 @@ public sealed class AuthController(ISender mediator) : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken ct)
     {
-        var command = new RefreshTokenCommand(request.RefreshToken);
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var command = new RefreshTokenCommand(request.RefreshToken, ipAddress, userAgent);
         var result = await mediator.Send(command, ct);
 
         if (!result.IsSuccess)

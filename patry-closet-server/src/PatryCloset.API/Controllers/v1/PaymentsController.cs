@@ -145,6 +145,87 @@ public sealed class PaymentsController(
 
         return (profile?.Id, email);
     }
+
+    private string? GetUserId() =>
+        User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+
+    // ─── Saved Payment Methods ───
+
+    /// <summary>
+    /// Get all saved payment methods for the current user.
+    /// </summary>
+    [HttpGet("methods")]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<PaymentMethodResponse>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPaymentMethods(CancellationToken ct)
+    {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var result = await mediator.Send(new GetPaymentMethodsQuery(userId), ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<IReadOnlyList<PaymentMethodResponse>>.Ok(result.Value!))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>
+    /// Add a payment method (Stripe PaymentMethod ID from frontend).
+    /// </summary>
+    [HttpPost("methods")]
+    [ProducesResponseType(typeof(ApiResponse<PaymentMethodResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddPaymentMethod(
+        [FromBody] AddPaymentMethodRequest request, CancellationToken ct)
+    {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var result = await mediator.Send(
+            new AddPaymentMethodCommand(userId, request.PaymentMethodId), ct);
+
+        return result.IsSuccess
+            ? StatusCode(StatusCodes.Status201Created,
+                ApiResponse<PaymentMethodResponse>.Ok(result.Value!, "Método de pago agregado"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>
+    /// Remove a saved payment method.
+    /// </summary>
+    [HttpDelete("methods/{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemovePaymentMethod(Guid id, CancellationToken ct)
+    {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var result = await mediator.Send(
+            new RemovePaymentMethodCommand(userId, id), ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<object>.Ok(null!, "Método de pago eliminado"))
+            : NotFound(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>
+    /// Set a payment method as the default.
+    /// </summary>
+    [HttpPut("methods/{id:guid}/default")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SetDefaultPaymentMethod(Guid id, CancellationToken ct)
+    {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var result = await mediator.Send(
+            new SetDefaultPaymentMethodCommand(userId, id), ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<object>.Ok(null!, "Método de pago predeterminado actualizado"))
+            : NotFound(ApiResponse<object>.Fail(result.Error!));
+    }
 }
 
 public sealed record ConfirmPaymentRequest

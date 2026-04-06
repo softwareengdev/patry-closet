@@ -49,7 +49,9 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
 
 public sealed record LoginCommand(
     string Email,
-    string Password
+    string Password,
+    string? IpAddress = null,
+    string? UserAgent = null
 ) : IRequest<Result<AuthResponse>>;
 
 public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
@@ -68,7 +70,9 @@ public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
 // ─── Refresh Token ───
 
 public sealed record RefreshTokenCommand(
-    string RefreshToken
+    string RefreshToken,
+    string? IpAddress = null,
+    string? UserAgent = null
 ) : IRequest<Result<AuthResponse>>;
 
 public sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>

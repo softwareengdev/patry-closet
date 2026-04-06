@@ -24,7 +24,7 @@ public sealed class LoginCommandHandler(IAuthService authService)
 {
     public async Task<Result<AuthResponse>> Handle(LoginCommand request, CancellationToken ct)
     {
-        return await authService.LoginAsync(request.Email, request.Password, ct);
+        return await authService.LoginAsync(request.Email, request.Password, request.IpAddress, request.UserAgent, ct);
     }
 }
 
@@ -33,7 +33,7 @@ public sealed class RefreshTokenCommandHandler(IAuthService authService)
 {
     public async Task<Result<AuthResponse>> Handle(RefreshTokenCommand request, CancellationToken ct)
     {
-        return await authService.RefreshTokenAsync(request.RefreshToken, ct);
+        return await authService.RefreshTokenAsync(request.RefreshToken, request.IpAddress, request.UserAgent, ct);
     }
 }
 

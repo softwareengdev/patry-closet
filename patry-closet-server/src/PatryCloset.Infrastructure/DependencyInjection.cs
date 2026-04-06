@@ -99,6 +99,7 @@ public static class DependencyInjection
         // Stripe Payments
         services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
         services.AddScoped<IPaymentService, StripePaymentService>();
+        services.AddScoped<IPaymentMethodService, PaymentMethodService>();
         services.AddScoped<StripeWebhookHandler>();
 
         // Email

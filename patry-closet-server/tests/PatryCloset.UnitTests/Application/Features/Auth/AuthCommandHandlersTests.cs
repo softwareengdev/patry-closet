@@ -102,7 +102,7 @@ public class LoginCommandHandlerTests
         var command = new LoginCommand("test@email.com", "P@ssw0rd!");
         var expected = AuthTestHelpers.CreateAuthResponse();
         _authService
-            .Setup(s => s.LoginAsync(command.Email, command.Password, It.IsAny<CancellationToken>()))
+            .Setup(s => s.LoginAsync(command.Email, command.Password, It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<AuthResponse>.Success(expected));
 
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -116,7 +116,7 @@ public class LoginCommandHandlerTests
     {
         var command = new LoginCommand("test@email.com", "wrong-password");
         _authService
-            .Setup(s => s.LoginAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.LoginAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<AuthResponse>.Failure("Invalid credentials"));
 
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -131,12 +131,12 @@ public class LoginCommandHandlerTests
         var command = new LoginCommand("user@email.com", "MyP@ss1!");
         using var cts = new CancellationTokenSource();
         _authService
-            .Setup(s => s.LoginAsync(command.Email, command.Password, cts.Token))
+            .Setup(s => s.LoginAsync(command.Email, command.Password, It.IsAny<string?>(), It.IsAny<string?>(), cts.Token))
             .ReturnsAsync(Result<AuthResponse>.Success(AuthTestHelpers.CreateAuthResponse()));
 
         await _sut.Handle(command, cts.Token);
 
-        _authService.Verify(s => s.LoginAsync(command.Email, command.Password, cts.Token), Times.Once);
+        _authService.Verify(s => s.LoginAsync(command.Email, command.Password, It.IsAny<string?>(), It.IsAny<string?>(), cts.Token), Times.Once);
     }
 }
 
@@ -157,7 +157,7 @@ public class RefreshTokenCommandHandlerTests
         var command = new RefreshTokenCommand("valid-refresh-token");
         var expected = AuthTestHelpers.CreateAuthResponse();
         _authService
-            .Setup(s => s.RefreshTokenAsync(command.RefreshToken, It.IsAny<CancellationToken>()))
+            .Setup(s => s.RefreshTokenAsync(command.RefreshToken, It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<AuthResponse>.Success(expected));
 
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -171,7 +171,7 @@ public class RefreshTokenCommandHandlerTests
     {
         var command = new RefreshTokenCommand("expired-token");
         _authService
-            .Setup(s => s.RefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Setup(s => s.RefreshTokenAsync(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<AuthResponse>.Failure("Token expired"));
 
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -186,12 +186,12 @@ public class RefreshTokenCommandHandlerTests
         var command = new RefreshTokenCommand("my-refresh-token");
         using var cts = new CancellationTokenSource();
         _authService
-            .Setup(s => s.RefreshTokenAsync(command.RefreshToken, cts.Token))
+            .Setup(s => s.RefreshTokenAsync(command.RefreshToken, It.IsAny<string?>(), It.IsAny<string?>(), cts.Token))
             .ReturnsAsync(Result<AuthResponse>.Success(AuthTestHelpers.CreateAuthResponse()));
 
         await _sut.Handle(command, cts.Token);
 
-        _authService.Verify(s => s.RefreshTokenAsync(command.RefreshToken, cts.Token), Times.Once);
+        _authService.Verify(s => s.RefreshTokenAsync(command.RefreshToken, It.IsAny<string?>(), It.IsAny<string?>(), cts.Token), Times.Once);
     }
 }
 

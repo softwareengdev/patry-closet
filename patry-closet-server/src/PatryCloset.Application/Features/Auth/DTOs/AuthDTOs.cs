@@ -118,6 +118,8 @@ public sealed record SessionResponse
 {
     public required string Id { get; init; }
     public required string Device { get; init; }
+    public string? Browser { get; init; }
+    public string? Os { get; init; }
     public string? Location { get; init; }
     public required string IpAddress { get; init; }
     public required DateTime LastActive { get; init; }

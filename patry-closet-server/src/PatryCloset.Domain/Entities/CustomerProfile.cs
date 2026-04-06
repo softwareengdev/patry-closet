@@ -20,6 +20,7 @@ public class CustomerProfile : AuditableEntity
     public string? FavoriteBrands { get; set; }
     public string? FavoriteCategories { get; set; }
     public string? NotificationPreferences { get; set; }
+    public string? StripeCustomerId { get; set; }
     public bool EmailVerified { get; set; }
     public string? EmailVerificationToken { get; set; }
     public DateTime? EmailVerificationTokenExpiry { get; set; }

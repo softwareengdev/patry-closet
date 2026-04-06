@@ -28,6 +28,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<BlogAuthor> BlogAuthors => Set<BlogAuthor>();
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<SavedPaymentMethod> SavedPaymentMethods => Set<SavedPaymentMethod>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

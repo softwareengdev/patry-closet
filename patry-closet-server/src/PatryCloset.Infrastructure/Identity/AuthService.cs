@@ -88,7 +88,7 @@ public sealed class AuthService : IAuthService
         return await GenerateAuthResponseAsync(user);
     }
 
-    public async Task<Result<AuthResponse>> LoginAsync(string email, string password, CancellationToken ct)
+    public async Task<Result<AuthResponse>> LoginAsync(string email, string password, string? ipAddress = null, string? userAgent = null, CancellationToken ct = default)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
@@ -120,11 +120,22 @@ public sealed class AuthService : IAuthService
         await _userManager.UpdateAsync(user);
 
         _logger.LogInformation("User logged in: {Email}", email);
-        return await GenerateAuthResponseAsync(user);
+        return await GenerateAuthResponseAsync(user, ipAddress, userAgent);
     }
 
-    public async Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken, CancellationToken ct)
+    public async Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken, string? ipAddress = null, string? userAgent = null, CancellationToken ct = default)
     {
+        // First check if there's a valid UserSession for this refresh token
+        var session = await _dbContext.UserSessions
+            .FirstOrDefaultAsync(s => s.RefreshToken == refreshToken && !s.IsRevoked, ct);
+
+        if (session is not null && session.ExpiresAt <= DateTime.UtcNow)
+        {
+            session.IsRevoked = true;
+            await _dbContext.SaveChangesAsync(ct);
+            return Result<AuthResponse>.Failure("Refresh token inválido o expirado");
+        }
+
         var user = await _userManager.Users
             .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken, ct);
 
@@ -138,8 +149,16 @@ public sealed class AuthService : IAuthService
             return Result<AuthResponse>.Failure("Cuenta desactivada");
         }
 
+        // Update session last active
+        if (session is not null)
+        {
+            session.LastActive = DateTime.UtcNow;
+            if (ipAddress is not null) session.IpAddress = ipAddress;
+            await _dbContext.SaveChangesAsync(ct);
+        }
+
         _logger.LogInformation("Token refreshed for user: {Email}", user.Email);
-        return await GenerateAuthResponseAsync(user);
+        return await GenerateAuthResponseAsync(user, ipAddress, userAgent);
     }
 
     public async Task<Result> RevokeTokenAsync(string userId, CancellationToken ct)
@@ -148,6 +167,18 @@ public sealed class AuthService : IAuthService
         if (user is null)
         {
             return Result.Failure("Usuario no encontrado");
+        }
+
+        // Revoke the active session matching the current refresh token
+        if (!string.IsNullOrEmpty(user.RefreshToken))
+        {
+            var session = await _dbContext.UserSessions
+                .FirstOrDefaultAsync(s => s.RefreshToken == user.RefreshToken && !s.IsRevoked, ct);
+            if (session is not null)
+            {
+                session.IsRevoked = true;
+                await _dbContext.SaveChangesAsync(ct);
+            }
         }
 
         user.RefreshToken = null;
@@ -352,15 +383,48 @@ public sealed class AuthService : IAuthService
         return await GenerateAuthResponseAsync(user);
     }
 
-    private async Task<Result<AuthResponse>> GenerateAuthResponseAsync(ApplicationUser user)
+    private async Task<Result<AuthResponse>> GenerateAuthResponseAsync(
+        ApplicationUser user, string? ipAddress = null, string? userAgent = null)
     {
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Email!, roles);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
+        // Revoke old session for this user's current refresh token (if refreshing)
+        if (!string.IsNullOrEmpty(user.RefreshToken))
+        {
+            var oldSession = await _dbContext.UserSessions
+                .FirstOrDefaultAsync(s => s.RefreshToken == user.RefreshToken && !s.IsRevoked);
+            if (oldSession is not null)
+            {
+                oldSession.IsRevoked = true;
+            }
+        }
+
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_refreshTokenExpirationDays);
         await _userManager.UpdateAsync(user);
+
+        // Create new UserSession
+        var (device, browser, os) = ParseUserAgent(userAgent);
+        var session = new UserSession
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            RefreshToken = refreshToken,
+            Device = device,
+            Browser = browser,
+            OperatingSystem = os,
+            IpAddress = ipAddress,
+            LastActive = DateTime.UtcNow,
+            ExpiresAt = user.RefreshTokenExpiryTime.Value,
+            IsRevoked = false,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = user.Id,
+        };
+
+        _dbContext.UserSessions.Add(session);
+        await _dbContext.SaveChangesAsync();
 
         var expiresAt = DateTime.UtcNow.AddMinutes(60); // same as token config
 
@@ -391,6 +455,39 @@ public sealed class AuthService : IAuthService
                 EmailVerified = profile?.EmailVerified ?? user.EmailConfirmed,
             },
         });
+    }
+
+    private static (string? Device, string? Browser, string? Os) ParseUserAgent(string? userAgent)
+    {
+        if (string.IsNullOrWhiteSpace(userAgent))
+            return (null, null, null);
+
+        string? browser = null;
+        string? os = null;
+        string? device = null;
+
+        // Simple OS detection
+        if (userAgent.Contains("Windows", StringComparison.OrdinalIgnoreCase)) os = "Windows";
+        else if (userAgent.Contains("Mac OS X", StringComparison.OrdinalIgnoreCase)) os = "macOS";
+        else if (userAgent.Contains("iPhone", StringComparison.OrdinalIgnoreCase)) os = "iOS";
+        else if (userAgent.Contains("iPad", StringComparison.OrdinalIgnoreCase)) os = "iPadOS";
+        else if (userAgent.Contains("Android", StringComparison.OrdinalIgnoreCase)) os = "Android";
+        else if (userAgent.Contains("Linux", StringComparison.OrdinalIgnoreCase)) os = "Linux";
+
+        // Simple browser detection
+        if (userAgent.Contains("Edg/", StringComparison.OrdinalIgnoreCase)) browser = "Edge";
+        else if (userAgent.Contains("Chrome/", StringComparison.OrdinalIgnoreCase)) browser = "Chrome";
+        else if (userAgent.Contains("Firefox/", StringComparison.OrdinalIgnoreCase)) browser = "Firefox";
+        else if (userAgent.Contains("Safari/", StringComparison.OrdinalIgnoreCase) &&
+                 !userAgent.Contains("Chrome/", StringComparison.OrdinalIgnoreCase)) browser = "Safari";
+
+        // Simple device detection
+        if (userAgent.Contains("Mobile", StringComparison.OrdinalIgnoreCase)) device = "Mobile";
+        else if (userAgent.Contains("Tablet", StringComparison.OrdinalIgnoreCase) ||
+                 userAgent.Contains("iPad", StringComparison.OrdinalIgnoreCase)) device = "Tablet";
+        else device = "Desktop";
+
+        return (device, browser, os);
     }
 
     private async Task<CustomerProfile> GetOrCreateProfileAsync(string userId, CancellationToken ct)
@@ -636,6 +733,16 @@ public sealed class AuthService : IAuthService
         user.RefreshTokenExpiryTime = null;
         await _userManager.UpdateAsync(user);
 
+        // Revoke all active sessions
+        var activeSessions = await _dbContext.UserSessions
+            .Where(s => s.UserId == userId && !s.IsRevoked)
+            .ToListAsync(ct);
+
+        foreach (var session in activeSessions)
+            session.IsRevoked = true;
+
+        await _dbContext.SaveChangesAsync(ct);
+
         _logger.LogInformation("All sessions revoked for user: {Email}", user.Email);
         return Result.Success();
     }
@@ -647,23 +754,47 @@ public sealed class AuthService : IAuthService
         if (user is null)
             return Result<IReadOnlyList<SessionResponse>>.Failure("Usuario no encontrado");
 
-        var sessions = new List<SessionResponse>();
+        var activeSessions = await _dbContext.UserSessions
+            .AsNoTracking()
+            .Where(s => s.UserId == userId && !s.IsRevoked && s.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(s => s.LastActive)
+            .ToListAsync(ct);
 
-        // Simple implementation: report current session based on RefreshToken existence
-        if (!string.IsNullOrEmpty(user.RefreshToken))
+        if (activeSessions.Count == 0)
         {
-            sessions.Add(new SessionResponse
+            // Fallback: if no sessions in DB yet, show current based on RefreshToken
+            var sessions = new List<SessionResponse>();
+            if (!string.IsNullOrEmpty(user.RefreshToken))
             {
-                Id = "current",
-                Device = "Sesión actual",
-                Location = null,
-                IpAddress = "N/A",
-                LastActive = user.LastLoginAt ?? user.CreatedAt,
-                IsCurrent = true,
-            });
+                sessions.Add(new SessionResponse
+                {
+                    Id = "current",
+                    Device = "Sesión actual",
+                    Browser = null,
+                    Os = null,
+                    Location = null,
+                    IpAddress = "N/A",
+                    LastActive = user.LastLoginAt ?? user.CreatedAt,
+                    IsCurrent = true,
+                });
+            }
+            return Result<IReadOnlyList<SessionResponse>>.Success(sessions.AsReadOnly());
         }
 
-        return Result<IReadOnlyList<SessionResponse>>.Success(sessions.AsReadOnly());
+        var currentRefreshToken = user.RefreshToken;
+        var result = activeSessions.Select(s => new SessionResponse
+        {
+            Id = s.Id.ToString(),
+            Device = s.Device ?? "Dispositivo desconocido",
+            Browser = s.Browser,
+            Os = s.OperatingSystem,
+            Location = s.Location,
+            IpAddress = s.IpAddress ?? "N/A",
+            LastActive = s.LastActive,
+            IsCurrent = currentRefreshToken is not null && s.RefreshToken == currentRefreshToken,
+        }).ToList();
+
+        return Result<IReadOnlyList<SessionResponse>>.Success(result.AsReadOnly());
     }
 
     public async Task<Result> RevokeSessionAsync(string userId, string sessionId, CancellationToken ct)
@@ -672,10 +803,35 @@ public sealed class AuthService : IAuthService
         if (user is null)
             return Result.Failure("Usuario no encontrado");
 
-        // Simple implementation: clear refresh token
-        user.RefreshToken = null;
-        user.RefreshTokenExpiryTime = null;
-        await _userManager.UpdateAsync(user);
+        if (!Guid.TryParse(sessionId, out var sessionGuid))
+        {
+            // Legacy "current" session handling for backward compatibility
+            if (sessionId == "current")
+            {
+                user.RefreshToken = null;
+                user.RefreshTokenExpiryTime = null;
+                await _userManager.UpdateAsync(user);
+                return Result.Success();
+            }
+            return Result.Failure("ID de sesión inválido");
+        }
+
+        var session = await _dbContext.UserSessions
+            .FirstOrDefaultAsync(s => s.Id == sessionGuid && s.UserId == userId && !s.IsRevoked, ct);
+
+        if (session is null)
+            return Result.Failure("Sesión no encontrada");
+
+        session.IsRevoked = true;
+        await _dbContext.SaveChangesAsync(ct);
+
+        // If this session's refresh token matches the user's current one, clear it
+        if (user.RefreshToken == session.RefreshToken)
+        {
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+            await _userManager.UpdateAsync(user);
+        }
 
         _logger.LogInformation("Session {SessionId} revoked for user: {Email}", sessionId, user.Email);
         return Result.Success();

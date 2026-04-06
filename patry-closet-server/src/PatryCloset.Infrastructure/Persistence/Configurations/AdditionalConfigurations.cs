@@ -68,6 +68,7 @@ public class CustomerProfileConfiguration : IEntityTypeConfiguration<CustomerPro
         builder.Property(c => c.AvatarUrl).HasMaxLength(512);
         builder.Property(c => c.PreferredLanguage).HasMaxLength(8);
         builder.Property(c => c.PreferredCurrency).HasMaxLength(3);
+        builder.Property(c => c.StripeCustomerId).HasMaxLength(256);
 
         builder.HasIndex(c => c.UserId).IsUnique();
 
@@ -177,5 +178,42 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .WithMany(c => c.Addresses)
             .HasForeignKey(a => a.CustomerProfileId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class SavedPaymentMethodConfiguration : IEntityTypeConfiguration<SavedPaymentMethod>
+{
+    public void Configure(EntityTypeBuilder<SavedPaymentMethod> builder)
+    {
+        builder.HasKey(pm => pm.Id);
+
+        builder.Property(pm => pm.UserId).HasMaxLength(450).IsRequired();
+        builder.Property(pm => pm.StripePaymentMethodId).HasMaxLength(256).IsRequired();
+        builder.Property(pm => pm.StripeCustomerId).HasMaxLength(256).IsRequired();
+        builder.Property(pm => pm.Brand).HasMaxLength(32).IsRequired();
+        builder.Property(pm => pm.Last4).HasMaxLength(4).IsRequired();
+        builder.Property(pm => pm.CardholderName).HasMaxLength(256);
+
+        builder.HasIndex(pm => pm.UserId);
+        builder.HasIndex(pm => pm.StripePaymentMethodId).IsUnique();
+    }
+}
+
+public class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
+{
+    public void Configure(EntityTypeBuilder<UserSession> builder)
+    {
+        builder.HasKey(s => s.Id);
+
+        builder.Property(s => s.UserId).HasMaxLength(450).IsRequired();
+        builder.Property(s => s.RefreshToken).HasMaxLength(512).IsRequired();
+        builder.Property(s => s.Device).HasMaxLength(256);
+        builder.Property(s => s.Browser).HasMaxLength(128);
+        builder.Property(s => s.OperatingSystem).HasMaxLength(128);
+        builder.Property(s => s.IpAddress).HasMaxLength(64);
+        builder.Property(s => s.Location).HasMaxLength(256);
+
+        builder.HasIndex(s => s.UserId);
+        builder.HasIndex(s => s.RefreshToken).IsUnique();
     }
 }
