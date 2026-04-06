@@ -74,6 +74,7 @@ public static class DependencyInjection
 
         // Services
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<IBlogService, BlogService>();
 
         // Caching — use in-memory distributed cache for dev, Redis for prod
         var redisConnection = configuration.GetConnectionString("Redis");
@@ -100,6 +101,10 @@ public static class DependencyInjection
 
         // Email
         services.AddScoped<IEmailService, Email.SmtpEmailService>();
+
+        // Contact & Notifications
+        services.AddScoped<IContactService, ContactService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         // File Storage
         services.Configure<CloudinarySettings>(configuration.GetSection(CloudinarySettings.SectionName));
