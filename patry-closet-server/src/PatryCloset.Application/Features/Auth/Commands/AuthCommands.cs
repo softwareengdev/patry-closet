@@ -154,6 +154,29 @@ public sealed class ResetPasswordCommandValidator : AbstractValidator<ResetPassw
     }
 }
 
+// ─── Social Login ───
+
+public sealed record SocialLoginCommand(
+    string Provider,
+    string Token,
+    string? Email,
+    string? Name,
+    string? Avatar
+) : IRequest<Result<AuthResponse>>;
+
+public sealed class SocialLoginCommandValidator : AbstractValidator<SocialLoginCommand>
+{
+    public SocialLoginCommandValidator()
+    {
+        RuleFor(x => x.Provider)
+            .NotEmpty().WithMessage("El proveedor es obligatorio")
+            .Must(p => p is "google" or "apple").WithMessage("Proveedor no soportado");
+
+        RuleFor(x => x.Token)
+            .NotEmpty().WithMessage("El token es obligatorio");
+    }
+}
+
 // ─── Revoke Token (Logout) ───
 
 public sealed record RevokeTokenCommand(

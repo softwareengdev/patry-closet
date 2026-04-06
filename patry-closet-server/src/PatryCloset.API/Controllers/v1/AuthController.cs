@@ -59,6 +59,27 @@ public sealed class AuthController(ISender mediator) : ControllerBase
         return Ok(ApiResponse<AuthResponse>.Ok(result.Value!, "Sesión iniciada correctamente"));
     }
 
+    /// <summary>Social login (Google / Apple).</summary>
+    [HttpPost("social-login")]
+    [ProducesResponseType(typeof(ApiResponse<AuthResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SocialLogin([FromBody] SocialLoginRequest request, CancellationToken ct)
+    {
+        var command = new SocialLoginCommand(
+            request.Provider,
+            request.Token,
+            request.Email,
+            request.Name,
+            request.Avatar);
+
+        var result = await mediator.Send(command, ct);
+
+        if (!result.IsSuccess)
+            return BadRequest(ApiResponse<object>.Fail(result.Error!, result.Errors));
+
+        return Ok(ApiResponse<AuthResponse>.Ok(result.Value!, "Sesión iniciada correctamente"));
+    }
+
     /// <summary>Refresh an expired access token.</summary>
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(ApiResponse<AuthResponse>), StatusCodes.Status200OK)]

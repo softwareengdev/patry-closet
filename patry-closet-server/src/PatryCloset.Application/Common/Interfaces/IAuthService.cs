@@ -12,6 +12,7 @@ public interface IAuthService
     Task<Result> ChangePasswordAsync(string userId, string currentPassword, string newPassword, CancellationToken ct = default);
     Task<Result> ForgotPasswordAsync(string email, CancellationToken ct = default);
     Task<Result> ResetPasswordAsync(string email, string token, string newPassword, CancellationToken ct = default);
+    Task<Result<AuthResponse>> SocialLoginAsync(string provider, string token, string? email, string? name, string? avatar, CancellationToken ct = default);
     Task<Result<UserProfileResponse>> GetCurrentUserAsync(string userId, CancellationToken ct = default);
 
     // Profile & Account

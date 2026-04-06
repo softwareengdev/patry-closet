@@ -124,6 +124,15 @@ public sealed record SessionResponse
     public required bool IsCurrent { get; init; }
 }
 
+public sealed record SocialLoginRequest
+{
+    public required string Provider { get; init; }
+    public required string Token { get; init; }
+    public string? Email { get; init; }
+    public string? Name { get; init; }
+    public string? Avatar { get; init; }
+}
+
 public sealed record VerifyEmailRequest
 {
     public required string Token { get; init; }

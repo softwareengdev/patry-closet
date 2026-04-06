@@ -68,8 +68,10 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
         // Auth & Token Services
+        services.AddHttpClient();
         services.AddSingleton<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISocialTokenValidator, SocialTokenValidator>();
         services.AddScoped<IAdminUserService, AdminUserService>();
 
         // Services

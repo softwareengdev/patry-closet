@@ -72,6 +72,16 @@ public sealed class ResetPasswordCommandHandler(IAuthService authService)
     }
 }
 
+public sealed class SocialLoginCommandHandler(IAuthService authService)
+    : IRequestHandler<SocialLoginCommand, Result<AuthResponse>>
+{
+    public async Task<Result<AuthResponse>> Handle(SocialLoginCommand request, CancellationToken ct)
+    {
+        return await authService.SocialLoginAsync(
+            request.Provider, request.Token, request.Email, request.Name, request.Avatar, ct);
+    }
+}
+
 public sealed class RevokeTokenCommandHandler(IAuthService authService)
     : IRequestHandler<RevokeTokenCommand, Result>
 {

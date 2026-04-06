@@ -18,6 +18,7 @@ public sealed class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly ApplicationDbContext _dbContext;
     private readonly IFileStorageService _fileStorageService;
+    private readonly ISocialTokenValidator _socialTokenValidator;
     private readonly int _refreshTokenExpirationDays;
 
     public AuthService(
@@ -26,13 +27,15 @@ public sealed class AuthService : IAuthService
         ILogger<AuthService> logger,
         ApplicationDbContext dbContext,
         IConfiguration configuration,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        ISocialTokenValidator socialTokenValidator)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _logger = logger;
         _dbContext = dbContext;
         _fileStorageService = fileStorageService;
+        _socialTokenValidator = socialTokenValidator;
         _refreshTokenExpirationDays = int.TryParse(
             configuration["Jwt:RefreshTokenExpirationDays"], out var days) ? days : 7;
     }
@@ -256,6 +259,98 @@ public sealed class AuthService : IAuthService
     }
 
     // ─── Private Helpers ───
+
+    public async Task<Result<AuthResponse>> SocialLoginAsync(
+        string provider, string token, string? email, string? name, string? avatar, CancellationToken ct)
+    {
+        SocialUserInfo? userInfo = provider switch
+        {
+            "google" => await _socialTokenValidator.ValidateGoogleTokenAsync(token, ct),
+            "apple" => await _socialTokenValidator.ValidateAppleTokenAsync(token, ct),
+            _ => null,
+        };
+
+        if (userInfo is null)
+            return Result<AuthResponse>.Failure("Token social inválido");
+
+        var userEmail = userInfo.Email ?? email;
+        if (string.IsNullOrEmpty(userEmail))
+            return Result<AuthResponse>.Failure("No se pudo obtener el email del proveedor");
+
+        var user = provider switch
+        {
+            "google" => await _userManager.Users.FirstOrDefaultAsync(u => u.GoogleId == userInfo.ProviderId, ct),
+            "apple" => await _userManager.Users.FirstOrDefaultAsync(u => u.AppleId == userInfo.ProviderId, ct),
+            _ => null,
+        };
+
+        user ??= await _userManager.FindByEmailAsync(userEmail);
+
+        if (user is not null)
+        {
+            if (provider == "google" && string.IsNullOrEmpty(user.GoogleId))
+                user.GoogleId = userInfo.ProviderId;
+            if (provider == "apple" && string.IsNullOrEmpty(user.AppleId))
+                user.AppleId = userInfo.ProviderId;
+
+            if (!user.IsActive)
+                return Result<AuthResponse>.Failure("Cuenta desactivada");
+
+            user.LastLoginAt = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+
+            _logger.LogInformation("Social login ({Provider}) for existing user: {Email}", provider, user.Email);
+        }
+        else
+        {
+            var firstName = userInfo.FirstName ?? name?.Split(' ').FirstOrDefault() ?? "";
+            var lastName = userInfo.LastName ?? name?.Split(' ').Skip(1).FirstOrDefault() ?? "";
+
+            user = new ApplicationUser
+            {
+                UserName = userEmail,
+                Email = userEmail,
+                FirstName = firstName,
+                LastName = lastName,
+                AvatarUrl = userInfo.AvatarUrl ?? avatar,
+                EmailConfirmed = userInfo.EmailVerified,
+                GoogleId = provider == "google" ? userInfo.ProviderId : null,
+                AppleId = provider == "apple" ? userInfo.ProviderId : null,
+                LoginProvider = provider,
+                CreatedAt = DateTime.UtcNow,
+                LastLoginAt = DateTime.UtcNow,
+                IsActive = true,
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                var errors = createResult.Errors.Select(e => e.Description).ToList();
+                _logger.LogWarning("Social registration failed for {Email}: {Errors}", userEmail, string.Join(", ", errors));
+                return Result<AuthResponse>.Failure(errors.AsReadOnly());
+            }
+
+            await _userManager.AddToRoleAsync(user, "Customer");
+
+            var profile = new CustomerProfile
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                AvatarUrl = user.AvatarUrl,
+                EmailVerified = userInfo.EmailVerified,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = user.Id,
+            };
+            _dbContext.CustomerProfiles.Add(profile);
+            await _dbContext.SaveChangesAsync(ct);
+
+            _logger.LogInformation("New user registered via social login ({Provider}): {Email}", provider, userEmail);
+        }
+
+        return await GenerateAuthResponseAsync(user);
+    }
 
     private async Task<Result<AuthResponse>> GenerateAuthResponseAsync(ApplicationUser user)
     {
