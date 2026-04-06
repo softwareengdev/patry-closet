@@ -138,7 +138,8 @@ export const AuthProvider = ({ children }) => {
     const socialLogin = useCallback(async (provider) => {
         setError(null);
         try {
-            const { user: userData, tokens } = await authService.socialLogin(provider);
+            const params = typeof provider === 'string' ? { provider } : provider;
+            const { user: userData, tokens } = await authService.socialLogin(params);
             storeTokens(tokens);
             setUser(userData);
             scheduleRefresh();

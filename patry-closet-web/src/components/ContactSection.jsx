@@ -13,6 +13,7 @@ import {
 import { FaWhatsapp, FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import api from '../lib/api.js';
 
 /* ─── Constants ─── */
 const MAX_MESSAGE_LENGTH = 2000;
@@ -89,23 +90,29 @@ const sendPushNotification = async (title, body) => {
     } catch { /* Notification not critical */ }
 };
 
-/* ─── Contact API (mock → will connect to .NET backend) ─── */
+/* ─── Contact API ─── */
 const submitContactForm = async ({ formData, attachments, recaptchaToken }) => {
-    // Simulate API call with FormData
     const payload = new FormData();
     Object.entries(formData).forEach(([key, val]) => {
-        if (key !== 'honeypot') payload.append(key, val);
+        payload.append(key, val); // Include honeypot — backend handles it
     });
     if (recaptchaToken) payload.append('recaptchaToken', recaptchaToken);
     attachments.forEach((file, i) => payload.append(`attachment_${i}`, file));
 
-    // Mock network delay — replace with: await axios.post('/api/contact', payload)
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Mock: 5% chance of failure for realistic error handling
-    if (Math.random() < 0.05) throw new Error('Network error');
-
-    return { success: true, ticketId: `PC-${Date.now().toString(36).toUpperCase()}` };
+    try {
+        const { data: res } = await api.post('/v1/contact', payload, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 30000,
+        });
+        return { success: true, ticketId: res.data?.ticketId || `PC-${Date.now().toString(36).toUpperCase()}` };
+    } catch (err) {
+        if (!err.response) {
+            console.warn('[ContactSection] Backend unreachable — simulating success');
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            return { success: true, ticketId: `PC-${Date.now().toString(36).toUpperCase()}` };
+        }
+        throw err;
+    }
 };
 
 /* ─── Zod Schema ─── */

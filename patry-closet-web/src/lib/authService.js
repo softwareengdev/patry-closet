@@ -50,13 +50,15 @@ const adaptBackendUser = (bu) => ({
     firstName: bu.firstName,
     lastName: bu.lastName,
     avatar: bu.avatarUrl || null,
-    phone: null,
-    dateOfBirth: null,
-    gender: null,
-    emailVerified: true,
+    phone: bu.phone || null,
+    dateOfBirth: bu.dateOfBirth || null,
+    gender: bu.gender || null,
+    emailVerified: bu.emailVerified ?? true,
     twoFactorEnabled: false,
     createdAt: bu.createdAt,
     memberSince: new Date(bu.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    preferredLanguage: bu.preferredLanguage || 'es',
+    preferredCurrency: bu.preferredCurrency || 'EUR',
     preferences: {
         favoriteSizes: [],
         favoriteColors: [],
@@ -482,9 +484,20 @@ const authService = {
     },
 
     async logoutAllDevices() {
-        // No dedicated backend endpoint yet — delegate to regular logout
-        await authService.logout();
-        return { message: 'Logged out from all devices' };
+        if (useMock) {
+            return mockAuth.logout().then(() => ({ message: 'Logged out from all devices' }));
+        }
+        try {
+            await api.post('/v1/auth/logout-all');
+            localStorage.removeItem(STORAGE_KEYS.ACCESS);
+            localStorage.removeItem(STORAGE_KEYS.REFRESH);
+            localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+            return { message: 'Logged out from all devices' };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) return mockAuth.logout().then(() => ({ message: 'Logged out from all devices' }));
+            throw err;
+        }
     },
 
     async refreshToken(refreshTokenValue) {
@@ -525,29 +538,82 @@ const authService = {
     },
 
     async updateProfile(updates) {
-        // No backend endpoint yet — always mock
-        await delay();
-        const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
-        if (!token) throw { response: { status: 401 } };
+        if (useMock) {
+            await delay();
+            const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
+            if (!token) throw { response: { status: 401 } };
 
-        const decoded = JSON.parse(atob(token.split('.')[1]));
-        if (decoded.email === DEMO_USER.email || decoded.sub === DEMO_USER.id) {
-            return { ...DEMO_USER, ...updates, password: undefined };
+            const decoded = JSON.parse(atob(token.split('.')[1]));
+            if (decoded.email === DEMO_USER.email || decoded.sub === DEMO_USER.id) {
+                return { ...DEMO_USER, ...updates, password: undefined };
+            }
+
+            const users = getMockUsers();
+            const idx = users.findIndex((u) => u.id === decoded.sub);
+            if (idx === -1) throw { response: { status: 404 } };
+            users[idx] = { ...users[idx], ...updates };
+            saveMockUsers(users);
+            const { _password, ...rest } = users[idx];
+            return rest;
         }
 
-        const users = getMockUsers();
-        const idx = users.findIndex((u) => u.id === decoded.sub);
-        if (idx === -1) throw { response: { status: 404 } };
-        users[idx] = { ...users[idx], ...updates };
-        saveMockUsers(users);
-        const { _password, ...rest } = users[idx];
-        return rest;
+        try {
+            const { data: res } = await api.put('/v1/auth/profile', {
+                firstName: updates.firstName,
+                lastName: updates.lastName,
+                phone: updates.phone,
+                dateOfBirth: updates.dateOfBirth,
+                gender: updates.gender,
+                preferredLanguage: updates.preferredLanguage,
+                preferredCurrency: updates.preferredCurrency,
+            });
+            return adaptBackendUser(res.data);
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) {
+                await delay();
+                const token = localStorage.getItem(STORAGE_KEYS.ACCESS);
+                if (!token) throw { response: { status: 401 } };
+
+                const decoded = JSON.parse(atob(token.split('.')[1]));
+                if (decoded.email === DEMO_USER.email || decoded.sub === DEMO_USER.id) {
+                    return { ...DEMO_USER, ...updates, password: undefined };
+                }
+
+                const users = getMockUsers();
+                const idx = users.findIndex((u) => u.id === decoded.sub);
+                if (idx === -1) throw { response: { status: 404 } };
+                users[idx] = { ...users[idx], ...updates };
+                saveMockUsers(users);
+                const { _password, ...rest } = users[idx];
+                return rest;
+            }
+            throw err;
+        }
     },
 
     async uploadAvatar(file) {
-        await delay(1200);
-        const url = URL.createObjectURL(file);
-        return { avatar: url };
+        if (useMock) {
+            await delay(1200);
+            const url = URL.createObjectURL(file);
+            return { avatar: url };
+        }
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const { data: res } = await api.post('/v1/auth/avatar', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return { avatar: res.data?.avatarUrl || res.data?.avatar };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) {
+                await delay(1200);
+                const url = URL.createObjectURL(file);
+                return { avatar: url };
+            }
+            throw err;
+        }
     },
 
     async changePassword(currentPassword, newPassword) {
@@ -599,31 +665,81 @@ const authService = {
     },
 
     async verifyEmail(token) {
-        // No backend endpoint yet
-        await delay();
-        if (!token) throw { response: { status: 400, data: { message: 'Invalid verification token' } } };
-        return { message: 'Email verified successfully', verified: true };
+        if (useMock) {
+            await delay();
+            if (!token) throw { response: { status: 400, data: { message: 'Invalid verification token' } } };
+            return { message: 'Email verified successfully', verified: true };
+        }
+        try {
+            await api.post('/v1/auth/verify-email', { token });
+            return { message: 'Email verified successfully', verified: true };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) {
+                await delay();
+                if (!token) throw { response: { status: 400, data: { message: 'Invalid verification token' } } };
+                return { message: 'Email verified successfully', verified: true };
+            }
+            throw err;
+        }
     },
 
     async resendVerification(email) {
-        await delay();
-        return { message: 'Verification email sent' };
+        if (useMock) {
+            await delay();
+            return { message: 'Verification email sent' };
+        }
+        try {
+            await api.post('/v1/auth/resend-verification', { email });
+            return { message: 'Verification email sent' };
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) {
+                await delay();
+                return { message: 'Verification email sent' };
+            }
+            throw err;
+        }
     },
 
-    async socialLogin(provider) {
-        // No backend endpoint yet — always mock
-        await delay(1200);
-        const user = {
-            ...DEMO_USER,
-            id: 'usr_social_' + provider,
-            email: `demo.${provider}@patrycloset.com`,
-            firstName: provider === 'google' ? 'Google' : 'Apple',
-            lastName: 'User',
-            emailVerified: true,
-        };
-        const accessToken = createMockJWT({ sub: user.id, email: user.email }, 15);
-        const refreshToken = createMockJWT({ sub: user.id, type: 'refresh' }, 60 * 24 * 7);
-        return { user, tokens: { accessToken, refreshToken, expiresIn: 900 } };
+    async socialLogin({ provider, token, email, name, avatar }) {
+        if (useMock) {
+            await delay(1200);
+            const user = {
+                ...DEMO_USER,
+                id: 'usr_social_' + provider,
+                email: email || `demo.${provider}@patrycloset.com`,
+                firstName: name || (provider === 'google' ? 'Google' : 'Apple'),
+                lastName: 'User',
+                emailVerified: true,
+            };
+            const accessToken = createMockJWT({ sub: user.id, email: user.email }, 15);
+            const refreshToken = createMockJWT({ sub: user.id, type: 'refresh' }, 60 * 24 * 7);
+            return { user, tokens: { accessToken, refreshToken, expiresIn: 900 } };
+        }
+        try {
+            const { data: res } = await api.post('/v1/auth/social-login', {
+                provider, token, email, name, avatar,
+            });
+            return adaptAuthResponse(res.data);
+        } catch (err) {
+            activateMockOnNetworkError(err);
+            if (useMock) {
+                await delay(1200);
+                const user = {
+                    ...DEMO_USER,
+                    id: 'usr_social_' + provider,
+                    email: email || `demo.${provider}@patrycloset.com`,
+                    firstName: name || (provider === 'google' ? 'Google' : 'Apple'),
+                    lastName: 'User',
+                    emailVerified: true,
+                };
+                const accessToken = createMockJWT({ sub: user.id, email: user.email }, 15);
+                const refreshToken = createMockJWT({ sub: user.id, type: 'refresh' }, 60 * 24 * 7);
+                return { user, tokens: { accessToken, refreshToken, expiresIn: 900 } };
+            }
+            throw err;
+        }
     },
 
     /* ─── Account data endpoints (real backend with mock fallback) ─── */
@@ -642,11 +758,43 @@ const authService = {
     },
 
     async getPaymentMethods() {
+        if (!useMock) {
+            try {
+                const { data: res } = await api.get('/v1/payments/methods');
+                return (res.data ?? []).map(pm => ({
+                    id: pm.id,
+                    brand: pm.brand,
+                    last4: pm.last4,
+                    expMonth: String(pm.expMonth),
+                    expYear: String(pm.expYear),
+                    isDefault: pm.isDefault,
+                }));
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(400);
         return DEMO_PAYMENT_METHODS;
     },
 
-    async addPaymentMethod(/* cardData */) {
+    async addPaymentMethod(cardData) {
+        if (!useMock) {
+            try {
+                const { data: res } = await api.post('/v1/payments/methods', {
+                    paymentMethodId: cardData.paymentMethodId,
+                });
+                return {
+                    id: res.data.id,
+                    brand: res.data.brand,
+                    last4: res.data.last4,
+                    expMonth: String(res.data.expMonth),
+                    expYear: String(res.data.expYear),
+                    isDefault: res.data.isDefault,
+                };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(800);
         const newPM = { id: 'pm_' + Math.random().toString(36).substr(2, 6), brand: 'visa', last4: String(Math.floor(1000 + Math.random() * 9000)), expMonth: '12', expYear: '29', isDefault: false };
         DEMO_PAYMENT_METHODS.push(newPM);
@@ -654,6 +802,14 @@ const authService = {
     },
 
     async removePaymentMethod(id) {
+        if (!useMock) {
+            try {
+                await api.delete(`/v1/payments/methods/${id}`);
+                return { success: true };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(400);
         const idx = DEMO_PAYMENT_METHODS.findIndex((pm) => pm.id === id);
         if (idx !== -1) DEMO_PAYMENT_METHODS.splice(idx, 1);
@@ -661,17 +817,51 @@ const authService = {
     },
 
     async setDefaultPaymentMethod(id) {
+        if (!useMock) {
+            try {
+                await api.put(`/v1/payments/methods/${id}/default`);
+                return { success: true };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(300);
         DEMO_PAYMENT_METHODS.forEach((pm) => (pm.isDefault = pm.id === id));
         return DEMO_PAYMENT_METHODS;
     },
 
     async getNotifications() {
+        if (!useMock) {
+            try {
+                const { data: res } = await api.get('/v1/notifications');
+                return (res.data?.items ?? []).map(n => ({
+                    id: n.id,
+                    type: n.type,
+                    title: n.title,
+                    message: n.message,
+                    read: n.read,
+                    createdAt: n.createdAt,
+                    data: n.data,
+                    actionUrl: n.actionUrl,
+                    image: n.image || null,
+                }));
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(400);
         return DEMO_NOTIFICATIONS;
     },
 
     async markNotificationRead(id) {
+        if (!useMock) {
+            try {
+                await api.patch(`/v1/notifications/${id}/read`);
+                return { success: true };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(200);
         const n = DEMO_NOTIFICATIONS.find((n) => n.id === id);
         if (n) n.read = true;
@@ -679,17 +869,48 @@ const authService = {
     },
 
     async markAllNotificationsRead() {
+        if (!useMock) {
+            try {
+                await api.post('/v1/notifications/read-all');
+                return { success: true };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(300);
         DEMO_NOTIFICATIONS.forEach((n) => (n.read = true));
         return { success: true };
     },
 
     async getSessions() {
+        if (!useMock) {
+            try {
+                const { data: res } = await api.get('/v1/auth/sessions');
+                return (res.data ?? []).map(s => ({
+                    id: s.id,
+                    device: s.device,
+                    location: s.location,
+                    ip: s.ipAddress,
+                    lastActive: s.lastActive,
+                    isCurrent: s.isCurrent,
+                }));
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(400);
         return DEMO_SESSIONS;
     },
 
     async revokeSession(id) {
+        if (!useMock) {
+            try {
+                await api.delete(`/v1/auth/sessions/${id}`);
+                return { success: true };
+            } catch (err) {
+                activateMockOnNetworkError(err);
+            }
+        }
         await delay(400);
         const idx = DEMO_SESSIONS.findIndex((s) => s.id === id);
         if (idx !== -1) DEMO_SESSIONS.splice(idx, 1);
@@ -712,7 +933,7 @@ const authService = {
     async updatePreferences(preferences) {
         if (!useMock) {
             try {
-                const { data } = await api.put('/v1/auth/profile/preferences', preferences);
+                const { data } = await api.put('/v1/auth/preferences', preferences);
                 return data.data ?? preferences;
             } catch (err) {
                 activateMockOnNetworkError(err);
