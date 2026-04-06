@@ -190,4 +190,208 @@ public sealed class AuthController(ISender mediator) : ControllerBase
 
         return Ok(ApiResponse<object>.Ok(null!, "Contraseña restablecida correctamente"));
     }
+
+    // ─── Profile & Account Endpoints ───
+
+    /// <summary>Update user profile.</summary>
+    [HttpPut("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var command = new UpdateProfileCommand(
+            userId,
+            request.FirstName,
+            request.LastName,
+            request.Phone,
+            request.DateOfBirth,
+            request.Gender,
+            request.PreferredLanguage,
+            request.PreferredCurrency);
+
+        var result = await mediator.Send(command, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<UserProfileResponse>.Ok(result.Value!, "Perfil actualizado"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!, result.Errors));
+    }
+
+    /// <summary>Upload avatar image.</summary>
+    [HttpPost("avatar")]
+    [Authorize]
+    [RequestSizeLimit(5_242_880)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UploadAvatar(IFormFile file, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        if (file.Length == 0 || file.Length > 5_242_880)
+            return BadRequest(ApiResponse<object>.Fail("El archivo debe ser menor a 5MB"));
+
+        var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+        if (!allowedTypes.Contains(file.ContentType))
+            return BadRequest(ApiResponse<object>.Fail("Solo se permiten imágenes JPEG, PNG o WebP"));
+
+        using var stream = file.OpenReadStream();
+        var command = new UploadAvatarCommand(userId, stream, file.FileName, file.ContentType);
+        var result = await mediator.Send(command, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<object>.Ok(new { avatarUrl = result.Value }, "Avatar actualizado"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>Get user preferences.</summary>
+    [HttpGet("preferences")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<UserPreferencesResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPreferences(CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var query = new GetUserPreferencesQuery(userId);
+        var result = await mediator.Send(query, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<UserPreferencesResponse>.Ok(result.Value!))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>Update user preferences.</summary>
+    [HttpPut("preferences")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<UserPreferencesResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdatePreferences([FromBody] UpdatePreferencesRequest request, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var command = new UpdatePreferencesCommand(
+            userId,
+            request.StylePreferences,
+            request.FavoriteSizes,
+            request.FavoriteColors,
+            request.FavoriteBrands,
+            request.FavoriteCategories,
+            request.Notifications);
+
+        var result = await mediator.Send(command, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<UserPreferencesResponse>.Ok(result.Value!, "Preferencias actualizadas"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!, result.Errors));
+    }
+
+    /// <summary>Verify email address.</summary>
+    [HttpPost("verify-email")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var command = new VerifyEmailCommand(userId, request.Token);
+        var result = await mediator.Send(command, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<object>.Ok(null!, "Email verificado correctamente"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>Resend verification email.</summary>
+    [HttpPost("resend-verification")]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ResendVerification([FromBody] ResendVerificationRequest request, CancellationToken ct)
+    {
+        var command = new ResendVerificationCommand(request.Email);
+        await mediator.Send(command, ct);
+
+        return Ok(ApiResponse<object>.Ok(null!,
+            "Si el email está registrado, recibirás un enlace de verificación"));
+    }
+
+    /// <summary>Logout from all devices.</summary>
+    [HttpPost("logout-all")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> LogoutAll(CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var command = new LogoutAllDevicesCommand(userId);
+        var result = await mediator.Send(command, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<object>.Ok(null!, "Sesiones cerradas correctamente"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>Get active sessions.</summary>
+    [HttpGet("sessions")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<SessionResponse>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSessions(CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var query = new GetUserSessionsQuery(userId, null);
+        var result = await mediator.Send(query, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<IReadOnlyList<SessionResponse>>.Ok(result.Value!))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
+    /// <summary>Revoke a specific session.</summary>
+    [HttpDelete("sessions/{sessionId}")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RevokeSession(string sessionId, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse<object>.Fail("Token inválido"));
+
+        var command = new RevokeSessionCommand(userId, sessionId);
+        var result = await mediator.Send(command, ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<object>.Ok(null!, "Sesión revocada correctamente"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
 }
