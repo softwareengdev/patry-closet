@@ -37,7 +37,7 @@ $script:Config = @{
     ApiProject  = Join-Path $PSScriptRoot "patry-closet-server\src\PatryCloset.API"
     SolutionFile = Join-Path $PSScriptRoot "patry-closet-server\PatryCloset.sln"
     ApiUrl      = "http://localhost:5200"
-    FrontendUrl = "http://localhost:5173"
+    FrontendUrl = "http://localhost:3000"
     PgHost      = "localhost"
     PgPort      = 5432
     PgUser      = "postgres"
@@ -96,9 +96,9 @@ function Write-Box {
     foreach ($line in $Lines) {
         # Strip ANSI for length calculation
         $stripped = $line -replace '\e\[[0-9;]*m', ''
-        $pad = $inner - $stripped.Length
+        $pad = $inner - $stripped.Length - 1
         if ($pad -lt 0) { $pad = 0 }
-        Write-Host "$Color║$($c.Reset) $line$((' ' * ($pad - 1)))$Color║$($c.Reset)"
+        Write-Host "$Color║$($c.Reset) $line$((' ' * $pad))$Color║$($c.Reset)"
     }
     Write-Host "$Color╚$(('═' * $inner))╝$($c.Reset)"
 }
@@ -212,17 +212,17 @@ function Get-ProcessOnPort([int]$Port) {
     return $null
 }
 
-function Save-Pid([string]$Service, [int]$Pid) {
+function Save-Pid([string]$Service, [int]$ProcessId) {
     $pidFile = Join-Path $script:Config.PidDir "$Service.pid"
-    $Pid | Out-File -FilePath $pidFile -Force -NoNewline
+    $ProcessId | Out-File -FilePath $pidFile -Force -NoNewline
 }
 
 function Get-SavedPid([string]$Service) {
     $pidFile = Join-Path $script:Config.PidDir "$Service.pid"
     if (Test-Path $pidFile) {
-        $pid = Get-Content $pidFile -Raw -ErrorAction SilentlyContinue
-        if ($pid -and $pid -match '^\d+$') {
-            return [int]$pid
+        $savedId = Get-Content $pidFile -Raw -ErrorAction SilentlyContinue
+        if ($savedId -and $savedId -match '^\d+$') {
+            return [int]$savedId
         }
     }
     return 0
@@ -524,9 +524,9 @@ function Start-FrontendWindow {
     }
 
     # Kill any existing frontend on the port
-    $existing = Get-ProcessOnPort 5173
+    $existing = Get-ProcessOnPort 3000
     if ($existing) {
-        Write-Log "Port 5173 in use by PID $($existing.Id) — stopping..." "WARN"
+        Write-Log "Port 3000 in use by PID $($existing.Id) — stopping..." "WARN"
         Stop-ProcessSafely $existing.Id "existing frontend"
         Start-Sleep -Seconds 1
     }
@@ -551,15 +551,15 @@ try {
 "@
 
     Open-ServiceWindow -ServiceName "Frontend" `
-        -Title "PATRY♡CLOSET — Frontend Dev Server (port 5173)" `
+        -Title "PATRY♡CLOSET — Frontend Dev Server (port 3000)" `
         -WorkingDir $webDir `
         -ScriptBlock $cmd
 
     Write-Log "Waiting for Frontend dev server..." "STEP"
     $ready = $false
-    for ($i = 0; $i -lt 20; $i++) {
+    for ($i = 0; $i -lt 45; $i++) {
         Start-Sleep -Seconds 1
-        if (Test-PortInUse 5173) {
+        if (Test-PortInUse 3000) {
             $ready = $true
             break
         }
@@ -568,7 +568,7 @@ try {
     if ($ready) {
         Write-Log "Frontend is listening on $($script:Config.FrontendUrl)" "SUCCESS"
     } else {
-        Write-Log "Frontend did not start within 20s — check the frontend window" "WARN"
+        Write-Log "Frontend did not start within 45s — check the frontend window" "WARN"
     }
     return $ready
 }
@@ -576,7 +576,7 @@ try {
 function Stop-FrontendWindow {
     Write-Log "Stopping Frontend..." "STEP"
 
-    $proc = Get-ProcessOnPort 5173
+    $proc = Get-ProcessOnPort 3000
     if ($proc) {
         Stop-ProcessSafely $proc.Id "Frontend dev server"
     }
@@ -701,7 +701,7 @@ function Get-ServiceStatus([string]$Name) {
             return @{ Status = "Stopped"; Detail = "" }
         }
         "Frontend" {
-            if (Test-PortInUse 5173) { return @{ Status = "Running"; Detail = "http://localhost:5173" } }
+            if (Test-PortInUse 3000) { return @{ Status = "Running"; Detail = "http://localhost:3000" } }
             return @{ Status = "Stopped"; Detail = "" }
         }
     }
@@ -710,7 +710,7 @@ function Get-ServiceStatus([string]$Name) {
 
 function Show-ServiceStatus {
     $services = @("PostgreSQL", "Redis", "Backend", "Frontend")
-    $portMap = @{ PostgreSQL = $script:Config.PgPort; Redis = $script:Config.RedisPort; Backend = 5200; Frontend = 5173 }
+    $portMap = @{ PostgreSQL = $script:Config.PgPort; Redis = $script:Config.RedisPort; Backend = 5200; Frontend = 3000 }
 
     foreach ($svc in $services) {
         $info = Get-ServiceStatus $svc
@@ -981,14 +981,23 @@ function Invoke-DatabaseMigration {
     Write-Host ""
     Write-Log "Running EF Core migrations..." "STEP"
 
-    $apiDir = $script:Config.ApiProject
-    if (-not (Test-Path $apiDir)) {
-        Write-Log "API project not found" "ERROR"
+    $serverDir = $script:Config.ServerDir
+    $infraProject = Join-Path $serverDir "src\PatryCloset.Infrastructure"
+    $apiProject = $script:Config.ApiProject
+
+    if (-not (Test-Path $apiProject)) {
+        Write-Log "API project not found at $apiProject" "ERROR"
         return
+    }
+    if (-not (Test-Path $infraProject)) {
+        Write-Log "Infrastructure project not found — falling back to API project" "WARN"
+        $infraProject = $apiProject
     }
 
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    $result = & dotnet ef database update --project $apiDir --startup-project $apiDir 2>&1
+    Push-Location $serverDir
+    $result = & dotnet ef database update --project $infraProject --startup-project $apiProject 2>&1
+    Pop-Location
     $sw.Stop()
 
     if ($LASTEXITCODE -eq 0) {
@@ -1091,8 +1100,8 @@ function Show-Dashboard {
     # Check for open console windows
     $openWindows = @()
     foreach ($key in $script:ChildWindows.Keys) {
-        $pid = $script:ChildWindows[$key]
-        $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
+        $winPid = $script:ChildWindows[$key]
+        $proc = Get-Process -Id $winPid -ErrorAction SilentlyContinue
         if ($proc -and !$proc.HasExited) { $openWindows += $key }
     }
     if ($openWindows.Count -gt 0) {
