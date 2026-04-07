@@ -17,7 +17,12 @@ public sealed record PaymentMethodResponse
 
 public sealed record AddPaymentMethodRequest
 {
-    public required string PaymentMethodId { get; init; }
+    // Accept both field names: frontend sends stripePaymentMethodId, normalize here
+    public string? PaymentMethodId { get; init; }
+    public string? StripePaymentMethodId { get; init; }
+
+    public string ResolvedPaymentMethodId =>
+        PaymentMethodId ?? StripePaymentMethodId ?? string.Empty;
 }
 
 public sealed record SetDefaultPaymentMethodRequest

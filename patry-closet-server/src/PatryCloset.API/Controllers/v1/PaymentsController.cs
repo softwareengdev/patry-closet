@@ -181,7 +181,7 @@ public sealed class PaymentsController(
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await mediator.Send(
-            new AddPaymentMethodCommand(userId, request.PaymentMethodId), ct);
+            new AddPaymentMethodCommand(userId, request.ResolvedPaymentMethodId), ct);
 
         return result.IsSuccess
             ? StatusCode(StatusCodes.Status201Created,

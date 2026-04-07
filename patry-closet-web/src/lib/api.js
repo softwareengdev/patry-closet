@@ -65,13 +65,14 @@ api.interceptors.response.use(
                     refreshToken,
                 });
 
-                localStorage.setItem('patry_access_token', data.accessToken);
-                localStorage.setItem('patry_refresh_token', data.refreshToken);
+                const tokens = data.data || data;
+                localStorage.setItem('patry_access_token', tokens.accessToken);
+                localStorage.setItem('patry_refresh_token', tokens.refreshToken);
 
-                api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
-                processQueue(null, data.accessToken);
+                api.defaults.headers.common.Authorization = `Bearer ${tokens.accessToken}`;
+                processQueue(null, tokens.accessToken);
 
-                originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+                originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
                 processQueue(refreshError, null);

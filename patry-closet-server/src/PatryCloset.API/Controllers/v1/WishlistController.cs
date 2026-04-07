@@ -94,6 +94,30 @@ public sealed class WishlistController(ISender mediator, IRepository<CustomerPro
         return Ok(ApiResponse<bool>.Ok(result.Value));
     }
 
+    /// <summary>Sync local wishlist to server (merge on login).</summary>
+    [HttpPost("sync")]
+    [ProducesResponseType(typeof(ApiResponse<WishlistDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SyncWishlist(
+        [FromBody] SyncWishlistRequest request, CancellationToken ct)
+    {
+        var profileId = await GetProfileId(ct);
+        if (profileId is null) return Unauthorized();
+
+        var productIds = request.ProductIds
+            .Where(id => id != Guid.Empty)
+            .Distinct()
+            .Take(100) // Limit to prevent abuse
+            .ToList();
+
+        var result = await mediator.Send(
+            new SyncWishlistCommand(profileId.Value, productIds), ct);
+
+        return result.IsSuccess
+            ? Ok(ApiResponse<WishlistDto>.Ok(result.Value!, "Lista de deseos sincronizada"))
+            : BadRequest(ApiResponse<object>.Fail(result.Error!));
+    }
+
     private async Task<Guid?> GetProfileId(CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)

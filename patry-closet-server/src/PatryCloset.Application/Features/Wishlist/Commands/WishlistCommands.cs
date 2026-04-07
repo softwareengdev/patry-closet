@@ -33,3 +33,13 @@ public sealed record ToggleWishlistCommand(Guid CustomerProfileId, Guid ProductI
 
 public sealed record IsInWishlistQuery(Guid CustomerProfileId, Guid ProductId)
     : IRequest<Result<bool>>;
+
+// ─── Sync Wishlist (merge local items on login) ───
+
+public sealed record SyncWishlistCommand(Guid CustomerProfileId, IReadOnlyList<Guid> ProductIds)
+    : IRequest<Result<WishlistDto>>;
+
+public sealed record SyncWishlistRequest
+{
+    public IReadOnlyList<Guid> ProductIds { get; init; } = [];
+}

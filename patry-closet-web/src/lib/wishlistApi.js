@@ -21,7 +21,7 @@ export async function getWishlist() {
  */
 export async function addToWishlist(productId) {
     try {
-        await api.post('/v1/wishlist', { productId });
+        await api.post(`/v1/wishlist/${productId}`);
         return true;
     } catch {
         return false;

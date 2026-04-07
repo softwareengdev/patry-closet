@@ -48,7 +48,7 @@ const addressesApi = {
      * Set an address as default.
      */
     async setDefault(addressId) {
-        const { data } = await api.put(`/v1/addresses/${addressId}/default`);
+        const { data } = await api.post(`/v1/addresses/${addressId}/default`);
         return data.data;
     },
 };

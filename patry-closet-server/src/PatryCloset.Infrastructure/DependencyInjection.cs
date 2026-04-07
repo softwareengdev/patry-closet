@@ -42,6 +42,7 @@ public static class DependencyInjection
                     {
                         npgsql.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                         npgsql.EnableRetryOnFailure(3);
+                        npgsql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                     })
                 .AddInterceptors(auditInterceptor, domainEventInterceptor);
         });
