@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { X, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+
+const isDevMode = import.meta.env.DEV;
 
 /* ─── SVG icons for social providers ─── */
 const GoogleIcon = () => (
@@ -20,17 +23,134 @@ const AppleIcon = () => (
 );
 
 /**
+ * Dev-mode dialog — collects email + name instead of real OAuth redirect.
+ */
+const DevModeDialog = ({ provider, onSubmit, onClose }) => {
+    const { t } = useTranslation();
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [error, setError] = useState(null);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!email.trim()) {
+            setError(t('auth.emailRequired', 'Email is required'));
+            return;
+        }
+        onSubmit({ email: email.trim(), name: name.trim() });
+    };
+
+    const providerLabel = provider === 'google' ? 'Google' : 'Apple';
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white dark:bg-gray-900 border border-warm-300 dark:border-gray-700 p-6 w-full max-w-sm mx-4 shadow-xl"
+            >
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium">Dev Mode — {providerLabel}</h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="mb-4 p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-700 dark:text-amber-300">
+                    OAuth credentials not configured. Enter user info to simulate {providerLabel} login.
+                </div>
+
+                {error && (
+                    <div className="mb-3 text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-3">
+                    <div>
+                        <label htmlFor="dev-email" className="block text-sm font-medium mb-1">
+                            {t('auth.email', 'Email Address')} *
+                        </label>
+                        <input
+                            id="dev-email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            autoFocus
+                            className="w-full px-3 py-2.5 border border-warm-300 dark:border-gray-700 bg-transparent text-sm focus:outline-none focus:border-black dark:focus:border-white"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="dev-name" className="block text-sm font-medium mb-1">
+                            {t('auth.fullName', 'Full Name')}
+                        </label>
+                        <input
+                            id="dev-name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Jane Doe"
+                            className="w-full px-3 py-2.5 border border-warm-300 dark:border-gray-700 bg-transparent text-sm focus:outline-none focus:border-black dark:focus:border-white"
+                        />
+                    </div>
+                    <motion.button
+                        type="submit"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="w-full py-2.5 bg-black dark:bg-white text-white dark:text-black font-medium text-sm uppercase tracking-wider hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors"
+                    >
+                        {t('auth.continueAs', 'Continue as')} {providerLabel} {t('auth.user', 'User')}
+                    </motion.button>
+                </form>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+/**
  * Social login buttons — Google & Apple
  */
 const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) => {
     const { t } = useTranslation();
     const { socialLogin } = useAuth();
     const [loadingProvider, setLoadingProvider] = useState(null);
+    const [devDialogProvider, setDevDialogProvider] = useState(null);
 
     const handleSocialLogin = async (provider) => {
+        if (isDevMode) {
+            setDevDialogProvider(provider);
+            return;
+        }
+        await executeSocialLogin(provider);
+    };
+
+    const handleDevSubmit = async ({ email, name }) => {
+        const provider = devDialogProvider;
+        setDevDialogProvider(null);
+        await executeSocialLogin(provider, email, name);
+    };
+
+    const executeSocialLogin = async (provider, email, name) => {
         setLoadingProvider(provider);
         try {
-            const userData = await socialLogin(provider);
+            const params = { provider };
+            if (email) {
+                // Dev mode: encode user info as a base64 JSON token for the backend
+                params.token = btoa(JSON.stringify({ email, name }));
+                params.email = email;
+                params.name = name;
+            }
+            const userData = await socialLogin(params);
             onSuccess?.(userData);
         } catch (err) {
             onError?.(err?.response?.data?.message || `${provider} authentication failed`);
@@ -43,6 +163,13 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
 
     return (
         <div className={`flex flex-col gap-3 ${className}`}>
+            {/* Dev Mode badge */}
+            {isDevMode && (
+                <div className="text-center text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 font-semibold">
+                    ⚠ Dev Mode — Social login uses simulated credentials
+                </div>
+            )}
+
             {/* Google */}
             <motion.button
                 whileHover={{ scale: 1.01 }}
@@ -76,6 +203,17 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
                 )}
                 <span className="text-white dark:text-black">{actionText} Apple</span>
             </motion.button>
+
+            {/* Dev Mode Dialog */}
+            <AnimatePresence>
+                {devDialogProvider && (
+                    <DevModeDialog
+                        provider={devDialogProvider}
+                        onSubmit={handleDevSubmit}
+                        onClose={() => setDevDialogProvider(null)}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Divider */}
             <div className="relative flex items-center my-2">
