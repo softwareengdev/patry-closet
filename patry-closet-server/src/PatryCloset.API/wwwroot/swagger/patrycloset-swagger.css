@@ -1,0 +1,700 @@
+/* ═══════════════════════════════════════════════════════════
+   PATRY♡CLOSET — Swagger UI Custom Theme
+   Luxury fashion e-commerce API documentation
+   Matches the web store's warm, elegant design language
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ─── CSS Custom Properties (from tailwind.config.js palette) ─── */
+:root {
+    --pc-warm-50:  #FEFDFB;
+    --pc-warm-100: #FBF9F5;
+    --pc-warm-200: #F6F3ED;
+    --pc-warm-300: #F0ECE5;
+    --pc-warm-400: #E8E3DA;
+    --pc-warm-500: #DDD7CB;
+    --pc-warm-600: #C7BFB0;
+    --pc-warm-700: #A39B8C;
+    --pc-warm-800: #746D60;
+    --pc-warm-900: #4A453C;
+    --pc-warm-950: #2D2A25;
+    --pc-luxury:   #1A1A1A;
+    --pc-ivory:    #FDFBF7;
+    --pc-gold:     #D4AF37;
+    --pc-rose:     #C9A0A0;
+    --pc-charcoal: #2D2D2D;
+    --pc-burgundy: #800020;
+    --pc-font-display: 'Cormorant Garamond', 'Georgia', serif;
+    --pc-font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ─── Global Reset & Base ─── */
+html {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: var(--pc-font-body) !important;
+    background: var(--pc-warm-100) !important;
+    color: var(--pc-warm-950) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Top Bar ─── */
+.swagger-ui .topbar {
+    background: var(--pc-luxury) !important;
+    padding: 16px 32px !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+}
+
+.swagger-ui .topbar .wrapper {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.swagger-ui .topbar a {
+    display: flex;
+    align-items: center;
+    max-width: none;
+}
+
+.swagger-ui .topbar .topbar-wrapper .link span {
+    font-family: var(--pc-font-display) !important;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    color: var(--pc-warm-50) !important;
+    text-transform: uppercase;
+}
+
+/* Hide default Swagger logo */
+.swagger-ui .topbar .topbar-wrapper .link img,
+.swagger-ui .topbar .topbar-wrapper .link svg {
+    display: none !important;
+}
+
+/* Add PATRY♡CLOSET branding text before */
+.swagger-ui .topbar .topbar-wrapper .link::before {
+    content: 'P A T R Y  ♡  C L O S E T';
+    font-family: var(--pc-font-display);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--pc-warm-50);
+    margin-right: 12px;
+}
+
+.swagger-ui .topbar .topbar-wrapper .link::after {
+    content: '— API';
+    font-family: var(--pc-font-body);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--pc-gold);
+    text-transform: uppercase;
+    margin-left: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    padding: 3px 10px;
+    border-radius: 0;
+}
+
+/* ─── Info Section (API description header) ─── */
+.swagger-ui .information-container {
+    background: linear-gradient(180deg, var(--pc-warm-50) 0%, var(--pc-warm-100) 100%) !important;
+    border-bottom: 1px solid var(--pc-warm-400);
+    padding: 40px 0 32px !important;
+}
+
+.swagger-ui .info {
+    margin: 0 auto !important;
+    max-width: 1200px;
+    padding: 0 32px;
+}
+
+.swagger-ui .info .title {
+    font-family: var(--pc-font-display) !important;
+    font-size: 36px !important;
+    font-weight: 600 !important;
+    color: var(--pc-luxury) !important;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px !important;
+}
+
+.swagger-ui .info .title small {
+    background: var(--pc-luxury) !important;
+    color: var(--pc-gold) !important;
+    font-family: var(--pc-font-body) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em;
+    padding: 4px 14px !important;
+    border-radius: 0 !important;
+    vertical-align: middle;
+    margin-left: 12px;
+    text-transform: uppercase;
+}
+
+.swagger-ui .info .description {
+    font-family: var(--pc-font-body) !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+    color: var(--pc-warm-800) !important;
+}
+
+.swagger-ui .info .description h2,
+.swagger-ui .info .description h3 {
+    font-family: var(--pc-font-display) !important;
+    color: var(--pc-luxury) !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid var(--pc-warm-400);
+    padding-bottom: 8px;
+    margin-top: 24px;
+}
+
+.swagger-ui .info .description code {
+    background: var(--pc-warm-200) !important;
+    color: var(--pc-burgundy) !important;
+    padding: 2px 8px;
+    border-radius: 0;
+    font-size: 13px;
+    border: 1px solid var(--pc-warm-400);
+}
+
+.swagger-ui .info .description pre {
+    background: var(--pc-luxury) !important;
+    color: var(--pc-warm-300) !important;
+    border: 1px solid var(--pc-warm-900);
+    border-radius: 0 !important;
+    padding: 16px !important;
+}
+
+.swagger-ui .info a {
+    color: var(--pc-burgundy) !important;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(128, 0, 32, 0.3);
+    transition: border-color 0.2s ease;
+}
+
+.swagger-ui .info a:hover {
+    border-bottom-color: var(--pc-burgundy);
+}
+
+/* ─── Main Content Wrapper ─── */
+.swagger-ui .wrapper {
+    max-width: 1440px !important;
+    padding: 0 32px !important;
+}
+
+.swagger-ui .scheme-container {
+    background: var(--pc-warm-50) !important;
+    border-bottom: 1px solid var(--pc-warm-400) !important;
+    box-shadow: none !important;
+    padding: 16px 0 !important;
+}
+
+/* ─── Tag Groups (endpoint categories) ─── */
+.swagger-ui .opblock-tag-section {
+    margin-bottom: 8px !important;
+}
+
+.swagger-ui .opblock-tag {
+    font-family: var(--pc-font-display) !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    color: var(--pc-luxury) !important;
+    border-bottom: 1px solid var(--pc-warm-400) !important;
+    padding: 16px 20px !important;
+    margin: 0 !important;
+    transition: background-color 0.2s ease;
+}
+
+.swagger-ui .opblock-tag:hover {
+    background: var(--pc-warm-200) !important;
+}
+
+.swagger-ui .opblock-tag small {
+    font-family: var(--pc-font-body) !important;
+    font-size: 13px !important;
+    color: var(--pc-warm-700) !important;
+    font-weight: 400;
+}
+
+/* ─── Operation Blocks (individual endpoints) ─── */
+.swagger-ui .opblock {
+    border: 1px solid var(--pc-warm-400) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 0 4px 0 !important;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.swagger-ui .opblock:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* GET */
+.swagger-ui .opblock.opblock-get {
+    background: rgba(212, 175, 55, 0.04) !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
+}
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background: var(--pc-gold) !important;
+    color: var(--pc-luxury) !important;
+    font-weight: 700 !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em;
+    padding: 6px 16px !important;
+    min-width: 60px;
+    text-align: center;
+}
+.swagger-ui .opblock.opblock-get .opblock-summary {
+    border-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+/* POST */
+.swagger-ui .opblock.opblock-post {
+    background: rgba(26, 26, 26, 0.02) !important;
+    border-color: rgba(26, 26, 26, 0.2) !important;
+}
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background: var(--pc-luxury) !important;
+    color: var(--pc-warm-50) !important;
+    font-weight: 700 !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em;
+    padding: 6px 16px !important;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* PUT */
+.swagger-ui .opblock.opblock-put {
+    background: rgba(163, 177, 138, 0.06) !important;
+    border-color: rgba(163, 177, 138, 0.3) !important;
+}
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+    background: #5B7A3D !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em;
+    padding: 6px 16px !important;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* DELETE */
+.swagger-ui .opblock.opblock-delete {
+    background: rgba(128, 0, 32, 0.03) !important;
+    border-color: rgba(128, 0, 32, 0.2) !important;
+}
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+    background: var(--pc-burgundy) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em;
+    padding: 6px 16px !important;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* PATCH */
+.swagger-ui .opblock.opblock-patch {
+    background: rgba(201, 160, 160, 0.06) !important;
+    border-color: rgba(201, 160, 160, 0.3) !important;
+}
+.swagger-ui .opblock.opblock-patch .opblock-summary-method {
+    background: var(--pc-rose) !important;
+    color: var(--pc-luxury) !important;
+    font-weight: 700 !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em;
+    padding: 6px 16px !important;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* Operation summary text */
+.swagger-ui .opblock .opblock-summary-path {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace !important;
+    font-size: 13px !important;
+    color: var(--pc-warm-900) !important;
+    font-weight: 500;
+}
+
+.swagger-ui .opblock .opblock-summary-path__deprecated {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.swagger-ui .opblock .opblock-summary-description {
+    font-family: var(--pc-font-body) !important;
+    font-size: 13px !important;
+    color: var(--pc-warm-700) !important;
+}
+
+.swagger-ui .opblock .opblock-summary {
+    padding: 8px 16px !important;
+}
+
+/* ─── Operation Body (expanded details) ─── */
+.swagger-ui .opblock-body {
+    background: var(--pc-warm-50) !important;
+}
+
+.swagger-ui .opblock-body pre {
+    background: var(--pc-luxury) !important;
+    color: var(--pc-warm-300) !important;
+    border-radius: 0 !important;
+    font-size: 13px !important;
+    border: 1px solid var(--pc-warm-900);
+}
+
+.swagger-ui .opblock-description-wrapper {
+    padding: 16px 20px !important;
+}
+
+.swagger-ui .opblock-section-header {
+    background: var(--pc-warm-200) !important;
+    border-bottom: 1px solid var(--pc-warm-400) !important;
+    box-shadow: none !important;
+    padding: 10px 20px !important;
+}
+
+.swagger-ui .opblock-section-header h4 {
+    font-family: var(--pc-font-body) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--pc-warm-900) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* ─── Parameters Table ─── */
+.swagger-ui table thead tr th,
+.swagger-ui table thead tr td {
+    font-family: var(--pc-font-body) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: var(--pc-warm-800) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--pc-warm-400) !important;
+    padding: 10px 12px !important;
+}
+
+.swagger-ui table tbody tr td {
+    font-family: var(--pc-font-body) !important;
+    font-size: 13px !important;
+    color: var(--pc-warm-900) !important;
+    border-bottom: 1px solid var(--pc-warm-300) !important;
+    padding: 10px 12px !important;
+}
+
+.swagger-ui .parameter__name {
+    font-weight: 600 !important;
+    color: var(--pc-luxury) !important;
+    font-size: 13px !important;
+}
+
+.swagger-ui .parameter__name.required::after {
+    color: var(--pc-burgundy) !important;
+    font-size: 12px;
+}
+
+.swagger-ui .parameter__type {
+    font-size: 12px !important;
+    color: var(--pc-warm-700) !important;
+}
+
+/* ─── Inputs & Selects ─── */
+.swagger-ui input[type=text],
+.swagger-ui input[type=password],
+.swagger-ui input[type=search],
+.swagger-ui input[type=email],
+.swagger-ui input[type=file],
+.swagger-ui textarea,
+.swagger-ui select {
+    font-family: var(--pc-font-body) !important;
+    border: 1px solid var(--pc-warm-400) !important;
+    border-radius: 0 !important;
+    background: var(--pc-warm-50) !important;
+    color: var(--pc-warm-950) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.swagger-ui input:focus,
+.swagger-ui textarea:focus,
+.swagger-ui select:focus {
+    border-color: var(--pc-gold) !important;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15) !important;
+    outline: none !important;
+}
+
+/* ─── Buttons ─── */
+.swagger-ui .btn {
+    font-family: var(--pc-font-body) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 12px !important;
+    border-radius: 0 !important;
+    padding: 8px 20px !important;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+/* Execute button */
+.swagger-ui .btn.execute {
+    background: var(--pc-luxury) !important;
+    color: var(--pc-warm-50) !important;
+    border: 1px solid var(--pc-luxury) !important;
+}
+.swagger-ui .btn.execute:hover {
+    background: var(--pc-warm-950) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Cancel button */
+.swagger-ui .btn.cancel {
+    background: transparent !important;
+    color: var(--pc-warm-800) !important;
+    border: 1px solid var(--pc-warm-500) !important;
+}
+.swagger-ui .btn.cancel:hover {
+    background: var(--pc-warm-200) !important;
+    border-color: var(--pc-warm-700) !important;
+}
+
+/* Authorize button */
+.swagger-ui .btn.authorize {
+    background: transparent !important;
+    color: var(--pc-gold) !important;
+    border: 2px solid var(--pc-gold) !important;
+    line-height: 1;
+}
+.swagger-ui .btn.authorize:hover {
+    background: rgba(212, 175, 55, 0.08) !important;
+}
+
+.swagger-ui .btn.authorize svg {
+    fill: var(--pc-gold) !important;
+}
+
+/* Auth lock icons */
+.swagger-ui .authorization__btn {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+.swagger-ui .authorization__btn:hover {
+    opacity: 1;
+}
+.swagger-ui .authorization__btn svg {
+    fill: var(--pc-gold) !important;
+}
+.swagger-ui .authorization__btn.locked svg {
+    fill: var(--pc-gold) !important;
+    opacity: 1;
+}
+.swagger-ui .authorization__btn.unlocked svg {
+    fill: var(--pc-warm-600) !important;
+}
+
+/* ─── Response Codes ─── */
+.swagger-ui .responses-inner {
+    padding: 16px !important;
+}
+
+.swagger-ui .response-col_status {
+    font-family: 'SF Mono', 'Fira Code', monospace !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+.swagger-ui .response-col_status .response-undocumented {
+    color: var(--pc-warm-700) !important;
+}
+
+/* 2xx success */
+.swagger-ui .responses-table .response:first-child .response-col_status {
+    color: #5B7A3D !important;
+}
+
+/* ─── Models Section ─── */
+.swagger-ui section.models {
+    border: 1px solid var(--pc-warm-400) !important;
+    border-radius: 0 !important;
+}
+
+.swagger-ui section.models h4 {
+    font-family: var(--pc-font-display) !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: var(--pc-luxury) !important;
+    border-bottom: 1px solid var(--pc-warm-400) !important;
+    padding: 12px 20px !important;
+    margin: 0 !important;
+}
+
+.swagger-ui section.models .model-container {
+    background: var(--pc-warm-50) !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 8px 16px !important;
+    border-bottom: 1px solid var(--pc-warm-300);
+}
+
+.swagger-ui .model-title {
+    font-weight: 600 !important;
+    color: var(--pc-luxury) !important;
+}
+
+.swagger-ui .model {
+    font-family: 'SF Mono', 'Fira Code', monospace !important;
+    font-size: 12px !important;
+    color: var(--pc-warm-900) !important;
+}
+
+/* ─── Modal / Dialog (Authorize popup) ─── */
+.swagger-ui .dialog-ux .modal-ux {
+    border: 1px solid var(--pc-warm-400) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;
+    background: var(--pc-warm-50) !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header {
+    border-bottom: 1px solid var(--pc-warm-400) !important;
+    padding: 20px 24px !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header h3 {
+    font-family: var(--pc-font-display) !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    color: var(--pc-luxury) !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-content {
+    padding: 24px !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-content p {
+    font-family: var(--pc-font-body) !important;
+    color: var(--pc-warm-800) !important;
+}
+
+/* ─── Loading animation ─── */
+.swagger-ui .loading-container .loading::after {
+    border-color: var(--pc-gold) transparent !important;
+}
+
+/* ─── Scrollbar (WebKit) ─── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--pc-warm-200);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--pc-warm-500);
+    border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--pc-warm-700);
+}
+
+/* ─── Try-it-out response area ─── */
+.swagger-ui .highlight-code {
+    border-radius: 0 !important;
+}
+
+.swagger-ui .microlight {
+    background: var(--pc-luxury) !important;
+    color: var(--pc-warm-300) !important;
+    border-radius: 0 !important;
+    font-size: 13px !important;
+    padding: 16px !important;
+}
+
+/* ─── Footer area (if visible) ─── */
+.swagger-ui .info hgroup.main a {
+    font-family: var(--pc-font-body) !important;
+}
+
+/* ─── Selection highlight ─── */
+::selection {
+    background: rgba(212, 175, 55, 0.25);
+    color: var(--pc-luxury);
+}
+
+/* ─── Smooth transitions on expand/collapse ─── */
+.swagger-ui .opblock .opblock-summary {
+    transition: background-color 0.2s ease;
+}
+
+.swagger-ui .opblock .opblock-summary:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* ─── Server selector ─── */
+.swagger-ui .servers > label select {
+    border: 1px solid var(--pc-warm-400) !important;
+    border-radius: 0 !important;
+    font-family: var(--pc-font-body) !important;
+}
+
+/* ─── Copy-to-clipboard button ─── */
+.swagger-ui .copy-to-clipboard {
+    border-radius: 0 !important;
+}
+
+/* ─── Tab panels ─── */
+.swagger-ui .tab li {
+    font-family: var(--pc-font-body) !important;
+    font-size: 13px !important;
+    letter-spacing: 0.04em;
+}
+
+.swagger-ui .tab li.active {
+    color: var(--pc-luxury) !important;
+}
+
+.swagger-ui .tab li::after {
+    background: var(--pc-gold) !important;
+}
+
+/* ─── Filter/Search ─── */
+.swagger-ui .filter .operation-filter-input {
+    border: 1px solid var(--pc-warm-400) !important;
+    border-radius: 0 !important;
+    font-family: var(--pc-font-body) !important;
+}
+
+/* ─── Deprecation styling ─── */
+.swagger-ui .opblock-deprecated {
+    opacity: 0.5;
+    border-color: var(--pc-warm-500) !important;
+}
+
+.swagger-ui .opblock-deprecated .opblock-summary-method {
+    background: var(--pc-warm-600) !important;
+}

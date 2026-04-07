@@ -312,6 +312,7 @@ app.UseSerilogRequestLogging(options =>
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Swagger available in all environments (production is read-only for API consumers)
+app.UseStaticFiles(); // Serve wwwroot assets (custom Swagger CSS)
 app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
@@ -319,9 +320,15 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patry Closet API v1");
         c.RoutePrefix = "swagger";
-        c.DocumentTitle = "PATRY♡CLOSET API Documentation";
+        c.DocumentTitle = "PATRY♡CLOSET — API Documentation";
         c.DefaultModelsExpandDepth(1);
         c.DisplayRequestDuration();
+        c.InjectStylesheet("/swagger/patrycloset-swagger.css");
+        c.HeadContent =
+            "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">" +
+            "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>" +
+            "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap\">" +
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"/swagger/patrycloset-swagger.css\">";
     });
 }
 else
@@ -331,9 +338,15 @@ else
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patry Closet API v1");
         c.RoutePrefix = "swagger";
-        c.DocumentTitle = "PATRY♡CLOSET API";
+        c.DocumentTitle = "PATRY♡CLOSET — API";
         c.DefaultModelsExpandDepth(0);
         c.SupportedSubmitMethods(); // Disable Try It Out in production
+        c.InjectStylesheet("/swagger/patrycloset-swagger.css");
+        c.HeadContent =
+            "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">" +
+            "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>" +
+            "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap\">" +
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"/swagger/patrycloset-swagger.css\">";
     });
 }
 

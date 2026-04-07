@@ -12,6 +12,7 @@ public sealed class SecurityHeadersMiddleware(RequestDelegate next)
     public Task InvokeAsync(HttpContext context)
     {
         var headers = context.Response.Headers;
+        var path = context.Request.Path.Value ?? "";
 
         // Prevent MIME-type sniffing (forces browser to respect Content-Type)
         headers["X-Content-Type-Options"] = "nosniff";
@@ -35,8 +36,22 @@ public sealed class SecurityHeadersMiddleware(RequestDelegate next)
         headers.Remove("Server");
         headers.Remove("X-Powered-By");
 
-        // Content Security Policy — restrictive for API (no inline scripts/styles)
-        headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+        // Content Security Policy — relaxed for Swagger UI, strict for API
+        if (path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase))
+        {
+            headers["Content-Security-Policy"] =
+                "default-src 'self'; " +
+                "script-src 'self' 'unsafe-inline'; " +
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                "font-src 'self' https://fonts.gstatic.com; " +
+                "img-src 'self' data:; " +
+                "connect-src 'self'; " +
+                "frame-ancestors 'none'";
+        }
+        else
+        {
+            headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+        }
 
         return next(context);
     }
