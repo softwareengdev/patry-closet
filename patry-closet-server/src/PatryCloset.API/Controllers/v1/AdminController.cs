@@ -137,7 +137,7 @@ public sealed class AdminController(
     /// <summary>Upload an image for a product.</summary>
     [HttpPost("products/{productId:guid}/images")]
     [Authorize(Policy = "AdminOnly")]
-    [ProducesResponseType(typeof(ApiResponse<ProductImageDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<UploadedImageDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [RequestSizeLimit(10 * 1024 * 1024)]
@@ -175,8 +175,8 @@ public sealed class AdminController(
         await productImageRepository.AddAsync(image, ct);
         await unitOfWork.SaveChangesAsync(ct);
 
-        var dto = new ProductImageDto(image.Id, image.Url, image.AltText, image.SortOrder, image.IsHover);
-        return StatusCode(StatusCodes.Status201Created, ApiResponse<ProductImageDto>.Ok(dto, "Image uploaded successfully."));
+        var dto = new UploadedImageDto(image.Id, image.Url, image.AltText, image.SortOrder, image.IsHover);
+        return StatusCode(StatusCodes.Status201Created, ApiResponse<UploadedImageDto>.Ok(dto, "Image uploaded successfully."));
     }
 
     /// <summary>Delete a product image.</summary>
@@ -200,4 +200,4 @@ public sealed class AdminController(
 }
 
 /// <summary>DTO returned after image upload.</summary>
-public sealed record ProductImageDto(Guid Id, string Url, string? AltText, int SortOrder, bool IsHover);
+public sealed record UploadedImageDto(Guid Id, string Url, string? AltText, int SortOrder, bool IsHover);

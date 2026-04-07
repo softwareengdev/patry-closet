@@ -190,6 +190,9 @@ builder.Services.AddSwaggerGen(options =>
     // Custom operation filters for cleaner docs
     options.EnableAnnotations();
     options.OrderActionsBy(apiDesc => $"{apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.HttpMethod}");
+
+    // Prevent schema ID conflicts when same class name exists in different namespaces
+    options.CustomSchemaIds(type => type.FullName!.Replace('+', '.'));
 });
 
 // ─── CORS ───
