@@ -173,12 +173,29 @@ public sealed class OrdersController(ISender mediator, IRepository<CustomerProfi
 
     private async Task<Guid?> GetProfileId(CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
         if (string.IsNullOrEmpty(userId)) return null;
+
         var profile = await profileRepo.AsQueryable()
-            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.UserId == userId, ct);
-        return profile?.Id;
+
+        if (profile is null)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
+            profile = new CustomerProfile
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                FirstName = email?.Split('@')[0] ?? "User",
+                LastName = "",
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = userId,
+            };
+            await profileRepo.AddAsync(profile, ct);
+        }
+
+        return profile.Id;
     }
 }
 

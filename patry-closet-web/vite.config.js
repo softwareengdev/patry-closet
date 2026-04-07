@@ -13,6 +13,13 @@ export default defineConfig({
         host: true,
         port: 4173,
     },
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './src/test/setup.js',
+        css: true,
+        include: ['src/**/*.{test,spec}.{js,jsx}'],
+    },
     resolve: {
         dedupe: [
             'react',

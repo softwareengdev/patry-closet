@@ -68,7 +68,7 @@ const OrdersTab = () => {
     const filteredOrders = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
     const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const formatCurrency = (n) => `$${n.toFixed(2)}`;
+    const formatCurrency = (n) => `€${(n || 0).toFixed(2)}`;
 
     if (loading) {
         return (
@@ -139,7 +139,7 @@ const OrdersTab = () => {
                                             </span>
                                         </div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            {formatDate(order.createdAt)} · {order.items.length} {order.items.length === 1 ? 'item' : 'items'} · {formatCurrency(order.total)}
+                                            {formatDate(order.date)} · {order.items.length} {order.items.length === 1 ? 'item' : 'items'} · {formatCurrency(order.total)}
                                         </p>
                                     </div>
                                     {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-400 shrink-0" />}

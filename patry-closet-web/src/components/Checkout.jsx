@@ -868,7 +868,7 @@ function ConfirmationStep({ order, navigate, clearCart, t }) {
         </button>
         <button
           type="button"
-          onClick={() => navigate(order.orderId ? `/user?tab=orders&order=${order.orderId}` : '/user?tab=orders')}
+          onClick={() => navigate(order.orderId ? `/account?tab=orders&order=${order.orderId}` : '/account?tab=orders')}
           className="flex-1 border border-warm-500 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
         >
           {t('viewOrder') || 'View Order'}

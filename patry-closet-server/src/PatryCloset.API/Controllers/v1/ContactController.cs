@@ -19,13 +19,9 @@ public sealed class ContactController(ISender mediator) : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<ContactResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SubmitContact(
-        [FromForm] SubmitContactRequest request,
-        [FromForm] string? honeypot,
+        [FromBody] SubmitContactRequest request,
         CancellationToken ct)
     {
-        // Honeypot check — if filled, return fake success (trap bots)
-        if (!string.IsNullOrEmpty(honeypot))
-            return Ok(ApiResponse<ContactResponse>.Ok(new ContactResponse { Success = true, TicketId = "PC-BOT" }));
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();

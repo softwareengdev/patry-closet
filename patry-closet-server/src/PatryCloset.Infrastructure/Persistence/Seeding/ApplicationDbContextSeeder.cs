@@ -16,7 +16,7 @@ public static class ApplicationDbContextSeeder
         ILogger logger)
     {
         await SeedRolesAsync(roleManager, logger);
-        await SeedAdminUserAsync(userManager, logger);
+        await SeedAdminUserAsync(userManager, context, logger);
         await SeedCategoriesAsync(context, logger);
         await SeedProductsAsync(context, logger);
         await SeedBlogAsync(context, logger);
@@ -36,12 +36,31 @@ public static class ApplicationDbContextSeeder
         }
     }
 
-    private static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager, ILogger logger)
+    private static async Task SeedAdminUserAsync(
+        UserManager<ApplicationUser> userManager, ApplicationDbContext context, ILogger logger)
     {
         const string adminEmail = "admin@patrycloset.com";
 
-        if (await userManager.FindByEmailAsync(adminEmail) is not null)
+        var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
+        if (existingAdmin is not null)
+        {
+            // Ensure profile exists even if user was previously seeded without one
+            if (!await context.CustomerProfiles.AnyAsync(p => p.UserId == existingAdmin.Id))
+            {
+                context.CustomerProfiles.Add(new CustomerProfile
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = existingAdmin.Id,
+                    FirstName = existingAdmin.FirstName ?? "Patricia",
+                    LastName = existingAdmin.LastName ?? "Admin",
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = existingAdmin.Id,
+                });
+                await context.SaveChangesAsync();
+                logger.LogInformation("Created CustomerProfile for existing admin user");
+            }
             return;
+        }
 
         var admin = new ApplicationUser
         {
@@ -58,7 +77,19 @@ public static class ApplicationDbContextSeeder
         if (result.Succeeded)
         {
             await userManager.AddToRolesAsync(admin, ["Admin", "Manager"]);
-            logger.LogInformation("Seeded admin user: {Email}", adminEmail);
+
+            context.CustomerProfiles.Add(new CustomerProfile
+            {
+                Id = Guid.NewGuid(),
+                UserId = admin.Id,
+                FirstName = "Patricia",
+                LastName = "Admin",
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = admin.Id,
+            });
+            await context.SaveChangesAsync();
+
+            logger.LogInformation("Seeded admin user with profile: {Email}", adminEmail);
         }
     }
 
@@ -176,6 +207,13 @@ public static class ApplicationDbContextSeeder
             }
 
             var slug = GenerateSlug(p.Name);
+            // Ensure unique slugs — append suffix if duplicate exists
+            var baseSlug = slug;
+            var counter = 2;
+            while (context.Products.Local.Any(x => x.Slug == slug))
+            {
+                slug = $"{baseSlug}-{counter++}";
+            }
 
             var product = new Product
             {
@@ -428,6 +466,211 @@ public static class ApplicationDbContextSeeder
         new("Gafas Aviador Titanio", "Gafas de sol aviador con montura de titanio ultraligero y lentes polarizadas. Iconismo contemporáneo.", 54.99m, null, 0,
             ["https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80"],
             "Accesorios", "gafas", ["Dorado", "Plateado", "Negro"], ["Única"], null, 4.6m, 198, 86, "Luxe Atelier", true),
+
+        // ── New collection (doubling product catalog) ──
+
+        // Mujeres – vestidos
+        new("Vestido Sirena Terciopelo", "Vestido sirena de terciopelo con escote bardot y cola sutil. Pura elegancia nocturna para galas exclusivas.", 129.99m, 159.99m, 19,
+            ["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "vestidos", ["Burdeos", "Negro", "Marino"], ["XS", "S", "M", "L"], "onSale", 4.8m, 312, 96, "Maison Noir", true),
+
+        new("Vestido Camisero Rayas", "Vestido camisero de algodón a rayas marineras con cinturón trenzado. Chic costero para el día a día.", 64.99m, null, 0,
+            ["https://images.unsplash.com/photo-1502716119720-b23a1e3b3a34?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "vestidos", ["Azul", "Blanco", "Rojo"], ["XS", "S", "M", "L", "XL"], null, 4.4m, 145, 78, "Bloom Studio", true),
+
+        // Mujeres – tops
+        new("Blusa Cruzada Seda", "Blusa cruzada de seda habotai con detalle de nudo lateral y mangas tres cuartos. Fluidez sensorial.", 52.99m, null, 0,
+            ["https://images.unsplash.com/photo-1551489186-cf8726f514f8?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "tops", ["Crema", "Rosa", "Lavanda"], ["XS", "S", "M", "L"], "new", 4.5m, 134, 81, "Luxe Atelier", true),
+
+        new("Camiseta Tirantes Canalé", "Camiseta de tirantes finos en algodón canalé con escote redondo. Básico esencial para capas o en solitario.", 22.99m, null, 0,
+            ["https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "tops", ["Blanco", "Negro", "Beige", "Gris"], ["XS", "S", "M", "L", "XL"], null, 4.1m, 210, 72, "Patry Originals", true),
+
+        // Mujeres – pantalones
+        new("Pantalón Paperbag Lino", "Pantalón paperbag de lino italiano con cinturón de tela y bolsillos laterales. Frescura sofisticada.", 58.99m, null, 0,
+            ["https://images.unsplash.com/photo-1551854838-212c50b4c184?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "pantalones", ["Beige", "Oliva", "Blanco"], ["XS", "S", "M", "L"], "trending", 4.6m, 178, 87, "Bloom Studio", true),
+
+        new("Legging Cuero Vegano", "Legging de cuero vegano con cintura alta y acabado mate. Actitud rockera con confort total.", 42.99m, 54.99m, 22,
+            ["https://images.unsplash.com/photo-1548549557-dbe9946621da?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1542060748-10c28b62716f?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "pantalones", ["Negro", "Burdeos"], ["XS", "S", "M", "L", "XL"], "onSale", 4.3m, 267, 83, "Urban Edge", true),
+
+        // Mujeres – faldas
+        new("Falda Tubo Punto Milano", "Falda tubo de punto Milano con abertura posterior y forro interior. Silueta impecable para la oficina.", 47.99m, null, 0,
+            ["https://images.unsplash.com/photo-1577900232427-18219b9166a0?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1551163943-3f6a855d1153?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "faldas", ["Negro", "Gris", "Marino"], ["XS", "S", "M", "L"], null, 4.4m, 119, 74, "Maison Noir", true),
+
+        new("Falda Volantes Gasa", "Falda midi de gasa con volantes en cascada y cintura elástica. Movimiento etéreo para tardes de verano.", 53.99m, null, 0,
+            ["https://images.unsplash.com/photo-1559309761-3ef639a69e7e?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "faldas", ["Coral", "Lavanda", "Crema"], ["XS", "S", "M", "L", "XL"], "new", 4.7m, 93, 79, "Bloom Studio", true),
+
+        // Mujeres – abrigos
+        new("Chaqueta Tweed Bouclé", "Chaqueta de tweed bouclé con ribetes de cadena dorada y bolsillos de solapa. Herencia parisina reinventada.", 159.99m, null, 0,
+            ["https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1544022613-e87ca75a784a?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "abrigos", ["Crema", "Rosa", "Negro"], ["XS", "S", "M", "L"], "bestSeller", 4.9m, 356, 97, "Luxe Atelier", true),
+
+        new("Gabardina Doble Faz", "Gabardina reversible de algodón y lana con doble botonadura. Dos abrigos en uno para la mujer versátil.", 179.99m, 219.99m, 18,
+            ["https://images.unsplash.com/photo-1544923246-77307dd270b5?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1548624313-0396c75e4b14?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "abrigos", ["Camel", "Marino"], ["XS", "S", "M", "L", "XL"], "onSale", 4.6m, 201, 89, "Maison Noir", true),
+
+        // Mujeres – lenceria
+        new("Kimono Seda Floral", "Kimono de seda estampada con ribete de encaje y cinturón a tono. Lujo íntimo para el hogar.", 64.99m, null, 0,
+            ["https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1571513722275-4b41940f54b8?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "lenceria", ["Rosa", "Negro", "Lavanda"], ["S", "M", "L"], "limited", 4.5m, 87, 71, "Bloom Studio", true),
+
+        // Hombres – camisas
+        new("Camisa Estampado Tropical", "Camisa de viscosa con estampado tropical y corte relajado. Espíritu vacacional con actitud urbana.", 46.99m, null, 0,
+            ["https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1594938298603-c8148c4dae47?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "camisas", ["Verde", "Azul", "Negro"], ["S", "M", "L", "XL", "XXL"], "trending", 4.3m, 198, 82, "Urban Edge", true),
+
+        new("Camisa Franela Cuadros", "Camisa de franela suave con estampado de cuadros y corte regular. Calidez y estilo casual premium.", 41.99m, null, 0,
+            ["https://images.unsplash.com/photo-1589310243389-96a5483213a8?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "camisas", ["Rojo", "Verde", "Azul"], ["S", "M", "L", "XL", "XXL"], null, 4.2m, 143, 75, "Denim & Co", true),
+
+        new("Camisa Cuello Italiano Slim", "Camisa de popelín de algodón egipcio con cuello italiano y puños franceses. Sastrería de alto nivel.", 59.99m, null, 0,
+            ["https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1598033129183-c4f50c736c10?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "camisas", ["Blanco", "Azul", "Rosa"], ["S", "M", "L", "XL"], "bestSeller", 4.7m, 289, 93, "Luxe Atelier", true),
+
+        // Hombres – pantalones
+        new("Pantalón Cargo Técnico", "Pantalón cargo de tejido técnico repelente al agua con bolsillos laterales sellados. Funcionalidad urbana.", 64.99m, null, 0,
+            ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "pantalones", ["Negro", "Oliva", "Gris"], ["S", "M", "L", "XL", "XXL"], null, 4.4m, 176, 80, "Urban Edge", true),
+
+        new("Bermuda Lino Premium", "Bermuda de lino lavado con cintura elástica y cordón interior. Elegancia estival sin esfuerzo.", 39.99m, 49.99m, 20,
+            ["https://images.unsplash.com/photo-1565084888279-aca5ecc8f8e5?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "pantalones", ["Beige", "Blanco", "Marino"], ["S", "M", "L", "XL"], "onSale", 4.3m, 112, 73, "Bloom Studio", true),
+
+        // Hombres – chaquetas
+        new("Chaqueta Cuero Biker", "Chaqueta biker de cuero genuino con cierres asimétricos y forro de satén. Rebeldía atemporal.", 199.99m, null, 0,
+            ["https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "chaquetas", ["Negro", "Marrón"], ["S", "M", "L", "XL"], "limited", 4.8m, 345, 95, "Maison Noir", true),
+
+        new("Chaleco Acolchado Ligero", "Chaleco acolchado ultraligero con relleno de plumón reciclado y cuello alto. Capas inteligentes.", 74.99m, null, 0,
+            ["https://images.unsplash.com/photo-1557418669-b282441337d3?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "chaquetas", ["Negro", "Oliva", "Marino"], ["S", "M", "L", "XL", "XXL"], null, 4.5m, 167, 84, "Urban Edge", true),
+
+        new("Sobrecamisa Pana Gruesa", "Sobrecamisa de pana gruesa con bolsillos de parche y botones de madera. Textura y carácter otoñal.", 69.99m, 84.99m, 18,
+            ["https://images.unsplash.com/photo-1608063615781-e2ef8c73d114?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "chaquetas", ["Mostaza", "Marrón", "Verde"], ["S", "M", "L", "XL"], "onSale", 4.4m, 98, 76, "Denim & Co", true),
+
+        // Hombres – calzado
+        new("Mocasín Ante Flexible", "Mocasín de ante con suela flexible de goma y costuras vistas. Confort artesanal para el gentleman moderno.", 89.99m, null, 0,
+            ["https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "calzado", ["Marrón", "Camel", "Negro"], ["39", "40", "41", "42", "43", "44"], null, 4.6m, 215, 88, "Luxe Atelier", true),
+
+        new("Bota Chelsea Cuero", "Bota Chelsea de cuero pulido con elásticos laterales y suela de cuero apilado. Clásico británico renovado.", 119.99m, null, 0,
+            ["https://images.unsplash.com/photo-1638247025967-b4e38f787b76?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1605812860427-4024433a70fd?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "calzado", ["Negro", "Marrón"], ["39", "40", "41", "42", "43", "44"], "bestSeller", 4.8m, 298, 94, "Maison Noir", true),
+
+        // Accesorios – bolsos
+        new("Bandolera Cadena Matelassé", "Bandolera de piel matelassé con cadena dorada y cierre giratorio. Icono de lujo accesible.", 94.99m, null, 0,
+            ["https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "bolsos", ["Negro", "Rojo", "Nude"], ["Única"], "trending", 4.7m, 278, 92, "Luxe Atelier", true),
+
+        new("Bolso Bucket Rafia", "Bolso bucket de rafia trenzada a mano con asa de cuero y forro de lino. Artesanía mediterránea.", 67.99m, null, 0,
+            ["https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "bolsos", ["Beige", "Marrón"], ["Única"], null, 4.3m, 102, 70, "Bloom Studio", true),
+
+        new("Riñonera Nylon Técnico", "Riñonera de nylon técnico con compartimentos múltiples y correa ajustable. Funcionalidad urbana sin renunciar al estilo.", 34.99m, null, 0,
+            ["https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1622560480654-996b3a4db2bb?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "bolsos", ["Negro", "Oliva", "Gris"], ["Única"], null, 4.2m, 156, 77, "Urban Edge", true),
+
+        // Accesorios – joyas
+        new("Anillo Sello Oro Mate", "Anillo de sello en oro de 18k con acabado mate cepillado. Presencia discreta y sofisticada en cada gesto.", 44.99m, null, 0,
+            ["https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "joyas", ["Dorado"], ["Única"], null, 4.5m, 134, 80, "Patry Originals", true),
+
+        new("Pendientes Aro Geométrico", "Pendientes de aro con forma hexagonal en plata 925 bañada en oro. Geometría que enmarca el rostro.", 27.99m, null, 0,
+            ["https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "joyas", ["Dorado", "Plateado"], ["Única"], "new", 4.4m, 167, 82, "Bloom Studio", true),
+
+        // Accesorios – cinturones
+        new("Cinturón Trenzado Cuero", "Cinturón trenzado de tiras de cuero con hebilla plateada redondeada. Artesanía para complementar cualquier look.", 32.99m, null, 0,
+            ["https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1553062407-98eeb64c6a45?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "cinturones", ["Marrón", "Negro", "Camel"], ["Única"], null, 4.3m, 89, 68, "Denim & Co", true),
+
+        new("Cinturón Cadena Doble", "Cinturón de cadena doble con eslabones alternos en oro y plata. Acento de lujo para cintura alta.", 38.99m, 48.99m, 20,
+            ["https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1590548784585-643d2b9f2925?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "cinturones", ["Dorado", "Plateado"], ["Única"], "onSale", 4.1m, 72, 63, "Luxe Atelier", false),
+
+        // Accesorios – gafas
+        new("Gafas Redondas Acetato", "Gafas de sol redondas en acetato bicolor con lentes degradadas. Espíritu bohemio-intelectual.", 49.99m, null, 0,
+            ["https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "gafas", ["Marrón", "Negro", "Camel"], ["Única"], null, 4.5m, 143, 79, "Patry Originals", true),
+
+        new("Gafas Sport Espejo", "Gafas deportivas con lente espejada y montura envolvente ultraligera. Rendimiento y estilo al aire libre.", 42.99m, null, 0,
+            ["https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "gafas", ["Azul", "Rojo", "Negro"], ["Única"], "trending", 4.3m, 187, 83, "Urban Edge", true),
+
+        // Accesorios – relojes
+        new("Reloj Cronógrafo Acero", "Reloj cronógrafo con caja de acero inoxidable y esfera azul marino. Precisión y carácter en la muñeca.", 129.99m, null, 0,
+            ["https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1533139502658-0198f920d8e8?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "relojes", ["Plateado", "Dorado"], ["Única"], "bestSeller", 4.8m, 267, 93, "Maison Noir", true),
+
+        new("Reloj Digital Retro", "Reloj digital con caja dorada y pantalla LED retro. Nostalgia futurista para la muñeca contemporánea.", 39.99m, null, 0,
+            ["https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1495704907664-81f74a7efd36?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "relojes", ["Dorado", "Plateado", "Negro"], ["Única"], null, 4.0m, 98, 65, "Urban Edge", true),
+
+        // Accesorios – sombreros
+        new("Boina Lana Clásica", "Boina de lana merino con forro de satén y ajuste elástico. El toque parisino que transforma cualquier atuendo.", 29.99m, null, 0,
+            ["https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "sombreros", ["Negro", "Burdeos", "Beige"], ["S/M", "L/XL"], null, 4.4m, 112, 74, "Patry Originals", true),
+
+        new("Bucket Hat Algodón", "Sombrero bucket de algodón orgánico con ala ancha y ojales de ventilación. Protección solar con onda.", 24.99m, null, 0,
+            ["https://images.unsplash.com/photo-1588850561407-ed78c334e67a?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "sombreros", ["Beige", "Negro", "Oliva"], ["S/M", "L/XL"], "new", 4.2m, 156, 76, "Denim & Co", true),
+
+        // Extra – Mujeres
+        new("Vestido Punto Acanalado", "Vestido midi de punto acanalado con cuello alto y manga larga. Abrazo de cachemira para los días fríos.", 74.99m, null, 0,
+            ["https://images.unsplash.com/photo-1550639525-c97d455acf70?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1544957992-20514f595d6f?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1583496661160-fb5886a0aaab?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "vestidos", ["Crema", "Gris", "Negro", "Camel"], ["XS", "S", "M", "L"], null, 4.6m, 203, 86, "Maison Noir", true),
+
+        new("Top Halter Satén", "Top halter de satén con escote drapeado y cierre en la nuca. Sensualidad refinada para noches de verano.", 36.99m, 44.99m, 18,
+            ["https://images.unsplash.com/photo-1518622358385-8ea7d0794bf6?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1558171813-4c088753af8f?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "tops", ["Negro", "Coral", "Dorado"], ["XS", "S", "M", "L"], "onSale", 4.5m, 121, 78, "Luxe Atelier", true),
+
+        new("Falda Midi Estampada", "Falda midi de viscosa con estampado abstracto y cintura elástica forrada. Arte en movimiento.", 46.99m, null, 0,
+            ["https://images.unsplash.com/photo-1583846783214-7229a91a3b53?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1560243563-062bfc001d68?auto=format&fit=crop&w=600&q=80"],
+            "Mujeres", "faldas", ["Mostaza", "Verde", "Azul"], ["XS", "S", "M", "L", "XL"], null, 4.3m, 95, 71, "Bloom Studio", false),
+
+        // Extra – Hombres
+        new("Sudadera Capucha Premium", "Sudadera con capucha de algodón orgánico cepillado y cremallera oculta. Lujo informal al máximo nivel.", 54.99m, null, 0,
+            ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "camisas", ["Gris", "Negro", "Marino", "Crema"], ["S", "M", "L", "XL", "XXL"], "trending", 4.5m, 234, 88, "Patry Originals", true),
+
+        new("Pantalón Vestir Slim", "Pantalón de vestir en lana fría con pinzas y corte slim. Elegancia sartorial que no pasa de moda.", 69.99m, null, 0,
+            ["https://images.unsplash.com/photo-1594938298603-c8148c4dae57?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "pantalones", ["Negro", "Gris", "Marino"], ["S", "M", "L", "XL", "XXL"], null, 4.6m, 187, 85, "Luxe Atelier", true),
+
+        new("Zapatilla Running Mesh", "Zapatilla de running con upper de mesh transpirable y mediasuela de espuma reactiva. Ligereza extrema.", 94.99m, 114.99m, 17,
+            ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&q=80"],
+            "Hombres", "calzado", ["Blanco", "Negro", "Rojo"], ["39", "40", "41", "42", "43", "44"], "onSale", 4.7m, 312, 91, "Urban Edge", true),
+
+        // Extra – Accesorios
+        new("Collar Choker Terciopelo", "Gargantilla de terciopelo con colgante de estrella en plata 925. Minimalismo con un guiño celestial.", 22.99m, null, 0,
+            ["https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1515562141589-67f0d364884c?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "joyas", ["Negro", "Burdeos", "Marino"], ["Única"], null, 4.2m, 78, 64, "Patry Originals", true),
+
+        new("Bolso Shopper Canvas", "Bolso shopper de canvas encerado con asas de cuero y base reforzada. Capacidad y resistencia diaria.", 54.99m, null, 0,
+            ["https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1590874103328-eac38a683ce8?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "bolsos", ["Beige", "Oliva", "Marino"], ["Única"], null, 4.4m, 189, 81, "Denim & Co", true),
+
+        new("Reloj Automático Esqueleto", "Reloj automático con esfera esqueleto que muestra el movimiento mecánico. Ingeniería visible para muñecas exigentes.", 299.99m, null, 0,
+            ["https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1539874754764-5a96559165b0?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "relojes", ["Plateado", "Negro", "Dorado"], ["Única"], "limited", 4.9m, 389, 98, "Maison Noir", false),
+
+        new("Sombrero Panamá Trenza Fina", "Sombrero Panamá de paja toquilla trenzada a mano con cinta de grosgrain. Herencia artesanal ecuatoriana.", 59.99m, null, 0,
+            ["https://images.unsplash.com/photo-1521369909029-2afed882baef?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1572307480813-ceb0e59d8325?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "sombreros", ["Crema", "Blanco"], ["S/M", "L/XL"], "bestSeller", 4.7m, 201, 87, "Patry Originals", true),
+
+        new("Gafas Mariposa Oversize", "Gafas de sol oversize con forma mariposa en acetato jaspeado y lentes marrones. Glamour cinematográfico.", 52.99m, 64.99m, 18,
+            ["https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1574258495973-f010dfbb5372?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "gafas", ["Marrón", "Negro", "Camel"], ["Única"], "onSale", 4.4m, 132, 77, "Bloom Studio", true),
+
+        new("Cinturón Reversible Elegante", "Cinturón reversible de cuero con lado liso negro y lado texturizado marrón. Dos looks con una sola pieza.", 36.99m, null, 0,
+            ["https://images.unsplash.com/photo-1553062407-98eeb64c6a56?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1624222247344-550fb60583dd?auto=format&fit=crop&w=600&q=80"],
+            "Accesorios", "cinturones", ["Negro", "Marrón"], ["Única"], null, 4.5m, 145, 79, "Maison Noir", true),
     ];
 
     // ─── Blog Seed Data ───

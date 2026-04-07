@@ -1,9 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { CreditCard, Plus, Trash2, Star, Check, Loader2, ShieldCheck } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { CreditCard, Plus, Trash2, Star, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 import { ThemeContext } from '../../context/ThemeContext';
 import authService from '../../lib/authService';
+import api from '../../lib/api';
+
+const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx';
+const stripePromise = loadStripe(STRIPE_PK);
 
 const BRAND_ICONS = {
     visa: (
@@ -24,43 +30,177 @@ const BRAND_ICONS = {
     ),
 };
 
+const CARD_ELEMENT_OPTS = {
+    style: {
+        base: {
+            fontSize: '16px',
+            fontFamily: '"Inter", -apple-system, sans-serif',
+            color: '#1a1a1a',
+            '::placeholder': { color: '#9ca3af' },
+        },
+        invalid: { color: '#dc2626' },
+    },
+    hidePostalCode: true,
+};
+
+/* ─── Stripe-wrapped Add Card Form ─── */
+function AddCardForm({ onSuccess, onCancel, isDark, t }) {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [adding, setAdding] = useState(false);
+    const [error, setError] = useState(null);
+    const [cardComplete, setCardComplete] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!stripe || !elements) return;
+        setAdding(true);
+        setError(null);
+
+        try {
+            const cardElement = elements.getElement(CardElement);
+            const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+            });
+
+            if (stripeError) {
+                setError(stripeError.message);
+                setAdding(false);
+                return;
+            }
+
+            // Save to backend
+            const { data } = await api.post('/v1/payments/methods', {
+                stripePaymentMethodId: paymentMethod.id,
+            });
+            onSuccess(data.data || {
+                id: paymentMethod.id,
+                brand: paymentMethod.card.brand,
+                last4: paymentMethod.card.last4,
+                expMonth: paymentMethod.card.exp_month,
+                expYear: paymentMethod.card.exp_year,
+                isDefault: false,
+            });
+        } catch (err) {
+            // Fallback: use the Stripe PM data directly even if backend fails
+            setError(err.response?.data?.message || 'Failed to save card. Please try again.');
+        }
+        setAdding(false);
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6 overflow-hidden"
+        >
+            <form onSubmit={handleSubmit} className={`p-5 border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
+                <div className="flex items-center gap-2 mb-4">
+                    <ShieldCheck className="w-5 h-5 text-green-500" />
+                    <span className="text-sm font-medium">{t('account.securePayment', 'Secure payment via Stripe')}</span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    {t('account.stripeNote', 'Card details are securely processed by Stripe. We never store your full card number.')}
+                </p>
+                <div className={`p-4 border mb-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-warm-500 bg-warm-50'}`}>
+                    <CardElement
+                        options={{
+                            ...CARD_ELEMENT_OPTS,
+                            style: {
+                                ...CARD_ELEMENT_OPTS.style,
+                                base: {
+                                    ...CARD_ELEMENT_OPTS.style.base,
+                                    color: isDark ? '#f5f5f5' : '#1a1a1a',
+                                },
+                            },
+                        }}
+                        onChange={(e) => {
+                            setCardComplete(e.complete);
+                            if (e.error) setError(e.error.message);
+                            else setError(null);
+                        }}
+                    />
+                </div>
+                {error && (
+                    <div className="flex items-center gap-2 text-sm text-red-500 mb-4">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{error}</span>
+                    </div>
+                )}
+                <p className="text-[10px] text-gray-400 mb-4 flex items-center gap-1.5">
+                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full" />
+                    Test mode — use card 4242 4242 4242 4242, any future date, any CVC
+                </p>
+                <div className="flex gap-3">
+                    <motion.button
+                        type="submit"
+                        disabled={adding || !stripe || !cardComplete}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
+                    >
+                        {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                        {t('account.addCard', 'Add Card')}
+                    </motion.button>
+                    <button type="button" onClick={onCancel} className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 text-sm">
+                        {t('account.cancel', 'Cancel')}
+                    </button>
+                </div>
+            </form>
+        </motion.div>
+    );
+}
+
 const PaymentsTab = () => {
     const { t } = useTranslation();
     const { isDark } = useContext(ThemeContext);
     const [methods, setMethods] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [adding, setAdding] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const data = await authService.getPaymentMethods();
-                setMethods(data);
-            } catch { /* ignore */ }
-            setLoading(false);
-        };
-        load();
+    const loadMethods = useCallback(async () => {
+        try {
+            // Try real API first
+            const { data } = await api.get('/v1/payments/methods');
+            const items = data.data || data;
+            if (Array.isArray(items)) {
+                setMethods(items);
+                setLoading(false);
+                return;
+            }
+        } catch { /* fall through to mock */ }
+        try {
+            const data = await authService.getPaymentMethods();
+            setMethods(data);
+        } catch { /* ignore */ }
+        setLoading(false);
     }, []);
 
-    const handleAdd = async () => {
-        setAdding(true);
-        try {
-            const newPM = await authService.addPaymentMethod();
-            setMethods(prev => [...prev, newPM]);
-            setShowAddForm(false);
-        } catch { /* ignore */ }
-        setAdding(false);
+    useEffect(() => { loadMethods(); }, [loadMethods]);
+
+    const handleAddSuccess = (newPM) => {
+        setMethods(prev => [...prev, newPM]);
+        setShowAddForm(false);
     };
 
     const handleRemove = async (id) => {
-        await authService.removePaymentMethod(id);
+        try {
+            await api.delete(`/v1/payments/methods/${id}`);
+        } catch {
+            await authService.removePaymentMethod(id);
+        }
         setMethods(prev => prev.filter(m => m.id !== id));
     };
 
     const handleSetDefault = async (id) => {
-        const updated = await authService.setDefaultPaymentMethod(id);
-        setMethods(updated);
+        try {
+            await api.put(`/v1/payments/methods/${id}/default`);
+            setMethods(prev => prev.map(m => ({ ...m, isDefault: m.id === id })));
+        } catch {
+            const updated = await authService.setDefaultPaymentMethod(id);
+            setMethods(updated);
+        }
     };
 
     if (loading) {
@@ -88,40 +228,12 @@ const PaymentsTab = () => {
                 )}
             </div>
 
-            {/* Add form mock */}
+            {/* Add card form with real Stripe Elements */}
             <AnimatePresence>
                 {showAddForm && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mb-6 overflow-hidden"
-                    >
-                        <div className={`p-5 border-2 ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-warm-400 bg-warm-200'}`}>
-                            <div className="flex items-center gap-2 mb-4">
-                                <ShieldCheck className="w-5 h-5 text-green-500" />
-                                <span className="text-sm font-medium">{t('account.securePayment', 'Secure payment via Stripe')}</span>
-                            </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                                {t('account.stripeNote', 'Card details are securely processed by Stripe. We never store your full card number.')}
-                            </p>
-                            <div className={`p-4 border mb-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-warm-500 bg-warm-50'}`}>
-                                <div className="h-10 flex items-center text-sm text-gray-400">
-                                    {t('account.stripeElementPlaceholder', 'Stripe CardElement would render here with real backend')}
-                                </div>
-                            </div>
-                            <div className="flex gap-3">
-                                <motion.button onClick={handleAdd} disabled={adding} whileTap={{ scale: 0.98 }}
-                                    className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider flex items-center gap-2 disabled:opacity-50">
-                                    {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                                    {t('account.addCard', 'Add Card')}
-                                </motion.button>
-                                <button onClick={() => setShowAddForm(false)} className="px-4 py-2.5 border border-warm-400 dark:border-gray-700 text-sm">
-                                    {t('account.cancel', 'Cancel')}
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
+                    <Elements stripe={stripePromise}>
+                        <AddCardForm onSuccess={handleAddSuccess} onCancel={() => setShowAddForm(false)} isDark={isDark} t={t} />
+                    </Elements>
                 )}
             </AnimatePresence>
 
@@ -158,11 +270,13 @@ const PaymentsTab = () => {
                             </div>
                             <div className="flex items-center gap-2">
                                 {!pm.isDefault && (
-                                    <button onClick={() => handleSetDefault(pm.id)} className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                                    <button onClick={() => handleSetDefault(pm.id)} title="Set as default"
+                                        className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
                                         <Star className="w-4 h-4" />
                                     </button>
                                 )}
-                                <button onClick={() => handleRemove(pm.id)} className="text-xs text-red-500 hover:text-red-600">
+                                <button onClick={() => handleRemove(pm.id)} title="Remove card"
+                                    className="text-xs text-red-500 hover:text-red-600">
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
