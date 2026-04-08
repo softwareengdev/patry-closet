@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { X, AlertCircle } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 
 const isDevMode = import.meta.env.DEV;
@@ -128,11 +128,11 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
     const { socialLogin } = useAuth();
     const [loadingProvider, setLoadingProvider] = useState(null);
     const [devDialogProvider, setDevDialogProvider] = useState(null);
+    const googleInitRef = useRef(false);
 
-    // Dev-mode Google uses simulated credentials; real Google is handled separately
     const googleUsesDevMode = isDevMode && !useRealGoogleOAuth;
 
-    const executeSocialLogin = async (provider, token, email, name) => {
+    const executeSocialLogin = useCallback(async (provider, token, email, name) => {
         setLoadingProvider(provider);
         try {
             const params = { provider };
@@ -150,17 +150,27 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
         } finally {
             setLoadingProvider(null);
         }
-    };
+    }, [socialLogin, onSuccess, onError]);
 
-    /* ── Google OAuth credential callback (returns id_token) ── */
-    const handleGoogleSuccess = async (credentialResponse) => {
-        if (credentialResponse?.credential) {
-            await executeSocialLogin('google', credentialResponse.credential);
+    /* ── Google OAuth via useGoogleLogin (avoids multiple initialize calls) ── */
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            if (tokenResponse?.access_token) {
+                await executeSocialLogin('google', tokenResponse.access_token);
+            }
+        },
+        onError: () => {
+            onError?.('Google login failed. Please try again.');
+        },
+        flow: 'implicit',
+    });
+
+    const handleGoogleClick = () => {
+        if (useRealGoogleOAuth) {
+            googleLogin();
+        } else if (isDevMode) {
+            setDevDialogProvider('google');
         }
-    };
-
-    const handleGoogleError = () => {
-        onError?.('Google login failed. Please try again.');
     };
 
     /* ── Apple: dev-mode only (no Apple Developer account configured) ── */
@@ -191,42 +201,22 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
                 </div>
             )}
 
-            {/* Google — real OAuth via GoogleLogin component */}
-            {useRealGoogleOAuth ? (
-                <div className="w-full [&_iframe]:!w-full">
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={handleGoogleError}
-                        theme="outline"
-                        shape="rectangular"
-                        size="large"
-                        width={400}
-                        text={mode === 'register' ? 'signup_with' : 'continue_with'}
-                        locale="es"
-                        useOneTap={false}
-                    />
-                </div>
-            ) : (
-                <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    onClick={() => {
-                        if (isDevMode) {
-                            setDevDialogProvider('google');
-                        }
-                    }}
-                    disabled={!!loadingProvider}
-                    className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-800 hover:bg-warm-200 dark:hover:bg-gray-750 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={`${actionText} Google`}
-                >
-                    {loadingProvider === 'google' ? (
-                        <div className="w-5 h-5 border-2 border-warm-500 border-t-blue-500 rounded-full animate-spin" />
-                    ) : (
-                        <GoogleIcon />
-                    )}
-                    <span className="text-gray-700 dark:text-gray-200">{actionText} Google</span>
-                </motion.button>
-            )}
+            {/* Google — custom styled button (avoids iframe & multiple initialize) */}
+            <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                onClick={handleGoogleClick}
+                disabled={!!loadingProvider}
+                className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-800 hover:bg-warm-200 dark:hover:bg-gray-750 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={`${actionText} Google`}
+            >
+                {loadingProvider === 'google' ? (
+                    <div className="w-5 h-5 border-2 border-warm-500 border-t-blue-500 rounded-full animate-spin" />
+                ) : (
+                    <GoogleIcon />
+                )}
+                <span className="text-gray-700 dark:text-gray-200">{actionText} Google</span>
+            </motion.button>
 
             {/* Apple — dev-mode dialog only (no Apple Developer account) */}
             <motion.button

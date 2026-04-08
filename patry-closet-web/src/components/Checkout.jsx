@@ -1067,15 +1067,14 @@ function Checkout() {
       try {
         // 1. Create/update shipping address on backend
         const addressPayload = {
-          firstName: shippingData.firstName,
-          lastName: shippingData.lastName,
+          fullName: `${shippingData.firstName} ${shippingData.lastName}`.trim(),
           street: shippingData.address1,
-          apartment: shippingData.address2 || '',
+          street2: shippingData.address2 || undefined,
           city: shippingData.city,
-          state: shippingData.state || '',
+          province: shippingData.state || shippingData.city,
           postalCode: shippingData.postalCode,
           country: shippingData.country,
-          phone: shippingData.phone || '',
+          phone: shippingData.phone || undefined,
           label: 'Checkout',
         };
 
@@ -1194,15 +1193,14 @@ function Checkout() {
     setPaymentError(null);
 
     const addressPayload = {
-      firstName: shippingData.firstName,
-      lastName: shippingData.lastName,
+      fullName: `${shippingData.firstName} ${shippingData.lastName}`.trim(),
       street: shippingData.address1,
-      apartment: shippingData.address2 || '',
+      street2: shippingData.address2 || undefined,
       city: shippingData.city,
-      state: shippingData.state || '',
+      province: shippingData.state || shippingData.city,
       postalCode: shippingData.postalCode,
       country: shippingData.country,
-      phone: shippingData.phone || '',
+      phone: shippingData.phone || undefined,
       label: 'Checkout',
     };
 

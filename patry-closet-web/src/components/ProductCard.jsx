@@ -43,7 +43,7 @@ const ColorSwatches = ({ colors, selected, onSelect, compact = false }) => {
     const remaining = colors.length - maxVisible;
 
     return (
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5">
             {visible.map((colorName) => {
                 const hex = COLOR_MAP[colorName] || '#ccc';
                 const isSelected = selected === colorName;
@@ -53,13 +53,13 @@ const ColorSwatches = ({ colors, selected, onSelect, compact = false }) => {
                     <button
                         key={colorName}
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelect(colorName); }}
-                        className={`relative w-5 h-5 rounded-full transition-all duration-200 ${isSelected ? 'ring-2 ring-offset-1 ring-black dark:ring-white scale-110' : 'hover:scale-110'} ${isLight ? 'border border-warm-500' : ''}`}
+                        className={`relative w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-all duration-200 ${isSelected ? 'ring-2 ring-offset-1 ring-black dark:ring-white scale-110' : 'hover:scale-110'} ${isLight ? 'border border-warm-500' : ''}`}
                         style={{ backgroundColor: hex }}
                         title={colorName}
                         aria-label={colorName}
                     >
                         {isSelected && (
-                            <Check className={`absolute inset-0 m-auto w-3 h-3 ${isLight ? 'text-gray-800' : 'text-white'}`} strokeWidth={3} />
+                            <Check className={`absolute inset-0 m-auto w-2.5 h-2.5 sm:w-3 sm:h-3 ${isLight ? 'text-gray-800' : 'text-white'}`} strokeWidth={3} />
                         )}
                     </button>
                 );
@@ -186,12 +186,12 @@ const ProductCard = ({ product, onQuickView }) => {
                 {/* Wishlist button */}
                 <button
                     onClick={handleWishlistClick}
-                    className="absolute top-3 right-3 z-10 p-2 bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-warm-50 dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
+                    className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 p-1.5 sm:p-2 bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-warm-50 dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
                     aria-label={t('wishlist')}
                 >
                     <motion.div animate={wishlistAnimating ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.4 }}>
                         <Heart
-                            className={`w-4 h-4 transition-colors duration-200 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-400'}`}
+                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-200 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600 dark:text-gray-400'}`}
                         />
                     </motion.div>
                 </button>
@@ -205,10 +205,10 @@ const ProductCard = ({ product, onQuickView }) => {
                             exit={{ opacity: 0, y: 8 }}
                             transition={{ duration: 0.2 }}
                             onClick={handleQuickViewClick}
-                            className="absolute top-3 right-12 z-10 p-2 bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-warm-50 dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
+                            className="absolute top-2 right-10 sm:top-3 sm:right-12 z-10 p-1.5 sm:p-2 bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full hover:bg-warm-50 dark:hover:bg-gray-900 transition-all duration-200 shadow-sm"
                             aria-label="Quick view"
                         >
-                            <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
                         </motion.button>
                     )}
                 </AnimatePresence>

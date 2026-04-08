@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import authService from '../lib/authService';
 
 import ProfileTab from '../components/account/ProfileTab';
 import AddressesTab from '../components/account/AddressesTab';
@@ -38,6 +39,22 @@ const AccountPage = () => {
     const pathParts = location.pathname.split('/').filter(Boolean);
     const urlTab = pathParts.length > 1 ? pathParts[1] : null;
     const [activeTab, setActiveTab] = useState(urlTab && TAB_MAP[urlTab] ? urlTab : 'profile');
+    const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+    // Fetch real notification count
+    useEffect(() => {
+        let cancelled = false;
+        const fetchCount = async () => {
+            try {
+                const notifications = await authService.getNotifications();
+                if (!cancelled) {
+                    setUnreadNotifications(notifications.filter(n => !n.read).length);
+                }
+            } catch { /* ignore */ }
+        };
+        fetchCount();
+        return () => { cancelled = true; };
+    }, []);
 
     useEffect(() => {
         const tab = pathParts.length > 1 ? pathParts[1] : 'profile';
@@ -62,15 +79,15 @@ const AccountPage = () => {
         return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     };
 
-    const TABS = [
+    const TABS = useMemo(() => [
         { key: 'profile', label: t('account.profile', 'My Profile') },
         { key: 'addresses', label: t('account.addresses', 'Addresses') },
         { key: 'orders', label: t('account.orders', 'Orders') },
         { key: 'payments', label: t('account.paymentMethods', 'Payments') },
-        { key: 'notifications', label: t('account.notifications', 'Notifications'), badge: 2 },
+        { key: 'notifications', label: t('account.notifications', 'Notifications'), badge: unreadNotifications || undefined },
         { key: 'preferences', label: t('account.preferences', 'Preferences') },
         { key: 'security', label: t('account.security', 'Security') },
-    ];
+    ], [t, unreadNotifications]);
 
     const ActiveComponent = activeTab ? TAB_MAP[activeTab]?.component : null;
 

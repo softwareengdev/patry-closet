@@ -94,10 +94,10 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                         {/* Close button */}
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 z-50 w-10 h-10 flex items-center justify-center bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-md hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
+                            className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-warm-50/80 dark:bg-gray-900/80 backdrop-blur-md hover:bg-warm-200 dark:hover:bg-gray-800 transition-colors"
                             aria-label={t('close')}
                         >
-                            <X className="w-5 h-5" />
+                            <X className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -117,17 +117,17 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                     </TransformComponent>
                                 </TransformWrapper>
 
-                                {/* Nav arrows */}
+                                {/* Nav arrows — always visible on mobile, hover on desktop */}
                                 <button
                                     onClick={() => navigateImage('prev')}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/80 dark:bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
+                                    className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white/80 dark:bg-black/60 backdrop-blur-sm opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
                                     aria-label="Previous image"
                                 >
                                     <ChevronLeft className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => navigateImage('next')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/80 dark:bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
+                                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white/80 dark:bg-black/60 backdrop-blur-sm opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
                                     aria-label="Next image"
                                 >
                                     <ChevronRight className="w-4 h-4" />
@@ -221,12 +221,12 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                     <p className="text-[11px] font-medium uppercase tracking-ultra-wide text-gray-400 dark:text-gray-500 mb-3">
                                         {t('color')}: <span className="text-gray-900 dark:text-white">{selectedColor}</span>
                                     </p>
-                                    <div className="flex gap-2 flex-wrap">
+                                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                                         {availableColors.map(color => (
                                             <button
                                                 key={color}
                                                 onClick={() => setSelectedColor(color)}
-                                                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 transition-all ${
                                                     selectedColor === color
                                                         ? 'border-gray-900 dark:border-white scale-110 ring-2 ring-offset-2 ring-gray-900/20 dark:ring-white/20 ring-offset-warm-50 dark:ring-offset-gray-950'
                                                         : 'border-warm-300 dark:border-gray-700 hover:border-gray-400'
@@ -302,15 +302,15 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                     </div>
 
                                     {/* Trust badges */}
-                                    <div className="flex items-center justify-center gap-6 mt-5 pt-5 border-t border-warm-300 dark:border-gray-800">
-                                        <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gray-400">
-                                            <Truck className="w-3.5 h-3.5" /> {t('freeShipping', 'Free Shipping')}
+                                    <div className="flex items-center justify-center gap-3 sm:gap-6 mt-5 pt-5 border-t border-warm-300 dark:border-gray-800 flex-wrap">
+                                        <span className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">
+                                            <Truck className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> {t('freeShipping', 'Free Shipping')}
                                         </span>
-                                        <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gray-400">
-                                            <RotateCcw className="w-3.5 h-3.5" /> {t('easyReturns', '30-Day Returns')}
+                                        <span className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">
+                                            <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> {t('easyReturns', '30-Day Returns')}
                                         </span>
-                                        <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gray-400">
-                                            <Shield className="w-3.5 h-3.5" /> {t('securePayment', 'Secure')}
+                                        <span className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">
+                                            <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> {t('securePayment', 'Secure')}
                                         </span>
                                     </div>
                                 </div>
