@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { X, AlertCircle } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 
 const isDevMode = import.meta.env.DEV;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const useRealGoogleOAuth = !!GOOGLE_CLIENT_ID;
 
 /* ─── SVG icons for social providers ─── */
 const GoogleIcon = () => (
@@ -118,7 +121,7 @@ const DevModeDialog = ({ provider, onSubmit, onClose }) => {
 };
 
 /**
- * Social login buttons — Google & Apple
+ * Social login buttons — Google (real OAuth or dev-mode) & Apple (dev-mode only)
  */
 const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) => {
     const { t } = useTranslation();
@@ -126,27 +129,17 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
     const [loadingProvider, setLoadingProvider] = useState(null);
     const [devDialogProvider, setDevDialogProvider] = useState(null);
 
-    const handleSocialLogin = async (provider) => {
-        if (isDevMode) {
-            setDevDialogProvider(provider);
-            return;
-        }
-        await executeSocialLogin(provider);
-    };
+    // Dev-mode Google uses simulated credentials; real Google is handled separately
+    const googleUsesDevMode = isDevMode && !useRealGoogleOAuth;
 
-    const handleDevSubmit = async ({ email, name }) => {
-        const provider = devDialogProvider;
-        setDevDialogProvider(null);
-        await executeSocialLogin(provider, email, name);
-    };
-
-    const executeSocialLogin = async (provider, email, name) => {
+    const executeSocialLogin = async (provider, token, email, name) => {
         setLoadingProvider(provider);
         try {
             const params = { provider };
+            if (token) {
+                params.token = token;
+            }
             if (email) {
-                // Dev mode: encode user info as a base64 JSON token for the backend
-                params.token = btoa(JSON.stringify({ email, name }));
                 params.email = email;
                 params.name = name;
             }
@@ -159,39 +152,87 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
         }
     };
 
+    /* ── Google OAuth credential callback (returns id_token) ── */
+    const handleGoogleSuccess = async (credentialResponse) => {
+        if (credentialResponse?.credential) {
+            await executeSocialLogin('google', credentialResponse.credential);
+        }
+    };
+
+    const handleGoogleError = () => {
+        onError?.('Google login failed. Please try again.');
+    };
+
+    /* ── Apple: dev-mode only (no Apple Developer account configured) ── */
+    const handleAppleLogin = () => {
+        if (isDevMode) {
+            setDevDialogProvider('apple');
+            return;
+        }
+        onError?.('Apple Sign-In is not yet configured');
+    };
+
+    /* ── Dev-mode dialog submit (Google fallback & Apple) ── */
+    const handleDevSubmit = async ({ email, name }) => {
+        const provider = devDialogProvider;
+        setDevDialogProvider(null);
+        const token = btoa(JSON.stringify({ email, name }));
+        await executeSocialLogin(provider, token, email, name);
+    };
+
     const actionText = mode === 'register' ? t('auth.signUpWith', 'Sign up with') : t('auth.continueWith', 'Continue with');
 
     return (
         <div className={`flex flex-col gap-3 ${className}`}>
-            {/* Dev Mode badge */}
-            {isDevMode && (
+            {/* Dev Mode badge — only when all social logins are simulated */}
+            {googleUsesDevMode && (
                 <div className="text-center text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 font-semibold">
                     ⚠ Dev Mode — Social login uses simulated credentials
                 </div>
             )}
 
-            {/* Google */}
-            <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                onClick={() => handleSocialLogin('google')}
-                disabled={!!loadingProvider}
-                className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-800 hover:bg-warm-200 dark:hover:bg-gray-750 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={`${actionText} Google`}
-            >
-                {loadingProvider === 'google' ? (
-                    <div className="w-5 h-5 border-2 border-warm-500 border-t-blue-500 rounded-full animate-spin" />
-                ) : (
-                    <GoogleIcon />
-                )}
-                <span className="text-gray-700 dark:text-gray-200">{actionText} Google</span>
-            </motion.button>
+            {/* Google — real OAuth via GoogleLogin component */}
+            {useRealGoogleOAuth ? (
+                <div className="w-full [&_iframe]:!w-full">
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleError}
+                        theme="outline"
+                        shape="rectangular"
+                        size="large"
+                        width={400}
+                        text={mode === 'register' ? 'signup_with' : 'continue_with'}
+                        locale="es"
+                        useOneTap={false}
+                    />
+                </div>
+            ) : (
+                <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => {
+                        if (isDevMode) {
+                            setDevDialogProvider('google');
+                        }
+                    }}
+                    disabled={!!loadingProvider}
+                    className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-warm-50 dark:bg-gray-800 hover:bg-warm-200 dark:hover:bg-gray-750 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`${actionText} Google`}
+                >
+                    {loadingProvider === 'google' ? (
+                        <div className="w-5 h-5 border-2 border-warm-500 border-t-blue-500 rounded-full animate-spin" />
+                    ) : (
+                        <GoogleIcon />
+                    )}
+                    <span className="text-gray-700 dark:text-gray-200">{actionText} Google</span>
+                </motion.button>
+            )}
 
-            {/* Apple */}
+            {/* Apple — dev-mode dialog only (no Apple Developer account) */}
             <motion.button
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                onClick={() => handleSocialLogin('apple')}
+                onClick={handleAppleLogin}
                 disabled={!!loadingProvider}
                 className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-warm-300 dark:border-gray-800 bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label={`${actionText} Apple`}
@@ -204,7 +245,7 @@ const SocialButtons = ({ mode = 'login', onSuccess, onError, className = '' }) =
                 <span className="text-white dark:text-black">{actionText} Apple</span>
             </motion.button>
 
-            {/* Dev Mode Dialog */}
+            {/* Dev Mode Dialog (Google fallback when no client ID + Apple always) */}
             <AnimatePresence>
                 {devDialogProvider && (
                     <DevModeDialog

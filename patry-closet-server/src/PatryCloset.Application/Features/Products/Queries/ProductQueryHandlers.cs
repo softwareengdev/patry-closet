@@ -180,6 +180,7 @@ public sealed class GetProductBySlugQueryHandler(
             .Include(p => p.Images.OrderBy(i => i.SortOrder))
             .Include(p => p.Variants.Where(v => v.IsActive))
             .Include(p => p.Reviews.OrderByDescending(r => r.CreatedAt).Take(5))
+                .ThenInclude(r => r.CustomerProfile)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Slug == request.Slug || p.Id.ToString() == request.Slug, ct);
 
@@ -242,10 +243,13 @@ public sealed class GetProductBySlugQueryHandler(
             RecentReviews = p.Reviews.Select(r => new ProductReviewDto
             {
                 Id = r.Id,
-                AuthorName = "Cliente verificado",
+                AuthorName = r.CustomerProfile != null
+                    ? $"{r.CustomerProfile.FirstName} {r.CustomerProfile.LastName?.FirstOrDefault()}."
+                    : "Cliente verificado",
                 Rating = r.Rating,
                 Title = r.Title,
                 Comment = r.Comment,
+                IsVerifiedPurchase = r.IsVerifiedPurchase,
                 CreatedAt = r.CreatedAt,
             }).ToList().AsReadOnly(),
         };

@@ -1,6 +1,7 @@
 import { useContext, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import FeaturedProducts from './components/FeaturedProducts';
@@ -179,17 +180,30 @@ function AppContent() {
     );
 }
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+function GoogleProviderWrapper({ children }) {
+    if (!GOOGLE_CLIENT_ID) return children;
+    return (
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            {children}
+        </GoogleOAuthProvider>
+    );
+}
+
 function App() {
     return (
-        <ThemeProvider>
-            <AuthProvider>
-                <WishlistProvider>
-                    <CartProvider>
-                        <AppContent />
-                    </CartProvider>
-                </WishlistProvider>
-            </AuthProvider>
-        </ThemeProvider>
+        <GoogleProviderWrapper>
+            <ThemeProvider>
+                <AuthProvider>
+                    <WishlistProvider>
+                        <CartProvider>
+                            <AppContent />
+                        </CartProvider>
+                    </WishlistProvider>
+                </AuthProvider>
+            </ThemeProvider>
+        </GoogleProviderWrapper>
     );
 }
 

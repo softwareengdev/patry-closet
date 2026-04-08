@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, CardElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import {
   Check, ChevronDown, ChevronUp, Lock, Shield,
   CreditCard, Package, MapPin, Mail, Phone,
@@ -14,7 +14,7 @@ import paymentsApi from '../lib/paymentsApi';
 import addressesApi from '../lib/addressesApi';
 import cartApi from '../lib/cartApi';
 
-const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx';
+const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51TJv2WFMUQREQvwJfceI6D2l22BGJVOfpjMUKO0w6YITB9WPPqSx4tEDJlSWFTyzoSbcI1Q2nAN6HI7G2WfBVreD00128PhfjH';
 const stripePromise = loadStripe(STRIPE_PK);
 
 /** Check if user is authenticated (has a valid-looking JWT) */
@@ -509,9 +509,130 @@ function ShippingStep({ data, setData, errors, onContinue, t }) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  ExpressCheckout  (Google Pay / Apple Pay via PaymentRequestButton) */
+/* ------------------------------------------------------------------ */
+function ExpressCheckout({ amount, currency = 'eur', label = 'PATRY\u2661CLOSET', onCreateSession, onSuccess, onError, t: tProp }) {
+  const stripe = useStripe();
+  const [paymentRequest, setPaymentRequest] = useState(null);
+  const [canPay, setCanPay] = useState(false);
+  const prCreatedRef = useRef(false);
+
+  // Refs for callbacks to avoid stale closures in event handlers
+  const callbacksRef = useRef({ onCreateSession, onSuccess, onError });
+  useEffect(() => {
+    callbacksRef.current = { onCreateSession, onSuccess, onError };
+  }, [onCreateSession, onSuccess, onError]);
+
+  // Create PaymentRequest once when stripe is ready
+  useEffect(() => {
+    if (!stripe || !amount || prCreatedRef.current) return;
+    prCreatedRef.current = true;
+
+    const pr = stripe.paymentRequest({
+      country: 'ES',
+      currency: currency.toLowerCase(),
+      total: { label, amount: Math.round(amount * 100) },
+      requestPayerName: true,
+      requestPayerEmail: true,
+    });
+
+    pr.canMakePayment().then((result) => {
+      if (result) {
+        setPaymentRequest(pr);
+        setCanPay(true);
+      }
+    });
+
+    pr.on('paymentmethod', async (ev) => {
+      try {
+        const session = await callbacksRef.current.onCreateSession();
+
+        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+          session.clientSecret,
+          { payment_method: ev.paymentMethod.id },
+          { handleActions: false },
+        );
+
+        if (confirmError) {
+          ev.complete('fail');
+          callbacksRef.current.onError?.(confirmError.message);
+          return;
+        }
+
+        if (paymentIntent.status === 'requires_action') {
+          const { error: actionError, paymentIntent: pi2 } = await stripe.confirmCardPayment(session.clientSecret);
+          if (actionError) {
+            ev.complete('fail');
+            callbacksRef.current.onError?.(actionError.message);
+          } else {
+            ev.complete('success');
+            await paymentsApi.confirmPayment(session.orderId, (pi2 || paymentIntent).id);
+            callbacksRef.current.onSuccess?.(session, pi2 || paymentIntent);
+          }
+        } else {
+          ev.complete('success');
+          await paymentsApi.confirmPayment(session.orderId, paymentIntent.id);
+          callbacksRef.current.onSuccess?.(session, paymentIntent);
+        }
+      } catch (err) {
+        ev.complete('fail');
+        callbacksRef.current.onError?.(err?.message || 'Express checkout failed');
+      }
+    });
+  }, [stripe, amount, currency, label]);
+
+  // Update PaymentRequest total when amount changes
+  useEffect(() => {
+    if (paymentRequest && amount) {
+      paymentRequest.update({
+        total: { label, amount: Math.round(amount * 100) },
+      });
+    }
+  }, [paymentRequest, amount, label]);
+
+  if (!canPay || !paymentRequest) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {tProp('expressCheckout') || 'Express Checkout'}
+        </p>
+        <div className="p-3 bg-warm-50 dark:bg-gray-800 border border-warm-300 dark:border-gray-700 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {tProp('expressCheckoutUnavailable') || 'Google Pay / Apple Pay not available in this browser.'}
+          </p>
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+            {tProp('expressCheckoutHint') || 'Use Chrome on Android for Google Pay or Safari on Mac/iOS for Apple Pay.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        {tProp('expressCheckout') || 'Express Checkout'}
+      </p>
+      <PaymentRequestButtonElement
+        options={{
+          paymentRequest,
+          style: {
+            paymentRequestButton: {
+              type: 'default',
+              theme: 'dark',
+              height: '48px',
+            },
+          },
+        }}
+      />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  PaymentStepContent  (must be rendered inside <Elements>)           */
 /* ------------------------------------------------------------------ */
-function PaymentStepContent({ onBack, onPlaceOrder, processing, paymentError, coupon, applyCoupon, removeCoupon, t }) {
+function PaymentStepContent({ onBack, onPlaceOrder, processing, paymentError, coupon, applyCoupon, removeCoupon, grandTotal, onCreateExpressSession, onExpressSuccess, onExpressError, t }) {
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
@@ -552,34 +673,16 @@ function PaymentStepContent({ onBack, onPlaceOrder, processing, paymentError, co
         {t('payment') || 'Payment'}
       </h2>
 
-      {/* Express Checkout */}
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {t('expressCheckout') || 'Express Checkout'}
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            disabled
-            className="relative flex items-center justify-center gap-2 py-3 bg-black text-white opacity-50 cursor-not-allowed text-sm font-medium"
-          >
-            {'\uF8FF'} Apple Pay
-            <span className="absolute -top-2 -right-2 text-[10px] bg-gray-500 text-white px-1.5 py-0.5 rounded-full leading-tight">
-              {t('comingSoon') || 'Soon'}
-            </span>
-          </button>
-          <button
-            type="button"
-            disabled
-            className="relative flex items-center justify-center gap-2 py-3 bg-warm-50 dark:bg-gray-800 text-black dark:text-white border border-warm-500 dark:border-gray-600 opacity-50 cursor-not-allowed text-sm font-medium"
-          >
-            Google Pay
-            <span className="absolute -top-2 -right-2 text-[10px] bg-gray-500 text-white px-1.5 py-0.5 rounded-full leading-tight">
-              {t('comingSoon') || 'Soon'}
-            </span>
-          </button>
-        </div>
-      </div>
+      {/* Express Checkout (Google Pay / Apple Pay) */}
+      <ExpressCheckout
+        amount={grandTotal}
+        currency="eur"
+        label="PATRY♡CLOSET"
+        onCreateSession={onCreateExpressSession}
+        onSuccess={onExpressSuccess}
+        onError={onExpressError}
+        t={t}
+      />
 
       {/* Divider */}
       <div className="relative">
@@ -1082,6 +1185,65 @@ function Checkout() {
     setCurrentStep(2);
   }, [cartItems, shippingData, getSubtotal, getDiscount, getShipping, getTax, getGrandTotal, coupon, t]);
 
+  // Express checkout: create backend session (address + cart sync + PaymentIntent)
+  const createExpressCheckoutSession = useCallback(async () => {
+    if (!isAuthenticated()) {
+      throw new Error(t('loginRequired') || 'Please log in to use express checkout');
+    }
+    setProcessing(true);
+    setPaymentError(null);
+
+    const addressPayload = {
+      firstName: shippingData.firstName,
+      lastName: shippingData.lastName,
+      street: shippingData.address1,
+      apartment: shippingData.address2 || '',
+      city: shippingData.city,
+      state: shippingData.state || '',
+      postalCode: shippingData.postalCode,
+      country: shippingData.country,
+      phone: shippingData.phone || '',
+      label: 'Checkout',
+    };
+
+    const address = await addressesApi.createAddress(addressPayload);
+    await cartApi.syncLocalCartToServer(cartItems);
+
+    const session = await paymentsApi.createCheckout({
+      shippingAddressId: address.id,
+      shippingMethod: 'Standard',
+      couponCode: coupon?.code || undefined,
+    });
+
+    checkoutSessionRef.current = session;
+    return session;
+  }, [shippingData, cartItems, coupon, t]);
+
+  const handleExpressSuccess = useCallback((session, paymentIntent) => {
+    setCompletedOrder({
+      orderId: session.orderId,
+      orderNumber: session.orderNumber,
+      paymentIntentId: paymentIntent.id,
+      items: [...cartItems],
+      shippingData: { ...shippingData },
+      subtotal: getSubtotal(),
+      discount: getDiscount(),
+      shipping: getShipping(),
+      tax: getTax(),
+      grandTotal: session.amount / 100,
+      coupon,
+      isRealPayment: true,
+    });
+    setProcessing(false);
+    setDirection(1);
+    setCurrentStep(2);
+  }, [cartItems, shippingData, getSubtotal, getDiscount, getShipping, getTax, coupon]);
+
+  const handleExpressError = useCallback((message) => {
+    setPaymentError(message);
+    setProcessing(false);
+  }, []);
+
   const goBack = useCallback(() => {
     setDirection(-1);
     setCurrentStep((s) => Math.max(0, s - 1));
@@ -1216,6 +1378,10 @@ function Checkout() {
                   coupon={coupon}
                   applyCoupon={applyCoupon}
                   removeCoupon={removeCoupon}
+                  grandTotal={getGrandTotal()}
+                  onCreateExpressSession={createExpressCheckoutSession}
+                  onExpressSuccess={handleExpressSuccess}
+                  onExpressError={handleExpressError}
                   t={t}
                 />
               </motion.div>

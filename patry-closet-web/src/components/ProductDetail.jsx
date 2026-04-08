@@ -15,13 +15,17 @@ import {
   RotateCcw,
   Ruler,
   BadgeCheck,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useTranslation } from 'react-i18next';
 import { COLOR_MAP } from '../data/products';
 import { useProduct, useRelatedProducts } from '../hooks/useProducts';
+import { useProductReviews, useReviewSummary, useCreateReview } from '../hooks/useReviews';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
 import SizeGuideModal from './SizeGuideModal';
 import ProductCard from './ProductCard';
 import SEOHead, { getProductSchema, getBreadcrumbSchema } from './SEOHead';
@@ -43,49 +47,6 @@ const getStockForSize = (productId, size) => {
   const hash = (idNum * 7 + size.charCodeAt(0) * 13) % 20;
   return hash < 3 ? 0 : hash < 6 ? 2 : 10;
 };
-
-const MOCK_REVIEWS = [
-  {
-    id: 1,
-    name: 'María García',
-    date: '2024-11-12',
-    rating: 5,
-    text: 'Absolutely love this piece! The fabric quality is superb and the fit is exactly as described. Will definitely order more.',
-    verified: true,
-  },
-  {
-    id: 2,
-    name: 'Laura Sánchez',
-    date: '2024-10-28',
-    rating: 4,
-    text: 'Great quality for the price. The color is vibrant and true to the photos. Shipping was fast too.',
-    verified: true,
-  },
-  {
-    id: 3,
-    name: 'Carlos Ruiz',
-    date: '2024-10-15',
-    rating: 5,
-    text: 'Bought this as a gift and it was a hit. Elegant design and luxurious feel. Highly recommended.',
-    verified: false,
-  },
-  {
-    id: 4,
-    name: 'Ana Martínez',
-    date: '2024-09-30',
-    rating: 4,
-    text: 'Very comfortable to wear all day. The stitching is well done. Only minor issue was the packaging could be nicer.',
-    verified: true,
-  },
-];
-
-const RATING_DISTRIBUTION = [
-  { stars: 5, pct: 65 },
-  { stars: 4, pct: 20 },
-  { stars: 3, pct: 10 },
-  { stars: 2, pct: 3 },
-  { stars: 1, pct: 2 },
-];
 
 const TAB_KEYS = ['details', 'shipping', 'returns', 'reviews'];
 
@@ -127,8 +88,16 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useProduct(id);
   const { data: relatedProducts = [] } = useRelatedProducts(product?.id, 8);
 
+  // Reviews data from API
+  const { data: reviewsData } = useProductReviews(product?.id);
+  const { data: reviewSummary } = useReviewSummary(product?.id);
+  const createReviewMutation = useCreateReview();
+
   const { addToCart, triggerFlyToCart } = useContext(CartContext);
   const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
+
+  let authUser = null;
+  try { authUser = useAuth()?.user; } catch { /* no auth provider */ }
 
   const addBtnRef = useRef(null);
   const reviewsTabRef = useRef(null);
@@ -142,6 +111,42 @@ const ProductDetail = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [addedFeedback, setAddedFeedback] = useState(false);
+
+  // Review form state
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Derive reviews and distribution from API or product data
+  const reviews = reviewsData?.data ?? product?.recentReviews ?? [];
+  const ratingDistribution = reviewSummary?.ratingDistribution
+    ? [5, 4, 3, 2, 1].map((stars) => ({
+        stars,
+        pct: reviewSummary.totalReviews > 0
+          ? Math.round(((reviewSummary.ratingDistribution[stars] ?? 0) / reviewSummary.totalReviews) * 100)
+          : 0,
+      }))
+    : [5, 4, 3, 2, 1].map((stars) => ({ stars, pct: 0 }));
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!product?.id || createReviewMutation.isPending) return;
+    try {
+      await createReviewMutation.mutateAsync({
+        productId: product.id,
+        rating: reviewRating,
+        title: reviewTitle.trim() || null,
+        comment: reviewComment.trim() || null,
+      });
+      setReviewSubmitted(true);
+      setReviewTitle('');
+      setReviewComment('');
+      setReviewRating(5);
+    } catch {
+      // Error handled by mutation
+    }
+  };
 
   // Reset state when product changes
   useEffect(() => {
@@ -813,17 +818,17 @@ const ProductDetail = () => {
                     {/* Big rating */}
                     <div className="flex flex-col items-center gap-1.5">
                       <span className="text-5xl font-bold text-gray-900 dark:text-white">
-                        {product.rating}
+                        {reviewSummary?.averageRating?.toFixed(1) ?? product.rating}
                       </span>
-                      <StarRating rating={product.rating} size={20} />
+                      <StarRating rating={reviewSummary?.averageRating ?? product.rating} size={20} />
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {product.reviewCount} {t('reviews', 'reviews')}
+                        {reviewSummary?.totalReviews ?? product.reviewCount} {t('reviews', 'reviews')}
                       </span>
                     </div>
 
                     {/* Distribution bars */}
                     <div className="flex-1 max-w-sm space-y-2">
-                      {RATING_DISTRIBUTION.map(({ stars, pct }) => (
+                      {ratingDistribution.map(({ stars, pct }) => (
                         <div key={stars} className="flex items-center gap-2 text-sm">
                           <span className="w-6 text-right text-gray-600 dark:text-gray-400 font-medium">
                             {stars}
@@ -847,37 +852,125 @@ const ProductDetail = () => {
 
                   <hr className="border-warm-400 dark:border-gray-800" />
 
+                  {/* Review submission form */}
+                  {authUser && !reviewSubmitted && (
+                    <form onSubmit={handleSubmitReview} className="space-y-4 bg-warm-50 dark:bg-gray-800/50 border border-warm-300 dark:border-gray-700 p-5">
+                      <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-white">
+                        {t('writeReview', 'Write a Review')}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('yourRating', 'Your rating')}:</span>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setReviewRating(s)}
+                              className="p-0.5 transition-transform hover:scale-110"
+                              aria-label={`${s} stars`}
+                            >
+                              <Star
+                                size={20}
+                                className={s <= reviewRating ? 'text-amber-400' : 'text-gray-300 dark:text-gray-600'}
+                                fill={s <= reviewRating ? 'currentColor' : 'none'}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <input
+                        type="text"
+                        value={reviewTitle}
+                        onChange={(e) => setReviewTitle(e.target.value)}
+                        placeholder={t('reviewTitle', 'Review title (optional)')}
+                        maxLength={120}
+                        className="w-full px-3 py-2.5 border border-warm-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-black dark:focus:border-white"
+                      />
+                      <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder={t('reviewComment', 'Share your experience with this product…')}
+                        rows={3}
+                        maxLength={2000}
+                        className="w-full px-3 py-2.5 border border-warm-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-black dark:focus:border-white resize-none"
+                      />
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="submit"
+                          disabled={createReviewMutation.isPending}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium uppercase tracking-wider hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        >
+                          {createReviewMutation.isPending ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Send size={14} />
+                          )}
+                          {t('submitReview', 'Submit Review')}
+                        </button>
+                        {createReviewMutation.isError && (
+                          <span className="text-sm text-red-500">
+                            {createReviewMutation.error?.response?.data?.message || t('reviewError', 'Could not submit review')}
+                          </span>
+                        )}
+                      </div>
+                    </form>
+                  )}
+
+                  {reviewSubmitted && (
+                    <div className="flex items-center gap-2 p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-sm">
+                      <Check size={16} />
+                      {t('reviewSubmitted', 'Thank you! Your review has been submitted.')}
+                    </div>
+                  )}
+
+                  {!authUser && (
+                    <div className="p-4 bg-warm-100 dark:bg-gray-800 border border-warm-300 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
+                      <Link to="/login" className="text-black dark:text-white font-semibold underline underline-offset-2 hover:no-underline">
+                        {t('signIn', 'Sign in')}
+                      </Link>
+                      {' '}{t('toWriteReview', 'to write a review.')}
+                    </div>
+                  )}
+
                   {/* Individual reviews */}
                   <div className="space-y-6">
-                    {MOCK_REVIEWS.map((review) => (
+                    {reviews.length === 0 && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                        {t('noReviews', 'No reviews yet. Be the first to share your experience!')}
+                      </p>
+                    )}
+                    {reviews.map((review) => (
                       <div key={review.id} className="flex gap-4">
                         {/* Avatar */}
                         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warm-400 dark:bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300">
-                          {review.name.charAt(0)}
+                          {(review.authorName || review.name || '?').charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-semibold text-gray-900 dark:text-white text-sm">
-                              {review.name}
+                              {review.authorName || review.name}
                             </span>
-                            {review.verified && (
+                            {(review.isVerifiedPurchase || review.verified) && (
                               <span className="inline-flex items-center gap-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                                <BadgeCheck size={12} /> Verified
+                                <BadgeCheck size={12} /> {t('verified', 'Verified')}
                               </span>
                             )}
                             <span className="text-xs text-gray-400 dark:text-gray-500">
-                              {new Date(review.date).toLocaleDateString('en-US', {
+                              {new Date(review.createdAt || review.date).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'short',
                                 day: 'numeric',
                               })}
                             </span>
                           </div>
+                          {review.title && (
+                            <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">{review.title}</p>
+                          )}
                           <div className="mt-1">
                             <StarRating rating={review.rating} size={14} />
                           </div>
                           <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                            {review.text}
+                            {review.comment || review.text}
                           </p>
                         </div>
                       </div>

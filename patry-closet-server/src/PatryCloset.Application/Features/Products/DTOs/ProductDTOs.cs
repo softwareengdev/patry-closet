@@ -82,6 +82,7 @@ public sealed record ProductReviewDto
     public int Rating { get; init; }
     public string? Title { get; init; }
     public string? Comment { get; init; }
+    public bool IsVerifiedPurchase { get; init; }
     public DateTime CreatedAt { get; init; }
 }
 
