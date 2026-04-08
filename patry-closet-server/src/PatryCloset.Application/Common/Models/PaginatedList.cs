@@ -1,12 +1,24 @@
+using System.Text.Json.Serialization;
+
 namespace PatryCloset.Application.Common.Models;
 
 public class PaginatedList<T>
 {
-    public IReadOnlyList<T> Items { get; }
-    public int PageNumber { get; }
-    public int PageSize { get; }
-    public int TotalPages { get; }
-    public int TotalCount { get; }
+    public IReadOnlyList<T> Items { get; init; }
+    public int PageNumber { get; init; }
+    public int PageSize { get; init; }
+    public int TotalPages { get; init; }
+    public int TotalCount { get; init; }
+
+    [JsonConstructor]
+    public PaginatedList(IReadOnlyList<T> items, int totalCount, int pageNumber, int pageSize, int totalPages)
+    {
+        Items = items;
+        TotalCount = totalCount;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+        TotalPages = totalPages;
+    }
 
     public PaginatedList(IReadOnlyList<T> items, int count, int pageNumber, int pageSize)
     {

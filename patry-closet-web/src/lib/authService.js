@@ -646,12 +646,12 @@ const authService = {
         }
     },
 
-    async resetPassword(token, newPassword) {
+    async resetPassword(token, newPassword, email = '') {
         if (useMock) return mockAuth.resetPassword(token);
 
         try {
             const { data: res } = await api.post('/v1/auth/reset-password', {
-                email: '',
+                email,
                 token,
                 newPassword,
                 confirmNewPassword: newPassword,
@@ -920,8 +920,20 @@ const authService = {
     async updateAddresses(addresses) {
         if (!useMock) {
             try {
-                const { data } = await api.put('/v1/auth/profile/addresses', { addresses });
-                return data.data ?? addresses;
+                // Use individual address endpoints - create/update each address
+                const results = [];
+                for (const addr of addresses) {
+                    if (addr.id && typeof addr.id === 'string' && addr.id.includes('-')) {
+                        // Existing address (GUID) — update
+                        const { data } = await api.put(`/v1/addresses/${addr.id}`, addr);
+                        results.push(data.data);
+                    } else {
+                        // New address — create
+                        const { data } = await api.post('/v1/addresses', addr);
+                        results.push(data.data);
+                    }
+                }
+                return results.length ? results : addresses;
             } catch (err) {
                 activateMockOnNetworkError(err);
             }

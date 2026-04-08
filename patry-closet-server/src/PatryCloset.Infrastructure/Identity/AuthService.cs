@@ -19,6 +19,8 @@ public sealed class AuthService : IAuthService
     private readonly ApplicationDbContext _dbContext;
     private readonly IFileStorageService _fileStorageService;
     private readonly ISocialTokenValidator _socialTokenValidator;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
     private readonly int _refreshTokenExpirationDays;
 
     public AuthService(
@@ -28,14 +30,17 @@ public sealed class AuthService : IAuthService
         ApplicationDbContext dbContext,
         IConfiguration configuration,
         IFileStorageService fileStorageService,
-        ISocialTokenValidator socialTokenValidator)
+        ISocialTokenValidator socialTokenValidator,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _logger = logger;
         _dbContext = dbContext;
+        _configuration = configuration;
         _fileStorageService = fileStorageService;
         _socialTokenValidator = socialTokenValidator;
+        _emailService = emailService;
         _refreshTokenExpirationDays = int.TryParse(
             configuration["Jwt:RefreshTokenExpirationDays"], out var days) ? days : 7;
     }
@@ -225,9 +230,23 @@ public sealed class AuthService : IAuthService
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        // TODO: Send email via IEmailService with reset link
-        // For now, log the token (dev only)
-        _logger.LogInformation("Password reset token generated for {Email}: {Token}", email, token);
+        // Build reset link using frontend URL
+        var frontendUrl = _configuration["Cors:AllowedOrigins:0"] ?? "http://localhost:5173";
+        var encodedToken = Uri.EscapeDataString(token);
+        var encodedEmail = Uri.EscapeDataString(email);
+        var resetLink = $"{frontendUrl}/reset-password?token={encodedToken}&email={encodedEmail}";
+
+        try
+        {
+            await _emailService.SendPasswordResetAsync(email, resetLink, ct);
+            _logger.LogInformation("Password reset email sent to {Email}", email);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send password reset email to {Email}", email);
+            // Still log token as fallback for development
+            _logger.LogInformation("Password reset token for {Email}: {Token}", email, token);
+        }
 
         return Result.Success();
     }

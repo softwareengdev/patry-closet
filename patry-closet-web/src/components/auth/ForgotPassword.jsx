@@ -13,6 +13,7 @@ const ForgotPassword = () => {
     const [searchParams] = useSearchParams();
     const { forgotPassword, resetPassword } = useAuth();
     const resetToken = searchParams.get('token');
+    const resetEmail = searchParams.get('email') || '';
 
     const [phase, setPhase] = useState(resetToken ? 'reset' : 'request');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +54,7 @@ const ForgotPassword = () => {
         setIsSubmitting(true);
         setError(null);
         try {
-            await resetPassword(resetToken, data.password);
+            await resetPassword(resetToken, data.password, resetEmail);
             setPhase('done');
         } catch (err) {
             setError(err?.response?.data?.message || 'Invalid or expired reset link.');

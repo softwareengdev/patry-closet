@@ -121,6 +121,25 @@ public sealed class ProductsController(ISender mediator) : ControllerBase
         return Ok(ApiResponse<IReadOnlyList<ProductListDto>>.Ok(result.Value!));
     }
 
+    /// <summary>Get related products by slug (resolves slug to ID first).</summary>
+    [HttpGet("{slug}/related")]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ProductListDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRelatedProductsBySlug(
+        string slug, [FromQuery] int count = 8, CancellationToken ct = default)
+    {
+        // Resolve slug to product detail first
+        var productResult = await mediator.Send(new GetProductBySlugQuery(slug), ct);
+        if (!productResult.IsSuccess)
+            return NotFound(ApiResponse<object>.Fail(productResult.Error!));
+
+        var result = await mediator.Send(new GetRelatedProductsQuery(productResult.Value!.Id, count), ct);
+        if (!result.IsSuccess)
+            return NotFound(ApiResponse<object>.Fail(result.Error!));
+
+        return Ok(ApiResponse<IReadOnlyList<ProductListDto>>.Ok(result.Value!));
+    }
+
     // ─── Admin Endpoints ───
 
     /// <summary>Create a new product (Admin only).</summary>

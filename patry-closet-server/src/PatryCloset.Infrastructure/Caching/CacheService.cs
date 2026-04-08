@@ -1,11 +1,12 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using PatryCloset.Application.Common.Interfaces;
 using StackExchange.Redis;
 
 namespace PatryCloset.Infrastructure.Caching;
 
-public class CacheService(IDistributedCache cache, IConnectionMultiplexer? redis = null) : ICacheService
+public class CacheService(IDistributedCache cache, ILogger<CacheService> logger, IConnectionMultiplexer? redis = null) : ICacheService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -15,7 +16,18 @@ public class CacheService(IDistributedCache cache, IConnectionMultiplexer? redis
     public async Task<T?> GetAsync<T>(string key, CancellationToken ct = default)
     {
         var data = await cache.GetStringAsync(key, ct);
-        return data is null ? default : JsonSerializer.Deserialize<T>(data, JsonOptions);
+        if (data is null) return default;
+
+        try
+        {
+            return JsonSerializer.Deserialize<T>(data, JsonOptions);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogWarning(ex, "Cache deserialization failed for key {Key}, removing stale entry", key);
+            await cache.RemoveAsync(key, ct);
+            return default;
+        }
     }
 
     public async Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken ct = default)

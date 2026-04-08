@@ -196,8 +196,8 @@ export const AuthProvider = ({ children }) => {
         return authService.forgotPassword(email);
     }, []);
 
-    const resetPassword = useCallback(async (token, newPassword) => {
-        return authService.resetPassword(token, newPassword);
+    const resetPassword = useCallback(async (token, newPassword, email = '') => {
+        return authService.resetPassword(token, newPassword, email);
     }, []);
 
     /* ─── Email verification ─── */
